@@ -102,9 +102,15 @@ export function ConsoleShell({
           >
             <i className={`${collapsed ? 'pi pi-angle-right' : 'pi pi-angle-left'} text-[1.1rem]`}></i>
           </button>
-          <div className="flex items-center justify-center gap-2">
+          <div className="flex items-center justify-center">
             <img src="/images/okdp-notext.svg" alt="okdp" className="h-auto w-6" />
-            <div className="flex max-w-[150px] flex-row items-baseline gap-1 overflow-hidden leading-none whitespace-nowrap transition-[max-width,margin] duration-400 ease-smooth">
+            <div
+              className={`flex flex-row items-baseline gap-1 overflow-hidden leading-none whitespace-nowrap transition-[max-width,margin] duration-400 ease-smooth ${
+                collapsed
+                  ? 'ml-0 max-w-0'
+                  : 'ml-2 max-w-[150px] max-lg:ml-0 max-lg:max-w-0'
+              } max-md:ml-2 max-md:max-w-[150px]`}
+            >
               <span className="text-[1.075rem] font-bold tracking-[-0.02em] text-fg">okdp</span>
               <span className="text-[1.075rem] font-normal text-fg-secondary">console</span>
             </div>

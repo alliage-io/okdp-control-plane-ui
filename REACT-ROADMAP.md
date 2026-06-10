@@ -55,8 +55,9 @@ in the same commit that completes the step.
   (create/delete), identity page with users and groups tabs.
 - [x] **11. Project console shell** — project layout (sidebar, project
   selector, user menu) and project home.
-- [ ] **12. Services feature** — services page, service list, deploy / edit /
-  detail pages, pod list, pod log viewer (SSE follow), placeholder page.
+- [x] **12. Services feature** — services page, service list, deploy / edit /
+  detail pages, pod list, pod log viewer (SSE follow). (The unused
+  `ServicePlaceholderPageComponent` was dead code and is dropped.)
 - [ ] **13. Secret stores feature** — secrets page, secret store list,
   external secret list.
 - [ ] **14. Spark feature** — Spark applications page, list, submit / edit /

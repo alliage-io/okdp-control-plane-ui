@@ -43,12 +43,14 @@ in the same commit that completes the step.
   list merged from REST + SSE events, current project selection persisted in
   `sessionStorage`, consistency effect (deleted project fallback), and the
   project-context guard equivalent (redirect to last/first project).
-- [ ] **7. Routing skeleton** — full route table with `React.lazy` loaded
+- [x] **7. Routing skeleton** — full route table with `React.lazy` loaded
   pages, per-route data (title / serviceFilter / deployLabel / emptyMessage),
   guards wired, temporary placeholders for not-yet-ported pages.
 - [ ] **8. Shared components** — `DynamicSchemaForm` and `ProfileListEditor`
   rewritten with PrimeReact.
-- [ ] **9. Landing & welcome** — login landing page and welcome component.
+- [ ] **9. Landing page** — login landing page. (The Angular
+  `WelcomeComponent` and `ServicePlaceholderPageComponent` were dead code —
+  referenced by no route or component — and are dropped, not ported.)
 - [ ] **10. Admin space** — admin layout shell, admin home, project list
   (create/delete), identity page with users and groups tabs.
 - [ ] **11. Project console shell** — project layout (sidebar, project

@@ -34,7 +34,7 @@ in the same commit that completes the step.
   401/403 → forced logout hook) and ports of all API services:
   project, service, spark, secret-store, external-secret, identity;
   shared SSE subscription helper for `EventSource` streams.
-- [ ] **5. Authentication** — `oidc-client-ts` based `AuthProvider` exposing
+- [x] **5. Authentication** — `oidc-client-ts` based `AuthProvider` exposing
   `useAuth()` (ready / isAuthenticated / profile / roles / login / logout /
   forceLogout / token), silent renew, `autoLogin` query param support,
   deep-link return-URL restore, `<RequireAuth>` route guard and post-login

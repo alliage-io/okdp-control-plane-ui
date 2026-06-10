@@ -92,6 +92,6 @@ stores, Spark, tests, cleanup). `feat/tailwind` will be **rebased onto
   is committed and this branch is rebased.
 - [x] **14. (post-rebase) Secret stores & Spark features** — same, after
   REACT-ROADMAP steps 13–14.
-- [ ] **15. Cleanup** — fold what remains of `src/styles/` into a single
+- [x] **15. Cleanup** — fold what remains of `src/styles/` into a single
   entry stylesheet (`variables.css` tokens + Tailwind imports), remove
   unused keyframes/utilities, final `lint` + `build` + `test` green.

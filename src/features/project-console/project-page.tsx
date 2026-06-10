@@ -111,7 +111,7 @@ export default function ProjectPage() {
   const headerExtras = (
     <>
       {context.availableProjects.length > 0 && (
-        /* project-switcher scopes the Dropdown overrides in primereact-overrides.css */
+        /* project-switcher scopes the Dropdown overrides in the PrimeReact overrides section of styles.css */
         <div className="project-switcher flex items-center">
           <Dropdown
             value={context.currentProject}

@@ -20,6 +20,10 @@
     line-height: var(--db-line-height-base);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Theme (light/dark) switch transition */
+    transition:
+      background-color var(--db-transition-fast),
+      border-color var(--db-transition-fast);
   }
 
   main {
@@ -73,17 +77,6 @@
       scroll-behavior: auto !important;
     }
   }
-}
-
-/* Theme transition — only on elements that need it, not every DOM node */
-body,
-.sidebar,
-.main-layout,
-.main-header,
-.nav-link {
-  transition:
-    background-color var(--db-transition-fast),
-    border-color var(--db-transition-fast);
 }
 
 /* Keyframe animations — still referenced by legacy component CSS */
@@ -211,10 +204,6 @@ body,
 button,
 [role='button'],
 a[href],
-.nav-link,
-.topbar-btn,
-.toggle-btn,
-.user-card,
 .mode-btn {
   cursor: pointer;
 }

@@ -72,7 +72,7 @@ stores, Spark, tests, cleanup). `feat/tailwind` will be **rebased onto
   (`welcome-banner`, `section-heading`, `quick-actions`/`action-card`,
   `empty-state`, `cta-button`) into Tailwind-styled shared React components
   used by admin-home and project-home; delete the CSS rules.
-- [ ] **6. Layout** — migrate `styles/components/layout.css` (sidebar,
+- [x] **6. Layout** — migrate `styles/components/layout.css` (sidebar,
   header, nav, main layout) into utility classes in the admin and project
   console shell JSX.
 - [ ] **7. Design components** — migrate `styles/components/okdp-design.css`

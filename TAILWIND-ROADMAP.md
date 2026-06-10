@@ -80,7 +80,7 @@ stores, Spark, tests, cleanup). `feat/tailwind` will be **rebased onto
 - [x] **8. PrimeReact-adjacent CSS** — `tables.css`, `dialogs.css`,
   `forms.css`: convert wrapper/custom classes to utilities; anything that
   styles PrimeReact internals moves to `--p-*` variables where possible.
-- [ ] **9. Shared components** — `dynamic-schema-form.css`,
+- [x] **9. Shared components** — `dynamic-schema-form.css`,
   `profile-list-editor.css` → utilities in their TSX; delete the files.
 - [ ] **10. Landing page** — `features/landing/home-page.css` → utilities.
 - [ ] **11. Admin space** — `admin-page.css`, `home/admin-home.css`,

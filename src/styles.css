@@ -13,6 +13,7 @@
 @import './styles/components/dialogs.css';
 @import './styles/components/forms.css';
 @import './styles/components/okdp-design.css';
+@import './styles/components/primereact-overrides.css';
 
 /* Dark mode is class-based (body.dark-mode), not media-query based */
 @custom-variant dark (&:where(body.dark-mode, body.dark-mode *));

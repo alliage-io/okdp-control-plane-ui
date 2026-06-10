@@ -1,0 +1,33 @@
+/* PrimeReact-internal overrides that cannot be expressed as Tailwind
+   utilities: the PrimeReact 10 theme stylesheet is unlayered, so it would
+   out-rank utility-layer rules, and this PrimeReact major has no --p-*
+   design tokens to target instead. Keep this file small. */
+
+/* DynamicSchemaForm — invalid-field highlight on PrimeReact inputs */
+.dsf-root .field-invalid,
+.dsf-root .field-invalid.p-inputtext {
+  border-color: var(--db-danger, #dc2626) !important;
+  background-color: rgba(220, 38, 38, 0.04);
+}
+
+/* ProfileListEditor — borderless inline Panel for the Resources section */
+.resource-panel .p-panel-header {
+  padding: 10px 0;
+  background: transparent;
+  border: none;
+  border-top: 1px solid var(--db-border-light);
+}
+
+.resource-panel .p-panel-content {
+  padding: 14px 0 0 0;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.resource-panel .p-panel-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--db-text-secondary);
+}

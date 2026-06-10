@@ -1,58 +1,78 @@
 /* Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
 
-/* Base Reset */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
+/* Base layer — participates in the cascade below unlayered component CSS,
+   after Tailwind's preflight (this file is imported after 'tailwindcss'). */
+@layer base {
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background-color: var(--db-bg-secondary);
+    background-image: radial-gradient(
+      circle at top 30%,
+      rgba(65, 146, 143, 0.05) 0%,
+      transparent 60%
+    );
+    background-attachment: fixed;
+    color: var(--db-text-primary);
+    font-family: 'DM Sans', 'Inter', 'Segoe UI', system-ui, sans-serif;
+    font-size: var(--db-font-size-base);
+    line-height: var(--db-line-height-base);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 
-body {
-  margin: 0;
-  min-height: 100vh;
-  background-color: var(--db-bg-secondary);
-  background-image: radial-gradient(
-    circle at top 30%,
-    rgba(65, 146, 143, 0.05) 0%,
-    transparent 60%
-  );
-  background-attachment: fixed;
-  color: var(--db-text-primary);
-  font-family: 'DM Sans', 'Inter', 'Segoe UI', system-ui, sans-serif;
-  font-size: var(--db-font-size-base);
-  line-height: var(--db-line-height-base);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+  main {
+    min-height: 100vh;
+  }
 
-main {
-  min-height: 100vh;
-}
+  /* Smooth scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
 
-/* Smooth scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
 
-::-webkit-scrollbar-track {
-  background: transparent;
-}
+  ::-webkit-scrollbar-thumb {
+    background: var(--db-border-color);
+    border-radius: 3px;
+  }
 
-::-webkit-scrollbar-thumb {
-  background: var(--db-border-color);
-  border-radius: 3px;
-}
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--db-text-secondary);
+  }
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--db-text-secondary);
-}
+  /* Selection */
+  ::selection {
+    background: var(--db-primary-100);
+    color: var(--db-primary-800);
+  }
 
-/* Selection */
-::selection {
-  background: var(--db-primary-100);
-  color: var(--db-primary-800);
+  /* Focus-visible for keyboard accessibility */
+  :focus-visible {
+    outline: 2px solid var(--db-primary);
+    outline-offset: 2px;
+  }
+
+  button:focus:not(:focus-visible),
+  a:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* Accessibility: Reduced Motion */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
 
 /* Theme transition — only on elements that need it, not every DOM node */
@@ -66,7 +86,7 @@ body,
     border-color var(--db-transition-fast);
 }
 
-/* Keyframe animations */
+/* Keyframe animations — still referenced by legacy component CSS */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -119,40 +139,28 @@ body,
 }
 
 /* ========== Utilities ========== */
-.animate-in {
+@utility animate-in {
   animation: fadeInUp 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.animate-in-delay-1 {
+@utility animate-in-delay-1 {
   animation-delay: 0.06s;
   animation-fill-mode: backwards;
 }
-.animate-in-delay-2 {
+
+@utility animate-in-delay-2 {
   animation-delay: 0.12s;
   animation-fill-mode: backwards;
 }
-.animate-in-delay-3 {
+
+@utility animate-in-delay-3 {
   animation-delay: 0.18s;
   animation-fill-mode: backwards;
 }
-.animate-in-delay-4 {
+
+@utility animate-in-delay-4 {
   animation-delay: 0.24s;
   animation-fill-mode: backwards;
-}
-
-.w-full {
-  width: 100%;
-}
-
-/* Focus-visible for keyboard accessibility */
-:focus-visible {
-  outline: 2px solid var(--db-primary);
-  outline-offset: 2px;
-}
-
-button:focus:not(:focus-visible),
-a:focus:not(:focus-visible) {
-  outline: none;
 }
 
 /* ========== Shared Component Patterns ========== */
@@ -373,18 +381,6 @@ a:focus:not(:focus-visible) {
 
 .cta-button:hover {
   background: var(--db-primary-hover);
-}
-
-/* ========== Accessibility: Reduced Motion ========== */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
 }
 
 /* ========== Cursor ========== */

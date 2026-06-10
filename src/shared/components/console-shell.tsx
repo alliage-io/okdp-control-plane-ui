@@ -5,6 +5,7 @@ import { Avatar } from 'primereact/avatar';
 import { Menu } from 'primereact/menu';
 import type { MenuItem } from 'primereact/menuitem';
 import { useAuth } from '../../core/auth/auth-context';
+import { useTheme, type ThemeMode } from '../../core/theme/theme-context';
 import { environment } from '../../config/environment';
 import { sideNavIconClass, sideNavLabelClass, sideNavLinkClass } from './console-nav-classes';
 
@@ -62,6 +63,7 @@ export function ConsoleShell({
   children,
 }: ConsoleShellProps) {
   const auth = useAuth();
+  const { theme, setTheme } = useTheme();
   const menuRef = useRef<Menu>(null);
 
   const displayName = auth.profile?.firstName ?? auth.profile?.username ?? 'User';
@@ -69,7 +71,34 @@ export function ConsoleShell({
   const last = (auth.profile?.lastName ?? '').charAt(0).toUpperCase();
   const initials = `${first}${last || ''}`;
 
+  const themeOption = (mode: ThemeMode, icon: string, label: string): MenuItem => ({
+    label,
+    icon,
+    command: () => setTheme(mode),
+    // Custom template to append the active-mode check mark. Templates replace
+    // the .p-menuitem-content wrapper too, so it must be reproduced for the
+    // theme's padding/hover rules to keep applying.
+    template: (item, options) => (
+      <div className="p-menuitem-content">
+        <a className={options.className} onClick={options.onClick}>
+          <span className={options.iconClassName}></span>
+          <span className={options.labelClassName}>{item.label}</span>
+          {theme === mode && <i className="pi pi-check ml-auto text-[0.7rem] text-primary"></i>}
+        </a>
+      </div>
+    ),
+  });
+
   const profileMenu: MenuItem[] = [
+    {
+      label: 'Theme',
+      items: [
+        themeOption('system', 'pi pi-desktop', 'System'),
+        themeOption('light', 'pi pi-sun', 'Light'),
+        themeOption('dark', 'pi pi-moon', 'Dark'),
+      ],
+    },
+    { separator: true },
     {
       label: 'Sign out',
       icon: 'pi pi-sign-out',

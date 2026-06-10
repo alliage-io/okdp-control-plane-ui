@@ -10,6 +10,7 @@
      6. Page layout    — legacy page-level patterns (top-bar, buttons)
      7. Design system  — okdp @utility classes (services / spark)
      8. PrimeReact     — unlayered overrides the theme CSS requires
+     9. Dark mode      — PrimeReact surfaces re-skinned via --db-* tokens
    ============================================================ */
 
 /* Cascade layer order. The PrimeReact theme ships its component styles
@@ -1841,4 +1842,368 @@ button.create-btn:hover,
   font-size: 13px;
   font-weight: 500;
   color: var(--db-text-secondary);
+}
+
+/* ============================================================
+   9. Dark mode — PrimeReact component surfaces
+   ============================================================
+   variables.css flips the --db-* tokens under body.dark-mode, which
+   covers everything the app styles itself. The lara-light theme,
+   however, hardcodes light surfaces inside @layer primereact; the
+   unlayered overrides below re-skin the components the app uses so
+   they follow the flipped tokens. */
+
+/* ===== Popup menus ===== */
+body.dark-mode .p-menu {
+  background: var(--db-bg-elevated);
+  color: var(--db-text-primary);
+  border: 1px solid var(--db-border-color);
+}
+
+body.dark-mode .p-menu .p-menuitem > .p-menuitem-content {
+  color: var(--db-text-primary);
+}
+
+body.dark-mode .p-menu .p-menuitem > .p-menuitem-content .p-menuitem-link .p-menuitem-text,
+body.dark-mode .p-menu .p-menuitem > .p-menuitem-content .p-menuitem-link .p-menuitem-icon {
+  color: var(--db-text-primary);
+}
+
+body.dark-mode .p-menu .p-menuitem:not(.p-highlight):not(.p-disabled).p-focus > .p-menuitem-content,
+body.dark-mode
+  .p-menu
+  .p-menuitem:not(.p-highlight):not(.p-disabled)
+  > .p-menuitem-content:hover {
+  background: var(--db-bg-tertiary);
+  color: var(--db-text-primary);
+}
+
+body.dark-mode
+  .p-menu
+  .p-menuitem:not(.p-highlight):not(.p-disabled).p-focus
+  > .p-menuitem-content
+  .p-menuitem-link
+  .p-menuitem-text,
+body.dark-mode
+  .p-menu
+  .p-menuitem:not(.p-highlight):not(.p-disabled)
+  > .p-menuitem-content:hover
+  .p-menuitem-link
+  .p-menuitem-text {
+  color: var(--db-text-primary);
+}
+
+body.dark-mode .p-menu .p-submenu-header {
+  background: transparent;
+  color: var(--db-text-muted);
+}
+
+body.dark-mode .p-menu .p-menu-separator {
+  border-top-color: var(--db-border-color);
+}
+
+/* ===== Dialogs (incl. ConfirmDialog) ===== */
+body.dark-mode .p-dialog .p-dialog-header,
+body.dark-mode .p-dialog .p-dialog-content,
+body.dark-mode .p-dialog .p-dialog-footer {
+  background: var(--db-bg-elevated);
+  color: var(--db-text-primary);
+}
+
+body.dark-mode .p-dialog .p-dialog-header .p-dialog-title {
+  color: var(--db-text-primary);
+}
+
+body.dark-mode .p-dialog .p-dialog-header .p-dialog-header-icon {
+  color: var(--db-text-secondary);
+}
+
+body.dark-mode .p-dialog .p-dialog-header .p-dialog-header-icon:enabled:hover {
+  background: var(--db-bg-tertiary);
+  color: var(--db-text-primary);
+}
+
+body.dark-mode .p-confirm-dialog .p-confirm-dialog-icon,
+body.dark-mode .p-confirm-dialog .p-confirm-dialog-message {
+  color: var(--db-text-primary);
+}
+
+/* ===== Toasts ===== */
+body.dark-mode .p-toast .p-toast-message {
+  background: var(--db-bg-elevated);
+  color: var(--db-text-primary);
+  border: 1px solid var(--db-border-color);
+  border-left-width: 4px;
+}
+
+body.dark-mode .p-toast .p-toast-message .p-toast-summary,
+body.dark-mode .p-toast .p-toast-message .p-toast-detail,
+body.dark-mode .p-toast .p-toast-message .p-toast-icon-close {
+  color: var(--db-text-primary);
+}
+
+body.dark-mode .p-toast .p-toast-message.p-toast-message-success {
+  border-left-color: var(--db-success);
+}
+
+body.dark-mode .p-toast .p-toast-message.p-toast-message-success .p-toast-message-icon {
+  color: var(--db-success);
+}
+
+body.dark-mode .p-toast .p-toast-message.p-toast-message-error {
+  border-left-color: var(--db-danger);
+}
+
+body.dark-mode .p-toast .p-toast-message.p-toast-message-error .p-toast-message-icon {
+  color: var(--db-danger);
+}
+
+body.dark-mode .p-toast .p-toast-message.p-toast-message-warn {
+  border-left-color: var(--db-warning);
+}
+
+body.dark-mode .p-toast .p-toast-message.p-toast-message-warn .p-toast-message-icon {
+  color: var(--db-warning);
+}
+
+body.dark-mode .p-toast .p-toast-message.p-toast-message-info {
+  border-left-color: var(--db-accent-blue);
+}
+
+body.dark-mode .p-toast .p-toast-message.p-toast-message-info .p-toast-message-icon {
+  color: var(--db-accent-blue);
+}
+
+/* ===== Text inputs (InputText, Textarea, Password, number/dropdown labels) ===== */
+body.dark-mode .p-inputtext {
+  background: var(--db-bg-secondary);
+  color: var(--db-text-primary);
+  border-color: var(--db-border-color);
+}
+
+body.dark-mode .p-inputtext::placeholder {
+  color: var(--db-text-muted);
+}
+
+body.dark-mode .p-inputtext:enabled:hover {
+  border-color: var(--db-text-muted);
+}
+
+body.dark-mode .p-inputtext:enabled:focus {
+  border-color: var(--db-primary);
+}
+
+body.dark-mode .p-input-icon,
+body.dark-mode .p-icon-field > .p-input-icon {
+  color: var(--db-text-muted);
+}
+
+body.dark-mode .p-password-panel {
+  background: var(--db-bg-elevated);
+  color: var(--db-text-primary);
+}
+
+/* ===== Dropdown / MultiSelect ===== */
+body.dark-mode .p-dropdown,
+body.dark-mode .p-multiselect {
+  background: var(--db-bg-secondary);
+  border-color: var(--db-border-color);
+}
+
+body.dark-mode .p-dropdown:not(.p-disabled):hover,
+body.dark-mode .p-multiselect:not(.p-disabled):hover {
+  border-color: var(--db-text-muted);
+}
+
+body.dark-mode .p-dropdown:not(.p-disabled).p-focus,
+body.dark-mode .p-multiselect:not(.p-disabled).p-focus {
+  border-color: var(--db-primary);
+}
+
+body.dark-mode .p-dropdown .p-dropdown-label,
+body.dark-mode .p-multiselect .p-multiselect-label {
+  color: var(--db-text-primary);
+}
+
+body.dark-mode .p-dropdown .p-dropdown-label.p-placeholder,
+body.dark-mode .p-multiselect .p-multiselect-label.p-placeholder {
+  color: var(--db-text-muted);
+}
+
+body.dark-mode .p-dropdown .p-dropdown-trigger,
+body.dark-mode .p-multiselect .p-multiselect-trigger {
+  color: var(--db-text-secondary);
+}
+
+body.dark-mode .p-dropdown-panel,
+body.dark-mode .p-multiselect-panel {
+  background: var(--db-bg-elevated);
+  color: var(--db-text-primary);
+  border: 1px solid var(--db-border-color);
+}
+
+body.dark-mode .p-dropdown-panel .p-dropdown-items .p-dropdown-item,
+body.dark-mode .p-multiselect-panel .p-multiselect-items .p-multiselect-item {
+  color: var(--db-text-primary);
+}
+
+body.dark-mode .p-dropdown-panel .p-dropdown-items .p-dropdown-item:not(.p-highlight):not(.p-disabled):hover,
+body.dark-mode .p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-focus:not(.p-highlight),
+body.dark-mode .p-multiselect-panel .p-multiselect-items .p-multiselect-item:not(.p-highlight):not(.p-disabled):hover,
+body.dark-mode .p-multiselect-panel .p-multiselect-items .p-multiselect-item.p-focus:not(.p-highlight) {
+  background: var(--db-bg-tertiary);
+  color: var(--db-text-primary);
+}
+
+body.dark-mode .p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight,
+body.dark-mode .p-multiselect-panel .p-multiselect-items .p-multiselect-item.p-highlight {
+  background: var(--db-primary-100);
+  color: var(--db-primary);
+}
+
+body.dark-mode .p-multiselect-panel .p-multiselect-header {
+  background: var(--db-bg-elevated);
+  color: var(--db-text-primary);
+  border-bottom-color: var(--db-border-color);
+}
+
+body.dark-mode .p-multiselect.p-multiselect-chip .p-multiselect-token {
+  background: var(--db-bg-tertiary);
+  color: var(--db-text-primary);
+}
+
+/* ===== Checkbox / InputSwitch ===== */
+body.dark-mode .p-checkbox .p-checkbox-box {
+  background: var(--db-bg-secondary);
+  border-color: var(--db-border-color);
+}
+
+body.dark-mode .p-checkbox .p-checkbox-box.p-highlight {
+  background: var(--db-primary);
+  border-color: var(--db-primary);
+}
+
+body.dark-mode .p-inputswitch:not(.p-highlight) .p-inputswitch-slider {
+  background: var(--db-border-color);
+}
+
+/* ===== TabView ===== */
+body.dark-mode .p-tabview .p-tabview-nav {
+  background: transparent;
+  border-color: var(--db-border-color);
+}
+
+body.dark-mode .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+  background: transparent;
+  color: var(--db-text-secondary);
+  border-color: var(--db-border-color);
+}
+
+body.dark-mode .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+  color: var(--db-primary);
+  border-color: var(--db-primary);
+}
+
+body.dark-mode .p-tabview .p-tabview-panels {
+  background: transparent;
+  color: var(--db-text-primary);
+}
+
+/* ===== Panel ===== */
+body.dark-mode .p-panel .p-panel-header {
+  background: var(--db-bg-secondary);
+  color: var(--db-text-primary);
+  border-color: var(--db-border-color);
+}
+
+body.dark-mode .p-panel .p-panel-content {
+  background: transparent;
+  color: var(--db-text-primary);
+  border-color: var(--db-border-color);
+}
+
+/* The resource panel opts out of panel chrome; keep its transparent look. */
+body.dark-mode .resource-panel .p-panel-header,
+body.dark-mode .resource-panel .p-panel-content {
+  background: transparent;
+  border-color: var(--db-border-light);
+}
+
+/* ===== Tag ===== */
+body.dark-mode .p-tag.p-tag-success {
+  background: rgba(5, 150, 105, 0.18);
+  color: #34d399;
+}
+
+body.dark-mode .p-tag.p-tag-warning {
+  background: rgba(217, 119, 6, 0.18);
+  color: #fbbf24;
+}
+
+body.dark-mode .p-tag.p-tag-danger {
+  background: rgba(220, 38, 38, 0.18);
+  color: #f87171;
+}
+
+/* ===== Secondary / text buttons ===== */
+body.dark-mode .p-button.p-button-secondary.p-button-outlined,
+body.dark-mode .p-button.p-button-secondary.p-button-text {
+  color: var(--db-text-secondary);
+  border-color: var(--db-border-color);
+}
+
+body.dark-mode .p-button.p-button-secondary.p-button-outlined:enabled:hover,
+body.dark-mode .p-button.p-button-secondary.p-button-text:enabled:hover {
+  background: var(--db-bg-tertiary);
+  color: var(--db-text-primary);
+  border-color: var(--db-border-color);
+}
+
+body.dark-mode .p-button.p-button-text:not(.p-button-danger):not(.p-button-secondary) {
+  color: var(--db-primary);
+}
+
+body.dark-mode .p-button.p-button-text:not(.p-button-danger):not(.p-button-secondary):enabled:hover {
+  background: var(--db-primary-50);
+  color: var(--db-primary);
+}
+
+/* ===== DataTable ===== */
+body.dark-mode .p-datatable .p-datatable-thead > tr > th {
+  background: var(--db-bg-secondary);
+  color: var(--db-text-secondary);
+  border-color: var(--db-border-light);
+}
+
+body.dark-mode .p-datatable .p-datatable-tbody > tr {
+  background: transparent;
+  color: var(--db-text-primary);
+}
+
+body.dark-mode .p-datatable .p-datatable-tbody > tr > td {
+  border-color: var(--db-border-light);
+}
+
+/* The minimal table's glassmorphism is built on white tints; flip them. */
+body.dark-mode .p-datatable.minimal-table {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+body.dark-mode .p-datatable.minimal-table .p-datatable-thead > tr > th {
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+body.dark-mode .p-datatable.minimal-table .p-datatable-tbody > tr > td {
+  border-bottom-color: rgba(255, 255, 255, 0.04);
+}
+
+body.dark-mode .p-datatable.minimal-table .p-datatable-tbody > tr:last-child > td {
+  border-bottom: none;
+}
+
+body.dark-mode .p-datatable.minimal-table .p-datatable-tbody > tr:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
 }

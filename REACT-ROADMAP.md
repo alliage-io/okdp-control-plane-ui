@@ -48,7 +48,7 @@ in the same commit that completes the step.
   guards wired, temporary placeholders for not-yet-ported pages.
 - [x] **8. Shared components** — `DynamicSchemaForm` and `ProfileListEditor`
   rewritten with PrimeReact.
-- [ ] **9. Landing page** — login landing page. (The Angular
+- [x] **9. Landing page** — login landing page. (The Angular
   `WelcomeComponent` and `ServicePlaceholderPageComponent` were dead code —
   referenced by no route or component — and are dropped, not ported.)
 - [ ] **10. Admin space** — admin layout shell, admin home, project list

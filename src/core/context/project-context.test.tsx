@@ -130,7 +130,7 @@ describe('ProjectContextProvider', () => {
       emitSse({ type: 'DELETED', object: { name: 'proj-b' } as Project });
       emitSse({ type: 'DELETED', object: { name: 'proj-a' } as Project });
 
-      await waitFor(() => expect(currentPath).toBe('/admin/projects'));
+      await waitFor(() => expect(currentPath).toBe('/projects'));
       expect(result.current.currentProjectId).toBeNull();
     });
 

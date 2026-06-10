@@ -14,14 +14,14 @@ export default function AdminHome() {
       <SectionHeading>Manage</SectionHeading>
       <QuickActions>
         <ActionCard
-          to="/admin/projects"
+          to="/projects"
           icon="pi pi-th-large"
           tone="primary"
           title="Projects"
           description="Create and manage data projects"
         />
         <ActionCard
-          to="/admin/identity"
+          to="/identity"
           icon="pi pi-users"
           tone="purple"
           title="Identity"

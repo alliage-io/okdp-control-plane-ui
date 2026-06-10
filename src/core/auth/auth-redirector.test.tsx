@@ -67,10 +67,17 @@ describe('AuthRedirector', () => {
     });
 
     it('should keep an /admin deep link even when the preferred space is project', async () => {
-      renderAt('/admin/projects');
+      renderAt('/admin');
       await flushEffects();
 
-      expect(currentPath).toBe('/admin/projects');
+      expect(currentPath).toBe('/admin');
+    });
+
+    it('should keep an /identity deep link', async () => {
+      renderAt('/identity');
+      await flushEffects();
+
+      expect(currentPath).toBe('/identity');
     });
   });
 

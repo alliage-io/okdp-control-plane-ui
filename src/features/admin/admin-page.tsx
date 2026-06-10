@@ -29,13 +29,13 @@ export default function AdminPage() {
         <>
           <SideNavLink to="/admin" end icon="pi pi-home" label="Home" collapsed={sidebarCollapsed} />
           <SideNavLink
-            to="/admin/projects"
+            to="/projects"
             icon="pi pi-th-large"
             label="Projects"
             collapsed={sidebarCollapsed}
           />
           <SideNavLink
-            to="/admin/identity"
+            to="/identity"
             icon="pi pi-users"
             label="Identity"
             collapsed={sidebarCollapsed}

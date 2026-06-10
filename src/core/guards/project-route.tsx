@@ -42,12 +42,12 @@ export function ProjectIndexRedirect() {
       .getProjects()
       .then((projects) => {
         if (!cancelled) {
-          setTarget(projects.length > 0 ? `/project/${projects[0].name}` : '/admin/projects');
+          setTarget(projects.length > 0 ? `/project/${projects[0].name}` : '/projects');
         }
       })
       .catch(() => {
         if (!cancelled) {
-          setTarget('/admin/projects');
+          setTarget('/projects');
         }
       });
     return () => {

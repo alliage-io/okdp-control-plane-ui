@@ -55,18 +55,22 @@ export function AppRoutes() {
         <Route path="/login" element={<HomePage />} />
         <Route path="/home" element={<Navigate to="/login" replace />} />
 
+        {/* Admin space: pathless layout so the project list and identity
+            pages live at top-level /projects and /identity. */}
         <Route
-          path="/admin"
           element={
             <RequireAuth>
               <AdminPage />
             </RequireAuth>
           }
         >
-          <Route index element={<AdminHome />} />
-          <Route path="projects" element={<ProjectList />} />
-          <Route path="identity" element={<IdentityPage />} />
+          <Route path="/admin" element={<AdminHome />} />
+          <Route path="/projects" element={<ProjectList />} />
+          <Route path="/identity" element={<IdentityPage />} />
         </Route>
+        {/* Legacy bookmarks */}
+        <Route path="/admin/projects" element={<Navigate to="/projects" replace />} />
+        <Route path="/admin/identity" element={<Navigate to="/identity" replace />} />
 
         <Route
           path="/project"

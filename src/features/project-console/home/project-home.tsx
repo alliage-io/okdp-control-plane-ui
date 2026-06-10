@@ -50,7 +50,7 @@ export default function ProjectHome() {
           title="No Projects Available"
           description="Your workspace is empty. Create your first project to get started."
           action={
-            <CtaButton to="/admin/projects" icon="pi pi-plus">
+            <CtaButton to="/projects" icon="pi pi-plus">
               Create Project
             </CtaButton>
           }

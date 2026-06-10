@@ -108,54 +108,52 @@ export default function ProjectPage() {
   const projectName = context.currentProject?.name;
   const futureTitle = 'Direction future, non engagé';
 
-  const headerExtras = (
-    <>
-      {context.availableProjects.length > 0 && (
-        /* project-switcher scopes the Dropdown overrides in the PrimeReact overrides section of styles.css */
-        <div className="project-switcher flex items-center">
-          <Dropdown
-            value={context.currentProject}
-            options={context.availableProjects}
-            optionLabel="name"
-            dataKey="name"
-            placeholder="Select Project"
-            className="project-dropdown"
-            panelClassName="project-dropdown-panel"
-            appendTo={document.body}
-            onChange={(e) => context.selectProject((e.value as Project).name)}
-            valueTemplate={(project: Project | null) => (
-              <span className="flex items-center gap-2 font-semibold">
-                {project ? project.name : 'Select Project'}
-              </span>
+  const headerLeft = context.availableProjects.length > 0 && (
+    /* project-switcher scopes the Dropdown overrides in the PrimeReact overrides section of styles.css */
+    <div className="project-switcher flex items-center">
+      <Dropdown
+        value={context.currentProject}
+        options={context.availableProjects}
+        optionLabel="name"
+        dataKey="name"
+        placeholder="Select Project"
+        className="project-dropdown"
+        panelClassName="project-dropdown-panel"
+        appendTo={document.body}
+        onChange={(e) => context.selectProject((e.value as Project).name)}
+        valueTemplate={(project: Project | null) => (
+          <span className="flex items-center gap-2 font-semibold">
+            {project ? project.name : 'Select Project'}
+          </span>
+        )}
+        itemTemplate={(project: Project) => (
+          <div className="flex flex-col gap-px">
+            <span className="font-medium">{project.name}</span>
+            {project.description && (
+              <small className="text-xs text-fg-muted">{project.description}</small>
             )}
-            itemTemplate={(project: Project) => (
-              <div className="flex flex-col gap-px">
-                <span className="font-medium">{project.name}</span>
-                {project.description && (
-                  <small className="text-xs text-fg-muted">{project.description}</small>
-                )}
-              </div>
-            )}
-          />
-        </div>
-      )}
-      {auth.hasRole('admins') && (
-        <Link
-          to="/admin"
-          className="flex cursor-pointer items-center gap-1.5 rounded-md border-none bg-primary px-3 py-[5px] text-sm font-medium text-white no-underline transition-colors duration-250 ease-smooth hover:bg-primary-hover"
-          aria-label="Go to Administration"
-        >
-          <span>Administration</span>
-          <i className="pi pi-arrow-right text-sm"></i>
-        </Link>
-      )}
-    </>
+          </div>
+        )}
+      />
+    </div>
+  );
+
+  const headerExtras = auth.hasRole('admins') && (
+    <Link
+      to="/admin"
+      className="flex cursor-pointer items-center gap-1.5 rounded-md border-none bg-primary px-3 py-[5px] text-sm font-medium text-white no-underline transition-colors duration-250 ease-smooth hover:bg-primary-hover"
+      aria-label="Go to Administration"
+    >
+      <span>Administration</span>
+      <i className="pi pi-arrow-right text-sm"></i>
+    </Link>
   );
 
   return (
     <ConsoleShell
       collapsed={sidebarCollapsed}
       onToggleCollapsed={toggleSidebar}
+      headerLeft={headerLeft}
       headerExtras={headerExtras}
       navBottomAriaLabel="Project tools"
       nav={

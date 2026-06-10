@@ -43,7 +43,9 @@ const TOPBAR_BTN_CLASS =
 interface ConsoleShellProps {
   collapsed: boolean;
   onToggleCollapsed: () => void;
-  /** Extra header widgets rendered before the GitHub link (e.g. project switcher). */
+  /** Header widgets rendered right after the brand block (e.g. project switcher). */
+  headerLeft?: ReactNode;
+  /** Extra header widgets rendered before the GitHub link (e.g. admin link). */
   headerExtras?: ReactNode;
   nav: ReactNode;
   navBottom?: ReactNode;
@@ -56,6 +58,7 @@ interface ConsoleShellProps {
 export function ConsoleShell({
   collapsed,
   onToggleCollapsed,
+  headerLeft,
   headerExtras,
   nav,
   navBottom,
@@ -65,6 +68,7 @@ export function ConsoleShell({
   const auth = useAuth();
   const { theme, setTheme } = useTheme();
   const menuRef = useRef<Menu>(null);
+  const themeMenuRef = useRef<Menu>(null);
 
   const displayName = auth.profile?.firstName ?? auth.profile?.username ?? 'User';
   const first = (auth.profile?.firstName ?? auth.profile?.username ?? '?').charAt(0).toUpperCase();
@@ -89,16 +93,16 @@ export function ConsoleShell({
     ),
   });
 
+  const themeMenu: MenuItem[] = [
+    themeOption('system', 'pi pi-desktop', 'System'),
+    themeOption('light', 'pi pi-sun', 'Light'),
+    themeOption('dark', 'pi pi-moon', 'Dark'),
+  ];
+
+  const themeIcon =
+    theme === 'dark' ? 'pi pi-moon' : theme === 'light' ? 'pi pi-sun' : 'pi pi-desktop';
+
   const profileMenu: MenuItem[] = [
-    {
-      label: 'Theme',
-      items: [
-        themeOption('system', 'pi pi-desktop', 'System'),
-        themeOption('light', 'pi pi-sun', 'Light'),
-        themeOption('dark', 'pi pi-moon', 'Dark'),
-      ],
-    },
-    { separator: true },
     {
       label: 'Sign out',
       icon: 'pi pi-sign-out',
@@ -123,14 +127,6 @@ export function ConsoleShell({
               : 'w-(--db-sidebar-width) min-w-(--db-sidebar-width)'
           } max-lg:w-(--db-sidebar-collapsed-width) max-lg:min-w-(--db-sidebar-collapsed-width) max-md:w-auto max-md:min-w-auto`}
         >
-          <button
-            className="-ml-0.5 flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-sm border-none bg-transparent p-0 text-fg-muted transition-[color,background-color] duration-150 ease-smooth hover:bg-surface-tertiary hover:text-fg"
-            onClick={onToggleCollapsed}
-            title={collapsed ? 'Expand' : 'Collapse'}
-            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          >
-            <i className={`${collapsed ? 'pi pi-angle-right' : 'pi pi-angle-left'} text-[1.1rem]`}></i>
-          </button>
           <div className="flex items-center justify-center">
             <img src="/images/okdp-notext.svg" alt="okdp" className="h-auto w-6" />
             <div
@@ -144,9 +140,17 @@ export function ConsoleShell({
               <span className="text-[1.075rem] font-normal text-fg-secondary">console</span>
             </div>
           </div>
+          <button
+            className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-sm border-none bg-transparent p-0 text-fg-muted transition-[color,background-color] duration-150 ease-smooth hover:bg-surface-tertiary hover:text-fg"
+            onClick={onToggleCollapsed}
+            title={collapsed ? 'Expand' : 'Collapse'}
+            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            <i className={`${collapsed ? 'pi pi-angle-right' : 'pi pi-angle-left'} text-[1.1rem]`}></i>
+          </button>
         </div>
 
-        <div className="flex flex-1 justify-start pl-3">{/* Reserved */}</div>
+        <div className="flex flex-1 items-center justify-start gap-2 pl-3">{headerLeft}</div>
 
         <div className="flex items-center gap-2">
           {headerExtras}
@@ -159,6 +163,17 @@ export function ConsoleShell({
           >
             <i className="pi pi-github text-[1rem]"></i>
           </a>
+
+          <button
+            className={TOPBAR_BTN_CLASS}
+            onClick={(e) => themeMenuRef.current?.toggle(e)}
+            title="Theme"
+            aria-label="Theme menu"
+            aria-haspopup="menu"
+          >
+            <i className={`${themeIcon} text-[1rem]`}></i>
+          </button>
+          <Menu ref={themeMenuRef} model={themeMenu} popup />
 
           <div
             className="flex items-center gap-2 rounded-md border-none bg-transparent py-1 pr-2 pl-1 transition-[background-color] duration-150 ease-smooth hover:bg-surface-tertiary"

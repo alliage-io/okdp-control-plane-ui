@@ -60,7 +60,7 @@ in the same commit that completes the step.
   `ServicePlaceholderPageComponent` was dead code and is dropped.)
 - [x] **13. Secret stores feature** — secrets page, secret store list,
   external secret list.
-- [ ] **14. Spark feature** — Spark applications page, list, submit / edit /
+- [x] **14. Spark feature** — Spark applications page, list, submit / edit /
   detail pages.
 - [ ] **15. Tests** — Vitest + Testing Library setup; port the auth service
   and project context specs.

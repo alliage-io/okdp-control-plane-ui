@@ -85,7 +85,7 @@ stores, Spark, tests, cleanup). `feat/tailwind` will be **rebased onto
 - [x] **10. Landing page** — `features/landing/home-page.css` → utilities.
 - [x] **11. Admin space** — `admin-page.css`, `home/admin-home.css`,
   `identity/*.css`, `projects/project-list.css` → utilities.
-- [ ] **12. Project console** — `project-page.css`, `home/project-home.css`
+- [x] **12. Project console** — `project-page.css`, `home/project-home.css`
   → utilities.
 - [ ] **13. (post-rebase) Services feature** — migrate the services pages'
   CSS (`pod-list.css`, `pod-log-viewer.css`, …) once REACT-ROADMAP step 12

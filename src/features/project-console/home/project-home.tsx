@@ -4,14 +4,13 @@ import SectionHeading from '../../../shared/components/section-heading';
 import { ActionCard, QuickActions } from '../../../shared/components/action-card';
 import EmptyState from '../../../shared/components/empty-state';
 import CtaButton from '../../../shared/components/cta-button';
-import './project-home.css';
 
 export default function ProjectHome() {
   const context = useProjectContext();
   const project = context.currentProject;
 
   return (
-    <section className="home">
+    <section className="flex animate-[fadeInUp_0.4s_ease-out] flex-col gap-7">
       {project ? (
         <>
           <WelcomeBanner
@@ -57,8 +56,8 @@ export default function ProjectHome() {
           }
         />
       ) : (
-        <div className="loading-state">
-          <i className="pi pi-spin pi-spinner"></i>
+        <div className="flex items-center gap-2.5 py-7 text-fg-secondary">
+          <i className="pi pi-spin pi-spinner text-primary"></i>
           <p>Loading project...</p>
         </div>
       )}

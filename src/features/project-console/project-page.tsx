@@ -12,7 +12,6 @@ import {
   sideNavLabelClass,
   sideNavLinkClass,
 } from '../../shared/components/console-nav-classes';
-import './project-page.css';
 
 interface NavSectionProps {
   icon: string;
@@ -25,18 +24,36 @@ interface NavSectionProps {
 
 function NavSection({ icon, label, expanded, collapsed, onToggle, children }: NavSectionProps) {
   return (
-    <div className="nav-section">
+    <div className="mt-1">
       <button
-        className="nav-section-header"
+        className={`group flex w-full cursor-pointer items-center border-0 bg-transparent text-base font-medium text-fg-secondary transition-[color,background-color] duration-150 ease-smooth hover:bg-surface-secondary hover:text-fg ${
+          collapsed
+            ? 'justify-center border-l-0 p-2'
+            : 'rounded-r-md border-l-2 border-l-transparent px-2.5 py-1.5'
+        }`}
         onClick={onToggle}
         title={collapsed ? label : ''}
         type="button"
       >
-        <i className={`pi ${icon}`}></i>
-        <span>{label}</span>
-        <i className={`chevron pi ${expanded ? 'pi-chevron-down' : 'pi-chevron-right'}`}></i>
+        <i
+          className={`pi ${icon} w-[18px] text-center text-[1rem] text-fg-muted transition-colors duration-150 ease-smooth group-hover:text-fg-secondary`}
+        ></i>
+        <span className={sideNavLabelClass(collapsed)}>{label}</span>
+        <i
+          className={`pi ${expanded ? 'pi-chevron-down' : 'pi-chevron-right'} ml-auto text-[0.6rem] text-fg-muted transition-transform duration-250 ease-smooth ${
+            collapsed ? 'hidden' : ''
+          }`}
+        ></i>
       </button>
-      <div className={`nav-section-items${expanded ? ' expanded' : ''}`}>{children}</div>
+      {/* Bumped from 200px — Data Engineering holds 4 sub-items and Machine
+          Learning 3, all of which need to fit when expanded. */}
+      <div
+        className={`overflow-hidden [transition:max-height_0.25s_ease] ${
+          expanded ? 'max-h-[320px]' : 'max-h-0'
+        }`}
+      >
+        {children}
+      </div>
     </div>
   );
 }
@@ -94,7 +111,8 @@ export default function ProjectPage() {
   const headerExtras = (
     <>
       {context.availableProjects.length > 0 && (
-        <div className="project-switcher">
+        /* project-switcher scopes the Dropdown overrides in primereact-overrides.css */
+        <div className="project-switcher flex items-center">
           <Dropdown
             value={context.currentProject}
             options={context.availableProjects}
@@ -106,21 +124,29 @@ export default function ProjectPage() {
             appendTo={document.body}
             onChange={(e) => context.selectProject((e.value as Project).name)}
             valueTemplate={(project: Project | null) => (
-              <span className="selected-project">{project ? project.name : 'Select Project'}</span>
+              <span className="flex items-center gap-2 font-semibold">
+                {project ? project.name : 'Select Project'}
+              </span>
             )}
             itemTemplate={(project: Project) => (
-              <div className="project-item">
-                <span className="project-name">{project.name}</span>
-                {project.description && <small className="project-desc">{project.description}</small>}
+              <div className="flex flex-col gap-px">
+                <span className="font-medium">{project.name}</span>
+                {project.description && (
+                  <small className="text-xs text-fg-muted">{project.description}</small>
+                )}
               </div>
             )}
           />
         </div>
       )}
       {auth.hasRole('admins') && (
-        <Link to="/admin" className="space-switcher-btn" aria-label="Go to Administration">
+        <Link
+          to="/admin"
+          className="flex cursor-pointer items-center gap-1.5 rounded-md border-none bg-primary px-3 py-[5px] text-sm font-medium text-white no-underline transition-colors duration-250 ease-smooth hover:bg-primary-hover"
+          aria-label="Go to Administration"
+        >
           <span>Administration</span>
-          <i className="pi pi-arrow-right"></i>
+          <i className="pi pi-arrow-right text-sm"></i>
         </Link>
       )}
     </>

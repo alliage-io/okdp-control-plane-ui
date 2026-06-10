@@ -1,10 +1,5 @@
 /* Class lists for sidebar navigation entries, shared by the console shell
-   and the project console's hand-rolled nav placeholders.
-
-   The `nav-link`, `sub-link`, `active` and `disabled` marker classes are kept
-   on the markup: feature stylesheets that have not been migrated to Tailwind
-   yet (project-page.css nav sections) still target them with compound
-   selectors. */
+   and the project console's nav sections. */
 
 interface NavLinkClassOptions {
   active?: boolean;
@@ -16,19 +11,22 @@ interface NavLinkClassOptions {
 /** Class list for a sidebar navigation entry (link or inert placeholder). */
 export function sideNavLinkClass({ active, collapsed, sub, disabled }: NavLinkClassOptions) {
   return [
-    'nav-link',
-    sub && 'sub-link',
-    active && 'active',
-    disabled && 'disabled',
-    'group mb-px flex items-center text-base no-underline transition-[color,background-color] duration-150 ease-smooth',
+    'group mb-px flex items-center no-underline transition-[color,background-color] duration-150 ease-smooth',
+    sub ? 'text-sm' : 'text-base',
     collapsed
       ? 'justify-center rounded-md p-2'
-      : 'rounded-r-md border-l-2 px-2.5 py-1.5 max-lg:justify-center max-lg:rounded-md max-lg:border-l-0 max-lg:p-2',
+      : [
+          'rounded-r-md border-l-2 px-2.5 py-1.5 max-lg:justify-center max-lg:rounded-md max-lg:border-l-0 max-lg:p-2',
+          sub && 'pl-[2.1rem] max-lg:pl-[2.1rem]',
+          active ? 'border-l-primary' : 'border-l-transparent',
+        ],
     active
       ? 'bg-primary-50 font-semibold text-primary'
-      : 'font-medium text-fg-secondary hover:bg-surface-secondary hover:text-fg',
-    !collapsed && (active ? 'border-l-primary' : 'border-l-transparent'),
+      : disabled
+        ? 'cursor-not-allowed font-medium text-fg-muted opacity-45 hover:bg-transparent hover:text-fg-muted'
+        : 'font-medium text-fg-secondary hover:bg-surface-secondary hover:text-fg',
   ]
+    .flat()
     .filter(Boolean)
     .join(' ');
 }

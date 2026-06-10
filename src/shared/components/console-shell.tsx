@@ -8,11 +8,6 @@ import { useAuth } from '../../core/auth/auth-context';
 import { environment } from '../../config/environment';
 import { sideNavIconClass, sideNavLabelClass, sideNavLinkClass } from './console-nav-classes';
 
-/* The `sidebar` and `collapsed` marker classes are kept on the markup:
-   feature stylesheets that have not been migrated to Tailwind yet
-   (project-page.css nav sections) still target them with compound
-   selectors. */
-
 interface SideNavLinkProps {
   to: string;
   end?: boolean;
@@ -165,9 +160,7 @@ export function ConsoleShell({
       </header>
 
       {/* Sidebar */}
-      <aside
-        className={`sidebar${collapsed ? ' collapsed' : ''} z-[25] col-start-1 row-start-2 flex flex-col border-r border-border-light bg-surface transition-[width] duration-400 ease-smooth max-md:hidden`}
-      >
+      <aside className="z-[25] col-start-1 row-start-2 flex flex-col border-r border-border-light bg-surface transition-[width] duration-400 ease-smooth max-md:hidden">
         <nav
           className={`mt-0 flex-1 overflow-y-auto ${
             collapsed ? 'px-[0.4rem] py-3' : 'py-2 pr-1.5 pl-0 max-lg:px-[0.4rem] max-lg:py-3'

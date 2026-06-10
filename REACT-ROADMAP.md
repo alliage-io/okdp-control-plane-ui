@@ -46,7 +46,7 @@ in the same commit that completes the step.
 - [x] **7. Routing skeleton** — full route table with `React.lazy` loaded
   pages, per-route data (title / serviceFilter / deployLabel / emptyMessage),
   guards wired, temporary placeholders for not-yet-ported pages.
-- [ ] **8. Shared components** — `DynamicSchemaForm` and `ProfileListEditor`
+- [x] **8. Shared components** — `DynamicSchemaForm` and `ProfileListEditor`
   rewritten with PrimeReact.
 - [ ] **9. Landing page** — login landing page. (The Angular
   `WelcomeComponent` and `ServicePlaceholderPageComponent` were dead code —

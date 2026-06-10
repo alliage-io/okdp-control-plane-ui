@@ -1,4 +1,5 @@
 /* Main Global Styles Entry Point */
+@import 'tailwindcss';
 @import 'primeicons/primeicons.css';
 
 /* 1. Tokens & Base */
@@ -12,5 +13,8 @@
 @import './styles/components/forms.css';
 @import './styles/components/okdp-design.css';
 
-/* Note: Component-specific styles should be minimized. 
+/* Dark mode is class-based (body.dark-mode), not media-query based */
+@custom-variant dark (&:where(body.dark-mode, body.dark-mode *));
+
+/* Note: Component-specific styles should be minimized.
    Use the shared classes defined above. */

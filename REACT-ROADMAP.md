@@ -28,7 +28,7 @@ in the same commit that completes the step.
   root `index.html`, `src/main.tsx` with a minimal `<App/>`, ESLint flat
   config for React. Remove `angular.json` and Jest/Angular configs.
   `npm run build` passes.
-- [ ] **3. Core models & infrastructure** — port `core/models/*`,
+- [x] **3. Core models & infrastructure** — port `core/models/*`,
   `environments/*` and the logger to plain TypeScript modules.
 - [ ] **4. API layer** — fetch-based `http` client (bearer token injection,
   401/403 → forced logout hook) and ports of all API services:

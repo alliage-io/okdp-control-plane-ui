@@ -87,7 +87,7 @@ stores, Spark, tests, cleanup). `feat/tailwind` will be **rebased onto
   `identity/*.css`, `projects/project-list.css` → utilities.
 - [x] **12. Project console** — `project-page.css`, `home/project-home.css`
   → utilities.
-- [ ] **13. (post-rebase) Services feature** — migrate the services pages'
+- [x] **13. (post-rebase) Services feature** — migrate the services pages'
   CSS (`pod-list.css`, `pod-log-viewer.css`, …) once REACT-ROADMAP step 12
   is committed and this branch is rebased.
 - [ ] **14. (post-rebase) Secret stores & Spark features** — same, after

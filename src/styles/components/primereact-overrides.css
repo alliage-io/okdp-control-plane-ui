@@ -76,13 +76,15 @@
   font-weight: 500;
 }
 
-/* Identity page — TabView spacing and tab panel entrance animation */
-.identity-page .p-tabview-nav {
+/* Identity & secrets pages — TabView spacing and tab panel animation */
+.identity-page .p-tabview-nav,
+.secrets-page .p-tabview-nav {
   gap: 24px;
   padding-left: 4px;
 }
 
-.identity-page .p-tabview-panel {
+.identity-page .p-tabview-panel,
+.secrets-page .p-tabview-panel {
   animation: fadeIn 0.25s ease-out;
 }
 

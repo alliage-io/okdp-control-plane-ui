@@ -90,7 +90,7 @@ stores, Spark, tests, cleanup). `feat/tailwind` will be **rebased onto
 - [x] **13. (post-rebase) Services feature** — migrate the services pages'
   CSS (`pod-list.css`, `pod-log-viewer.css`, …) once REACT-ROADMAP step 12
   is committed and this branch is rebased.
-- [ ] **14. (post-rebase) Secret stores & Spark features** — same, after
+- [x] **14. (post-rebase) Secret stores & Spark features** — same, after
   REACT-ROADMAP steps 13–14.
 - [ ] **15. Cleanup** — fold what remains of `src/styles/` into a single
   entry stylesheet (`variables.css` tokens + Tailwind imports), remove

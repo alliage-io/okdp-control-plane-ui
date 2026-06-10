@@ -170,50 +170,6 @@
   animation-fill-mode: backwards;
 }
 
-/* ========== Shared Component Patterns ========== */
-
-/* Empty state — legacy pattern, still consumed by the services, spark and
-   secret-stores pages; their migration replaces it with the shared
-   <EmptyState> component and deletes these rules. */
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 48px var(--db-space-lg);
-}
-
-.empty-state .empty-icon-wrapper {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: var(--db-bg-tertiary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: var(--db-space-md);
-}
-
-.empty-state .empty-icon {
-  font-size: 1.5rem;
-  color: var(--db-text-muted);
-}
-
-.empty-state h2 {
-  margin: 0;
-  font-size: var(--db-font-size-lg);
-  font-weight: 600;
-  color: var(--db-text-primary);
-}
-
-.empty-state p {
-  margin: var(--db-space-xs) 0 0;
-  font-size: var(--db-font-size-base);
-  color: var(--db-text-secondary);
-  max-width: 340px;
-}
-
 /* ========== Cursor ========== */
 button,
 [role='button'],

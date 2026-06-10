@@ -62,7 +62,7 @@ in the same commit that completes the step.
   external secret list.
 - [x] **14. Spark feature** — Spark applications page, list, submit / edit /
   detail pages.
-- [ ] **15. Tests** — Vitest + Testing Library setup; port the auth service
+- [x] **15. Tests** — Vitest + Testing Library setup; port the auth service
   and project context specs.
 - [ ] **16. Cleanup** — delete remaining Angular sources and configs, update
   `README.md` and `.vscode/`, final `lint` + `build` + `test` all green.

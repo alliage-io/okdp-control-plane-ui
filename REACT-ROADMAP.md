@@ -30,7 +30,7 @@ in the same commit that completes the step.
   `npm run build` passes.
 - [x] **3. Core models & infrastructure** — port `core/models/*`,
   `environments/*` and the logger to plain TypeScript modules.
-- [ ] **4. API layer** — fetch-based `http` client (bearer token injection,
+- [x] **4. API layer** — fetch-based `http` client (bearer token injection,
   401/403 → forced logout hook) and ports of all API services:
   project, service, spark, secret-store, external-secret, identity;
   shared SSE subscription helper for `EventSource` streams.

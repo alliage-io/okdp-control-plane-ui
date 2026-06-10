@@ -8,7 +8,7 @@ all existing features, routes, styling and behavior.
 | Concern        | Angular (current)            | React (target)                  |
 | -------------- | ---------------------------- | ------------------------------- |
 | Build          | Angular CLI (`@angular/build`) | Vite                          |
-| UI library     | PrimeNG 20 (Aura preset)     | PrimeReact 10 (Aura theme)      |
+| UI library     | PrimeNG 20 (Aura preset)     | PrimeReact 10 (Lara theme — Aura is not shipped for PrimeReact 10) |
 | Routing        | `@angular/router`            | `react-router-dom` v7           |
 | Auth           | `angular-auth-oidc-client`   | `oidc-client-ts`                |
 | HTTP           | `HttpClient` + interceptor   | `fetch` wrapper with token injection + 401/403 handling |
@@ -23,7 +23,7 @@ Each step is implemented and committed independently; the checkbox is ticked
 in the same commit that completes the step.
 
 - [x] **1. Roadmap** — add this document.
-- [ ] **2. Toolchain scaffold** — replace Angular CLI with Vite + React 19 +
+- [x] **2. Toolchain scaffold** — replace Angular CLI with Vite + React 19 +
   TypeScript: new `package.json` deps/scripts, `vite.config.ts`, `tsconfig`,
   root `index.html`, `src/main.tsx` with a minimal `<App/>`, ESLint flat
   config for React. Remove `angular.json` and Jest/Angular configs.

@@ -50,3 +50,5 @@ CLAUDE.md
 .cursor/
 .claude/
 .agent/
+# TypeScript incremental build
+tsconfig.tsbuildinfo

@@ -1,11 +1,10 @@
 import WelcomeBanner from '../../../shared/components/welcome-banner';
 import SectionHeading from '../../../shared/components/section-heading';
 import { ActionCard, QuickActions } from '../../../shared/components/action-card';
-import './admin-home.css';
 
 export default function AdminHome() {
   return (
-    <div className="admin-home">
+    <div className="flex animate-[fadeInUp_0.4s_ease-out] flex-col gap-7">
       <WelcomeBanner
         icon="pi pi-cog"
         title="Administration"

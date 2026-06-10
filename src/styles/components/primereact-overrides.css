@@ -10,6 +10,16 @@
   background-color: rgba(220, 38, 38, 0.04);
 }
 
+/* Identity page — TabView spacing and tab panel entrance animation */
+.identity-page .p-tabview-nav {
+  gap: 24px;
+  padding-left: 4px;
+}
+
+.identity-page .p-tabview-panel {
+  animation: fadeIn 0.25s ease-out;
+}
+
 /* Landing page — primary sign-in Button skin */
 .login-btn {
   width: 100%;

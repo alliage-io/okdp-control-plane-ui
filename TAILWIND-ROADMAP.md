@@ -83,7 +83,7 @@ stores, Spark, tests, cleanup). `feat/tailwind` will be **rebased onto
 - [x] **9. Shared components** — `dynamic-schema-form.css`,
   `profile-list-editor.css` → utilities in their TSX; delete the files.
 - [x] **10. Landing page** — `features/landing/home-page.css` → utilities.
-- [ ] **11. Admin space** — `admin-page.css`, `home/admin-home.css`,
+- [x] **11. Admin space** — `admin-page.css`, `home/admin-home.css`,
   `identity/*.css`, `projects/project-list.css` → utilities.
 - [ ] **12. Project console** — `project-page.css`, `home/project-home.css`
   → utilities.

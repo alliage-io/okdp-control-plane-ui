@@ -1,7 +1,3 @@
-:host {
-  display: block;
-}
-
 .group-container {
   padding: 0;
   background-color: transparent;
@@ -9,10 +5,10 @@
 
 /* Search handled by global layout.css */
 
-.group-name {
+.group-container .group-name {
   font-weight: 500;
 }
 
-.description-cell {
+.group-container .description-cell {
   color: var(--db-text-secondary);
 }

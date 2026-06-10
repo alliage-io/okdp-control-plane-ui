@@ -8,13 +8,13 @@
 }
 
 /* Tab list spacing */
-:host ::ng-deep .p-tablist-tab-list {
+.identity-page .p-tabview-nav {
   gap: 24px;
   padding-left: 4px;
 }
 
 /* Tab panel entrance animation */
-:host ::ng-deep .p-tabpanel {
+.identity-page .p-tabview-panel {
   animation: fadeIn 0.25s ease-out;
 }
 

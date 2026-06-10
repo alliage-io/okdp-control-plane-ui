@@ -51,7 +51,7 @@ in the same commit that completes the step.
 - [x] **9. Landing page** — login landing page. (The Angular
   `WelcomeComponent` and `ServicePlaceholderPageComponent` were dead code —
   referenced by no route or component — and are dropped, not ported.)
-- [ ] **10. Admin space** — admin layout shell, admin home, project list
+- [x] **10. Admin space** — admin layout shell, admin home, project list
   (create/delete), identity page with users and groups tabs.
 - [ ] **11. Project console shell** — project layout (sidebar, project
   selector, user menu) and project home.

@@ -75,7 +75,7 @@ stores, Spark, tests, cleanup). `feat/tailwind` will be **rebased onto
 - [x] **6. Layout** — migrate `styles/components/layout.css` (sidebar,
   header, nav, main layout) into utility classes in the admin and project
   console shell JSX.
-- [ ] **7. Design components** — migrate `styles/components/okdp-design.css`
+- [x] **7. Design components** — migrate `styles/components/okdp-design.css`
   into the components that consume it.
 - [ ] **8. PrimeReact-adjacent CSS** — `tables.css`, `dialogs.css`,
   `forms.css`: convert wrapper/custom classes to utilities; anything that

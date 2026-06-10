@@ -10,6 +10,24 @@
   background-color: rgba(220, 38, 38, 0.04);
 }
 
+/* Landing page — primary sign-in Button skin */
+.login-btn {
+  width: 100%;
+  padding: 10px 1.5rem;
+  font-size: var(--db-font-size-md);
+  font-weight: 500;
+  justify-content: center;
+  background: var(--db-primary);
+  border-color: var(--db-primary);
+  border-radius: var(--db-radius-md);
+  transition: background var(--db-transition-base);
+}
+
+.login-btn:hover {
+  background: var(--db-primary-hover);
+  border-color: var(--db-primary-hover);
+}
+
 /* ProfileListEditor — borderless inline Panel for the Resources section */
 .resource-panel .p-panel-header {
   padding: 10px 0;

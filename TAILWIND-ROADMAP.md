@@ -68,7 +68,7 @@ stores, Spark, tests, cleanup). `feat/tailwind` will be **rebased onto
   (preflight covers it), move body / scrollbar / selection / focus-visible /
   reduced-motion rules into `@layer base`, redefine `.animate-in*` as
   `@utility`, drop the hand-rolled `.w-full`.
-- [ ] **5. Shared patterns** — convert the shared patterns from `base.css`
+- [x] **5. Shared patterns** — convert the shared patterns from `base.css`
   (`welcome-banner`, `section-heading`, `quick-actions`/`action-card`,
   `empty-state`, `cta-button`) into Tailwind-styled shared React components
   used by admin-home and project-home; delete the CSS rules.

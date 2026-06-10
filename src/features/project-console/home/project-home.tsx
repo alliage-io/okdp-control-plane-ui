@@ -1,5 +1,9 @@
-import { Link } from 'react-router-dom';
 import { useProjectContext } from '../../../core/context/project-context';
+import WelcomeBanner from '../../../shared/components/welcome-banner';
+import SectionHeading from '../../../shared/components/section-heading';
+import { ActionCard, QuickActions } from '../../../shared/components/action-card';
+import EmptyState from '../../../shared/components/empty-state';
+import CtaButton from '../../../shared/components/cta-button';
 import './project-home.css';
 
 export default function ProjectHome() {
@@ -10,67 +14,48 @@ export default function ProjectHome() {
     <section className="home">
       {project ? (
         <>
-          {/* Welcome Banner */}
-          <div className="welcome-banner">
-            <div className="banner-content">
-              <div className="banner-icon">
-                <i className="pi pi-th-large"></i>
-              </div>
-              <div className="banner-text">
-                <h1>{project.name}</h1>
-                <p className="subtitle">{project.description || 'Project Dashboard'}</p>
-              </div>
-            </div>
-            <div className="banner-decoration"></div>
-          </div>
+          <WelcomeBanner
+            icon="pi pi-th-large"
+            title={project.name}
+            subtitle={project.description || 'Project Dashboard'}
+          />
 
-          {/* Quick Actions */}
-          <h2 className="section-heading">Quick Actions</h2>
-          <div className="quick-actions">
-            <Link className="action-card" to={`/project/${project.name}/services/deploy`}>
-              <div className="card-icon deploy">
-                <i className="pi pi-play"></i>
-              </div>
-              <div className="action-text">
-                <span className="action-title">Deploy Notebook</span>
-                <span className="action-desc">Launch a new Jupyter instance</span>
-              </div>
-              <i className="pi pi-arrow-right action-arrow"></i>
-            </Link>
-            <Link className="action-card" to={`/project/${project.name}/services`}>
-              <div className="card-icon instances">
-                <i className="pi pi-server"></i>
-              </div>
-              <div className="action-text">
-                <span className="action-title">View Instances</span>
-                <span className="action-desc">Monitor running notebooks</span>
-              </div>
-              <i className="pi pi-arrow-right action-arrow"></i>
-            </Link>
-            <Link className="action-card" to={`/project/${project.name}/secret-stores`}>
-              <div className="card-icon secrets">
-                <i className="pi pi-lock"></i>
-              </div>
-              <div className="action-text">
-                <span className="action-title">Manage Secrets</span>
-                <span className="action-desc">Configure secret stores</span>
-              </div>
-              <i className="pi pi-arrow-right action-arrow"></i>
-            </Link>
-          </div>
+          <SectionHeading>Quick Actions</SectionHeading>
+          <QuickActions>
+            <ActionCard
+              to={`/project/${project.name}/services/deploy`}
+              icon="pi pi-play"
+              tone="primary"
+              title="Deploy Notebook"
+              description="Launch a new Jupyter instance"
+            />
+            <ActionCard
+              to={`/project/${project.name}/services`}
+              icon="pi pi-server"
+              tone="blue"
+              title="View Instances"
+              description="Monitor running notebooks"
+            />
+            <ActionCard
+              to={`/project/${project.name}/secret-stores`}
+              icon="pi pi-lock"
+              tone="purple"
+              title="Manage Secrets"
+              description="Configure secret stores"
+            />
+          </QuickActions>
         </>
       ) : context.availableProjects.length === 0 ? (
-        <div className="empty-state">
-          <div className="empty-icon-wrapper">
-            <i className="pi pi-folder-open empty-icon"></i>
-          </div>
-          <h2>No Projects Available</h2>
-          <p>Your workspace is empty. Create your first project to get started.</p>
-          <Link to="/admin/projects" className="cta-button">
-            <i className="pi pi-plus"></i>
-            Create Project
-          </Link>
-        </div>
+        <EmptyState
+          icon="pi pi-folder-open"
+          title="No Projects Available"
+          description="Your workspace is empty. Create your first project to get started."
+          action={
+            <CtaButton to="/admin/projects" icon="pi pi-plus">
+              Create Project
+            </CtaButton>
+          }
+        />
       ) : (
         <div className="loading-state">
           <i className="pi pi-spin pi-spinner"></i>

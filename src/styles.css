@@ -12,9 +12,18 @@
      8. PrimeReact     — unlayered overrides the theme CSS requires
    ============================================================ */
 
+/* Cascade layer order. The PrimeReact theme ships its component styles
+   inside `@layer primereact`; without an explicit order it would be
+   declared first and lose to Tailwind's preflight (`base` resets every
+   element's margin/padding/border), stripping PrimeReact components bare.
+   Declaring the order up front slots `primereact` above preflight while
+   keeping utilities strongest. */
+@layer theme, base, primereact, components, utilities;
+
 @import 'tailwindcss';
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
 @import 'primeicons/primeicons.css';
+@import 'primereact/resources/themes/lara-light-blue/theme.css';
 @import './styles/variables.css';
 
 /* Dark mode is class-based (body.dark-mode), not media-query based */

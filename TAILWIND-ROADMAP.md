@@ -77,7 +77,7 @@ stores, Spark, tests, cleanup). `feat/tailwind` will be **rebased onto
   console shell JSX.
 - [x] **7. Design components** — migrate `styles/components/okdp-design.css`
   into the components that consume it.
-- [ ] **8. PrimeReact-adjacent CSS** — `tables.css`, `dialogs.css`,
+- [x] **8. PrimeReact-adjacent CSS** — `tables.css`, `dialogs.css`,
   `forms.css`: convert wrapper/custom classes to utilities; anything that
   styles PrimeReact internals moves to `--p-*` variables where possible.
 - [ ] **9. Shared components** — `dynamic-schema-form.css`,

@@ -4,6 +4,7 @@
 
 /* 1. Tokens & Base */
 @import './styles/variables.css';
+@import './styles/theme.css';
 @import './styles/base.css';
 
 /* 2. Components */

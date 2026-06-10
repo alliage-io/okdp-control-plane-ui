@@ -6,15 +6,14 @@ import type { MenuItem } from 'primereact/menuitem';
 import { useAuth } from '../../core/auth/auth-context';
 import { rememberSpace } from '../../core/context/space';
 import { environment } from '../../config/environment';
+import { SIDEBAR_COLLAPSED_KEY } from '../../core/storage-keys';
 import './admin-page.css';
-
-const SIDEBAR_KEY = 'okdp-sidebar-collapsed';
 
 export default function AdminPage() {
   const auth = useAuth();
   const menuRef = useRef<Menu>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(
-    () => localStorage.getItem(SIDEBAR_KEY) === 'true',
+    () => localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === 'true',
   );
 
   useEffect(() => {
@@ -38,7 +37,7 @@ export default function AdminPage() {
   const toggleSidebar = () => {
     setSidebarCollapsed((collapsed) => {
       const newState = !collapsed;
-      localStorage.setItem(SIDEBAR_KEY, String(newState));
+      localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(newState));
       return newState;
     });
   };
@@ -71,7 +70,13 @@ export default function AdminPage() {
         <div className="header-center"></div>
 
         <div className="header-right">
-          <a href={environment.githubUrl} target="_blank" className="topbar-btn" title="GitHub">
+          <a
+            href={environment.githubUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="topbar-btn"
+            title="GitHub"
+          >
             <i className="pi pi-github"></i>
           </a>
 

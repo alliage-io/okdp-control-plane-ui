@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './auth-context';
 import { setUnauthorizedHandler } from '../api/http';
+import { AUTH_RETURN_URL_KEY } from '../storage-keys';
 import { resolveInitialRoute } from '../context/space';
 import { logger } from '../services/logger';
 
@@ -43,9 +44,9 @@ export function AuthRedirector() {
     }
 
     // Check for saved return URL
-    const returnUrl = sessionStorage.getItem('auth_return_url');
+    const returnUrl = sessionStorage.getItem(AUTH_RETURN_URL_KEY);
     if (returnUrl) {
-      sessionStorage.removeItem('auth_return_url');
+      sessionStorage.removeItem(AUTH_RETURN_URL_KEY);
       navigate(returnUrl);
       return;
     }

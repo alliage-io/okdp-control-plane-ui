@@ -1,4 +1,5 @@
-import { BrowserRouter } from 'react-router-dom';
+import { useEffect } from 'react';
+import { BrowserRouter, useLocation } from 'react-router-dom';
 import { PrimeReactProvider } from 'primereact/api';
 import { AuthProvider, useAuth } from './core/auth/auth-context';
 import { AuthRedirector } from './core/auth/auth-redirector';
@@ -14,10 +15,20 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   return children;
 }
 
+// Scroll to top on navigation (withInMemoryScrolling equivalent)
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
+
 export function App() {
   return (
     <PrimeReactProvider value={{ ripple: true }}>
       <BrowserRouter>
+        <ScrollToTop />
         <AuthProvider>
           <AuthGate>
             <AuthRedirector />

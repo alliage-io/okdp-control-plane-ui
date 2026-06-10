@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Toast } from 'primereact/toast';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { serviceApi } from '../../../core/api/service-api';
-import { useProjectContext } from '../../../core/context/project-context';
+import { applyListEvent } from '../../../core/api/sse';
 import type { ServiceInstance } from '../../../core/models/service.model';
 import { apiErrorMessage, formatMediumDate, tagClass } from './service-utils';
 
@@ -32,15 +32,13 @@ export function ServiceList({
 }: ServiceListProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  const context = useProjectContext();
+  const { projectId: projectName } = useParams<{ projectId: string }>();
   const toast = useRef<Toast>(null);
 
   const [services, setServices] = useState<ServiceInstance[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<StatusFilter>('All');
-
-  const projectName = context.currentProject?.name;
 
   useEffect(() => {
     if (!projectName) return;
@@ -70,18 +68,7 @@ export function ServiceList({
     const unsubscribe = serviceApi.subscribeServices(projectName, {
       next: (event) => {
         if (!matchesFilter(event.object)) return;
-        setServices((current) => {
-          const next = [...current];
-          const idx = next.findIndex((s) => s.name === event.object.name);
-          if (event.type === 'DELETED') {
-            if (idx !== -1) next.splice(idx, 1);
-          } else if (idx !== -1) {
-            next[idx] = event.object;
-          } else {
-            next.push(event.object);
-          }
-          return next;
-        });
+        setServices((current) => applyListEvent(current, event, (s) => s.name));
       },
     });
 

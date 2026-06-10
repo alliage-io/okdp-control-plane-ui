@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, react-refresh/only-export-components */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { InputNumber } from 'primereact/inputnumber';
@@ -64,7 +64,7 @@ function getGroupIcon(groupName: string): string {
   return GROUP_ICONS[groupName] || 'pi-cog';
 }
 
-export function formatLabel(name: string): string {
+function formatLabel(name: string): string {
   return name
     .replace(/([A-Z])/g, ' $1')
     .replace(/_/g, ' ')
@@ -182,7 +182,7 @@ function isQuantityField(field: SchemaField): boolean {
   return /\b(cpu|memory|mem)\b/.test(hay) || /request|limit/.test(field.name.toLowerCase());
 }
 
-export function validateField(field: SchemaField, value: unknown): string {
+function validateField(field: SchemaField, value: unknown): string {
   if (value === undefined || value === null || value === '') return '';
   if (!isQuantityField(field)) return '';
   const v = String(value).trim();
@@ -204,9 +204,13 @@ export function validateField(field: SchemaField, value: unknown): string {
   return '';
 }
 
+// Stable default — an inline `{}` default would change identity on every
+// parent render and re-trigger the values-rebuild effect in a loop.
+const EMPTY_VALUES: Record<string, any> = {};
+
 export function DynamicSchemaForm({
   schema,
-  initialValues = {},
+  initialValues = EMPTY_VALUES,
   onParametersChange,
   onValidityChange,
 }: DynamicSchemaFormProps) {

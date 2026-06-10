@@ -2,24 +2,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from 'primereact/button';
-import { InputText } from 'primereact/inputtext';
-import { InputNumber } from 'primereact/inputnumber';
-import { Dropdown } from 'primereact/dropdown';
-import { InputSwitch } from 'primereact/inputswitch';
-import { InputTextarea } from 'primereact/inputtextarea';
 import { Toast } from 'primereact/toast';
 import { sparkApi } from '../../../core/api/spark-api';
-import { useProjectContext } from '../../../core/context/project-context';
 import type { SparkAppInstance, SparkAppUpdateRequest } from '../../../core/models/spark.model';
 import { apiErrorMessage } from '../services/service-utils';
-import {
-  buildSections,
-  CORE_KEYS_EDIT,
-  parseKeyValue,
-  toOptions,
-  type SchemaProperty,
-  type SchemaSection,
-} from './spark-utils';
+import { buildSections, CORE_KEYS_EDIT, parseKeyValue, type SchemaSection } from './spark-utils';
+import { SparkPropertyField } from './spark-property-field';
 import './spark-pages.css';
 
 const FALLBACK_SECTIONS: SchemaSection[] = [
@@ -91,11 +79,11 @@ const FALLBACK_SECTIONS: SchemaSection[] = [
 
 export default function SparkEditPage() {
   const navigate = useNavigate();
-  const { appName = '' } = useParams<{ appName: string }>();
-  const context = useProjectContext();
+  const { projectId: projectName, appName = '' } = useParams<{
+    projectId: string;
+    appName: string;
+  }>();
   const toast = useRef<Toast>(null);
-
-  const projectName = context.currentProject?.name;
 
   const [app, setApp] = useState<SparkAppInstance | null>(null);
   const [loading, setLoading] = useState(true);
@@ -223,81 +211,6 @@ export default function SparkEditPage() {
       });
   };
 
-  const renderPropertyField = (prop: SchemaProperty) => {
-    const value = formValues[prop.key];
-    if (prop.enumValues && prop.enumValues.length > 0) {
-      return (
-        <Dropdown
-          value={value}
-          options={toOptions(prop.enumValues)}
-          optionLabel="label"
-          optionValue="value"
-          placeholder={`Select ${prop.key}`}
-          appendTo={document.body}
-          className="w-full"
-          onChange={(e) => setValue(prop.key, e.value)}
-        />
-      );
-    }
-    if (prop.key === 'image' && imageOptions.length > 0) {
-      return (
-        <Dropdown
-          value={value}
-          options={imageOptions}
-          optionLabel="label"
-          optionValue="value"
-          placeholder="Select image"
-          appendTo={document.body}
-          className="w-full"
-          editable
-          onChange={(e) => setValue(prop.key, e.value)}
-        />
-      );
-    }
-    if (prop.type === 'integer') {
-      return (
-        <InputNumber
-          value={value ?? null}
-          showButtons
-          min={0}
-          className="w-full"
-          onValueChange={(e) => setValue(prop.key, e.value)}
-        />
-      );
-    }
-    if (prop.type === 'boolean') {
-      return <InputSwitch checked={!!value} onChange={(e) => setValue(prop.key, e.value)} />;
-    }
-    if (prop.isObject) {
-      return (
-        <InputTextarea
-          value={value ?? ''}
-          rows={3}
-          className="w-full mono-textarea"
-          placeholder="key=value (one per line)"
-          onChange={(e) => setValue(prop.key, e.target.value)}
-        />
-      );
-    }
-    if (prop.isArray) {
-      return (
-        <InputText
-          value={value ?? ''}
-          className="w-full"
-          placeholder="Comma-separated values"
-          onChange={(e) => setValue(prop.key, e.target.value)}
-        />
-      );
-    }
-    return (
-      <InputText
-        value={value ?? ''}
-        className="w-full"
-        onChange={(e) => setValue(prop.key, e.target.value)}
-      />
-    );
-  };
-
   return (
     <>
       <Toast ref={toast} />
@@ -375,7 +288,12 @@ export default function SparkEditPage() {
                           {prop.key}
                           {prop.description && <i className="pi pi-info-circle info-icon"></i>}
                         </label>
-                        {renderPropertyField(prop)}
+                        <SparkPropertyField
+                          prop={prop}
+                          value={formValues[prop.key]}
+                          imageOptions={imageOptions}
+                          onChange={(v) => setValue(prop.key, v)}
+                        />
                       </div>
                     ))}
                   </div>

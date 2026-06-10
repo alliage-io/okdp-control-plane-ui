@@ -6,6 +6,36 @@ export interface StreamSubscriber<T> {
   complete?: () => void;
 }
 
+export interface ListEvent<T> {
+  type: 'ADDED' | 'MODIFIED' | 'DELETED';
+  object: T;
+}
+
+/**
+ * Apply a watch-style ADDED/MODIFIED/DELETED event to an immutable list,
+ * upserting by key. Shared by every SSE-backed list in the app.
+ */
+export function applyListEvent<T>(list: T[], event: ListEvent<T>, key: (item: T) => string): T[] {
+  const eventKey = key(event.object);
+  const idx = list.findIndex((item) => key(item) === eventKey);
+
+  switch (event.type) {
+    case 'ADDED':
+    case 'MODIFIED': {
+      if (idx === -1) {
+        return [...list, event.object];
+      }
+      const next = [...list];
+      next[idx] = event.object;
+      return next;
+    }
+    case 'DELETED':
+      return idx === -1 ? list : list.filter((_, i) => i !== idx);
+    default:
+      return list;
+  }
+}
+
 /**
  * Subscribe to a server-sent events endpoint emitting JSON messages.
  * Returns an unsubscribe function that closes the connection.

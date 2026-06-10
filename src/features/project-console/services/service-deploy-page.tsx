@@ -1,14 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Dropdown } from 'primereact/dropdown';
 import { Toast } from 'primereact/toast';
 import { serviceApi } from '../../../core/api/service-api';
-import { useProjectContext } from '../../../core/context/project-context';
 import type { PlatformService } from '../../../core/models/service.model';
 import { DynamicSchemaForm } from '../../../shared/components/dynamic-schema-form';
 import { ProfileListEditor, type Profile } from '../../../shared/components/profile-list-editor';
-import { apiErrorMessage, parentLabel } from './service-utils';
+import {
+  apiErrorMessage,
+  areaBasePath,
+  hasProfileEditorWidget,
+  parentLabel,
+  stripProfileEditorFields,
+} from './service-utils';
 
 type StepKey = 'basics' | 'params' | 'profiles' | 'review';
 
@@ -26,28 +31,10 @@ const PROGRESS_STAGES = [
 
 const NAME_REGEX = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/;
 
-function hasProfileEditorWidget(schema: any): boolean {
-  if (!schema?.properties) return false;
-  return Object.values<any>(schema.properties).some(
-    (def) => def['x-ui-widget'] === 'profile-editor',
-  );
-}
-
-function stripProfileEditorFields(schema: any): any {
-  if (!schema?.properties) return schema;
-  const filtered = { ...schema, properties: { ...schema.properties } };
-  for (const [key, def] of Object.entries<any>(filtered.properties)) {
-    if (def['x-ui-widget'] === 'profile-editor') {
-      delete filtered.properties[key];
-    }
-  }
-  return filtered;
-}
-
 export default function ServiceDeployPage() {
   const navigate = useNavigate();
+  const { projectId } = useParams<{ projectId: string }>();
   const [searchParams] = useSearchParams();
-  const context = useProjectContext();
   const toast = useRef<Toast>(null);
   const progressTickRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -219,20 +206,18 @@ export default function ServiceDeployPage() {
   };
 
   const goBack = () => {
-    const project = context.currentProject;
-    if (!project) return;
+    if (!projectId) return;
 
     const returnTo = searchParams.get('returnTo');
     if (returnTo) {
       navigate(returnTo);
     } else {
-      navigate(`/project/${project.name}/services`);
+      navigate(`/project/${projectId}/${areaBasePath(service?.name).join('/')}`);
     }
   };
 
   const deploy = () => {
-    const project = context.currentProject;
-    if (!project || !service) return;
+    if (!projectId || !service) return;
 
     setDeploying(true);
     setDeployProgress(0);
@@ -247,7 +232,7 @@ export default function ServiceDeployPage() {
     }, 700);
 
     serviceApi
-      .deployService(project.name, {
+      .deployService(projectId, {
         service: service.name,
         tag: selectedTag,
         instanceName,
@@ -267,7 +252,7 @@ export default function ServiceDeployPage() {
           if (returnTo) {
             navigate(returnTo);
           } else {
-            navigate(`/project/${project.name}/services`);
+            navigate(`/project/${projectId}/${areaBasePath(service.name).join('/')}`);
           }
         }, 400);
       })

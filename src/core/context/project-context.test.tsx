@@ -22,6 +22,11 @@ vi.mock('../api/project-api', () => ({
   },
 }));
 
+// The provider only fetches while authenticated
+vi.mock('../auth/auth-context', () => ({
+  useAuth: () => ({ isAuthenticated: true }),
+}));
+
 import { ProjectContextProvider, useProjectContext } from './project-context';
 
 const mockProjects: Project[] = [

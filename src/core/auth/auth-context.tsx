@@ -13,6 +13,7 @@ import { Log, User, UserManager, WebStorageStateStore } from 'oidc-client-ts';
 import { environment } from '../../config/environment';
 import { logger } from '../services/logger';
 import { setAuthTokenProvider } from '../api/http';
+import { AUTH_RETURN_URL_KEY, PROJECT_STORAGE_KEY } from '../storage-keys';
 import type { UserProfile } from './user-profile';
 
 export interface AuthState {
@@ -77,6 +78,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     userManagerRef.current = createUserManager();
   }
   const userManager = userManagerRef.current;
+  const initPromiseRef = useRef<Promise<boolean> | null>(null);
 
   const [state, setState] = useState<AuthState>({
     ready: false,
@@ -87,8 +89,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const clearLocalState = useCallback(() => {
     setState((s) => ({ ...s, isAuthenticated: false, profile: null, roles: [] }));
-    sessionStorage.removeItem('auth_return_url');
-    sessionStorage.removeItem('okdp-selected-projectId');
+    sessionStorage.removeItem(AUTH_RETURN_URL_KEY);
+    sessionStorage.removeItem(PROJECT_STORAGE_KEY);
   }, []);
 
   const login = useCallback(() => {
@@ -129,7 +131,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       currentUrl.pathname !== '/index.html' &&
       !currentUrl.pathname.includes('login')
     ) {
-      sessionStorage.setItem('auth_return_url', currentUrl.pathname + currentUrl.search);
+      sessionStorage.setItem(AUTH_RETURN_URL_KEY, currentUrl.pathname + currentUrl.search);
     }
 
     const autoLoginRequested = currentUrl.searchParams.has('autoLogin');
@@ -164,7 +166,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    init().then((isAuthenticated) => {
+    // Run the auth check exactly once: StrictMode re-runs this effect while
+    // the first init() is still awaiting the token exchange, and a second
+    // signinRedirectCallback() would redeem the single-use authorization
+    // code twice (IdPs may revoke the issued tokens on code reuse).
+    if (!initPromiseRef.current) {
+      initPromiseRef.current = init();
+    }
+    initPromiseRef.current.then((isAuthenticated) => {
       // Mark as ready in all cases so the app can load
       setState((s) => ({ ...s, ready: true }));
       if (autoLoginRequested && !isAuthenticated) {

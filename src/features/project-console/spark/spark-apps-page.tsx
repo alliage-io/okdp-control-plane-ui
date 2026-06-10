@@ -1,16 +1,14 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from 'primereact/button';
-import { useProjectContext } from '../../../core/context/project-context';
 import { SparkList } from './spark-list';
 
 export default function SparkAppsPage() {
   const navigate = useNavigate();
-  const context = useProjectContext();
+  const { projectId } = useParams<{ projectId: string }>();
 
   const goToSubmit = () => {
-    const project = context.currentProject;
-    if (project) {
-      navigate(`/project/${project.name}/spark/applications/submit`);
+    if (projectId) {
+      navigate(`/project/${projectId}/spark/applications/submit`);
     }
   };
 

@@ -8,10 +8,9 @@ import { useAuth } from '../../core/auth/auth-context';
 import { useProjectContext } from '../../core/context/project-context';
 import { rememberSpace } from '../../core/context/space';
 import { environment } from '../../config/environment';
+import { SIDEBAR_COLLAPSED_KEY } from '../../core/storage-keys';
 import type { Project } from '../../core/api/project-api';
 import './project-page.css';
-
-const SIDEBAR_KEY = 'okdp-sidebar-collapsed';
 
 interface NavSectionProps {
   icon: string;
@@ -46,7 +45,7 @@ export default function ProjectPage() {
   const menuRef = useRef<Menu>(null);
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(
-    () => localStorage.getItem(SIDEBAR_KEY) === 'true',
+    () => localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === 'true',
   );
   const [lakehouseExpanded, setLakehouseExpanded] = useState(true);
   const [dataEngExpanded, setDataEngExpanded] = useState(true);
@@ -74,7 +73,7 @@ export default function ProjectPage() {
   const toggleSidebar = () => {
     setSidebarCollapsed((collapsed) => {
       const newState = !collapsed;
-      localStorage.setItem(SIDEBAR_KEY, String(newState));
+      localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(newState));
       return newState;
     });
   };
@@ -145,7 +144,13 @@ export default function ProjectPage() {
               <i className="pi pi-arrow-right"></i>
             </Link>
           )}
-          <a href={environment.githubUrl} target="_blank" className="topbar-btn" title="GitHub">
+          <a
+            href={environment.githubUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="topbar-btn"
+            title="GitHub"
+          >
             <i className="pi pi-github"></i>
           </a>
 

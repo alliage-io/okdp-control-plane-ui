@@ -1,26 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
-import { InputNumber } from 'primereact/inputnumber';
-import { Dropdown } from 'primereact/dropdown';
-import { InputSwitch } from 'primereact/inputswitch';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { TabPanel, TabView } from 'primereact/tabview';
 import { Toast } from 'primereact/toast';
 import { sparkApi } from '../../../core/api/spark-api';
-import { useProjectContext } from '../../../core/context/project-context';
 import type { SparkAppRequest, SparkImage } from '../../../core/models/spark.model';
 import { apiErrorMessage } from '../services/service-utils';
-import {
-  buildSections,
-  CORE_KEYS_SUBMIT,
-  parseKeyValue,
-  toOptions,
-  type SchemaProperty,
-  type SchemaSection,
-} from './spark-utils';
+import { buildSections, CORE_KEYS_SUBMIT, parseKeyValue, type SchemaSection } from './spark-utils';
+import { SparkPropertyField } from './spark-property-field';
 import './spark-pages.css';
 
 const FALLBACK_SECTIONS: SchemaSection[] = [
@@ -74,7 +64,7 @@ const FALLBACK_SECTIONS: SchemaSection[] = [
 
 export default function SparkSubmitPage() {
   const navigate = useNavigate();
-  const context = useProjectContext();
+  const { projectId } = useParams<{ projectId: string }>();
   const toast = useRef<Toast>(null);
 
   const [sparkImages, setSparkImages] = useState<SparkImage[]>([]);
@@ -87,6 +77,11 @@ export default function SparkSubmitPage() {
   const [yamlContent, setYamlContent] = useState('');
 
   const setValue = (key: string, value: any) => setFormValues((v) => ({ ...v, [key]: value }));
+
+  const imageOptions = useMemo(
+    () => sparkImages.map((i) => ({ label: i.label, value: i.image })),
+    [sparkImages],
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -116,15 +111,13 @@ export default function SparkSubmitPage() {
   }, []);
 
   const goBack = () => {
-    const project = context.currentProject;
-    if (project) {
-      navigate(`/project/${project.name}/spark/applications`);
+    if (projectId) {
+      navigate(`/project/${projectId}/spark/applications`);
     }
   };
 
   const submitGuided = () => {
-    const project = context.currentProject;
-    if (!project) return;
+    if (!projectId) return;
 
     setSubmitting(true);
 
@@ -167,14 +160,14 @@ export default function SparkSubmitPage() {
     }
 
     sparkApi
-      .submitApp(project.name, req)
+      .submitApp(projectId, req)
       .then(() => {
         toast.current?.show({
           severity: 'success',
           summary: 'Submitted',
           detail: `Spark job "${req.name}" submitted`,
         });
-        navigate(`/project/${project.name}/spark/applications`);
+        navigate(`/project/${projectId}/spark/applications`);
       })
       .catch((err) => {
         toast.current?.show({
@@ -187,20 +180,19 @@ export default function SparkSubmitPage() {
   };
 
   const submitYAML = () => {
-    const project = context.currentProject;
-    if (!project) return;
+    if (!projectId) return;
 
     setSubmitting(true);
 
     sparkApi
-      .submitAppYAML(project.name, { yaml: yamlContent })
+      .submitAppYAML(projectId, { yaml: yamlContent })
       .then(() => {
         toast.current?.show({
           severity: 'success',
           summary: 'Submitted',
           detail: 'Spark job submitted from YAML',
         });
-        navigate(`/project/${project.name}/spark/applications`);
+        navigate(`/project/${projectId}/spark/applications`);
       })
       .catch((err) => {
         toast.current?.show({
@@ -210,88 +202,6 @@ export default function SparkSubmitPage() {
         });
         setSubmitting(false);
       });
-  };
-
-  const renderPropertyField = (prop: SchemaProperty) => {
-    const value = formValues[prop.key];
-    if (prop.enumValues && prop.enumValues.length > 0) {
-      return (
-        <Dropdown
-          value={value}
-          options={toOptions(prop.enumValues)}
-          optionLabel="label"
-          optionValue="value"
-          placeholder={`Select ${prop.key}`}
-          appendTo={document.body}
-          className="w-full"
-          onChange={(e) => setValue(prop.key, e.value)}
-        />
-      );
-    }
-    if (prop.key === 'image' && sparkImages.length > 0) {
-      return (
-        <Dropdown
-          value={value}
-          options={sparkImages}
-          optionLabel="label"
-          optionValue="image"
-          placeholder="Select image"
-          appendTo={document.body}
-          className="w-full"
-          editable
-          onChange={(e) => setValue(prop.key, e.value)}
-        />
-      );
-    }
-    if (prop.type === 'integer') {
-      return (
-        <InputNumber
-          value={value ?? null}
-          showButtons
-          min={0}
-          className="w-full"
-          onValueChange={(e) => setValue(prop.key, e.value)}
-        />
-      );
-    }
-    if (prop.type === 'boolean') {
-      return <InputSwitch checked={!!value} onChange={(e) => setValue(prop.key, e.value)} />;
-    }
-    if (prop.isObject) {
-      return (
-        <InputTextarea
-          value={value ?? ''}
-          rows={3}
-          className="w-full mono-textarea"
-          placeholder="key=value (one per line)"
-          onChange={(e) => setValue(prop.key, e.target.value)}
-        />
-      );
-    }
-    if (prop.isArray) {
-      return (
-        <InputText
-          value={value ?? ''}
-          className="w-full"
-          placeholder="Comma-separated values"
-          onChange={(e) => setValue(prop.key, e.target.value)}
-        />
-      );
-    }
-    return (
-      <InputText
-        value={value ?? ''}
-        className="w-full"
-        placeholder={
-          prop.description
-            ? prop.description.length > 60
-              ? prop.description.substring(0, 60) + '...'
-              : prop.description
-            : ''
-        }
-        onChange={(e) => setValue(prop.key, e.target.value)}
-      />
-    );
   };
 
   return (
@@ -370,7 +280,13 @@ export default function SparkSubmitPage() {
                             {prop.key}
                             {prop.description && <i className="pi pi-info-circle info-icon"></i>}
                           </label>
-                          {renderPropertyField(prop)}
+                          <SparkPropertyField
+                            prop={prop}
+                            value={formValues[prop.key]}
+                            imageOptions={imageOptions}
+                            descriptionPlaceholder
+                            onChange={(v) => setValue(prop.key, v)}
+                          />
                         </div>
                       ))}
                     </div>

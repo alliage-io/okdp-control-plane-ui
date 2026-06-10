@@ -3,11 +3,16 @@ import { useLocation, useNavigate, useParams, useSearchParams } from 'react-rout
 import { Toast } from 'primereact/toast';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { serviceApi } from '../../../core/api/service-api';
-import { useProjectContext } from '../../../core/context/project-context';
 import type { Pod, ServiceInstance, ServiceMetrics } from '../../../core/models/service.model';
 import { PodList } from './pod-list';
 import { PodLogViewer } from './pod-log-viewer';
-import { apiErrorMessage, formatMediumDateTime, parentLabel, tagClass } from './service-utils';
+import {
+  apiErrorMessage,
+  areaBasePath,
+  formatMediumDateTime,
+  parentLabel,
+  tagClass,
+} from './service-utils';
 
 type Tab = 'overview' | 'pods' | 'logs' | 'parameters';
 
@@ -92,12 +97,12 @@ function MetricCard({
 export default function ServiceDetailPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { serviceName = '' } = useParams<{ serviceName: string }>();
+  const { projectId = '', serviceName = '' } = useParams<{
+    projectId: string;
+    serviceName: string;
+  }>();
   const [searchParams] = useSearchParams();
-  const context = useProjectContext();
   const toast = useRef<Toast>(null);
-
-  const projectId = context.currentProject?.name || '';
 
   const [instance, setInstance] = useState<ServiceInstance | null>(null);
   const [pods, setPods] = useState<Pod[]>([]);
@@ -169,13 +174,17 @@ export default function ServiceDetailPage() {
     return () => clearInterval(id);
   }, [projectId, serviceName]);
 
+  // Navigation stays inside the instance's own console area (e.g. a Trino
+  // instance edits/returns under /lakehouse/trino, not /services).
+  const basePath = areaBasePath(instance?.service).join('/');
+
   const goBack = () => {
     if (!projectId) return;
     const returnTo = searchParams.get('returnTo');
     if (returnTo) {
       navigate(returnTo);
     } else {
-      navigate(`/project/${projectId}/services`);
+      navigate(`/project/${projectId}/${basePath}`);
     }
   };
 
@@ -187,7 +196,7 @@ export default function ServiceDetailPage() {
   const editInstance = () => {
     if (projectId) {
       const returnTo = encodeURIComponent(location.pathname + location.search);
-      navigate(`/project/${projectId}/services/${serviceName}/edit?returnTo=${returnTo}`);
+      navigate(`/project/${projectId}/${basePath}/${serviceName}/edit?returnTo=${returnTo}`);
     }
   };
 
@@ -397,7 +406,7 @@ export default function ServiceDetailPage() {
                           className="info-link mono"
                           href={instance.url}
                           target="_blank"
-                          rel="noopener"
+                          rel="noopener noreferrer"
                         >
                           {instance.url}
                           <i className="pi pi-external-link" style={{ fontSize: '11px' }}></i>

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
@@ -10,7 +10,7 @@ import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
 import { InputText } from 'primereact/inputtext';
 import { sparkApi } from '../../../core/api/spark-api';
-import { useProjectContext } from '../../../core/context/project-context';
+import { applyListEvent } from '../../../core/api/sse';
 import type { SparkAppInstance, SparkUIInfo } from '../../../core/models/spark.model';
 import { apiErrorMessage, formatMediumDate } from '../services/service-utils';
 import { getStatusSeverity, isTerminalStatus } from './spark-utils';
@@ -24,14 +24,12 @@ function shortenImage(image: string): string {
 
 export function SparkList() {
   const navigate = useNavigate();
-  const context = useProjectContext();
+  const { projectId: projectName } = useParams<{ projectId: string }>();
   const toast = useRef<Toast>(null);
 
   const [apps, setApps] = useState<SparkAppInstance[]>([]);
   const [loading, setLoading] = useState(true);
   const [globalFilter, setGlobalFilter] = useState('');
-
-  const projectName = context.currentProject?.name;
 
   useEffect(() => {
     if (!projectName) return;
@@ -56,20 +54,7 @@ export function SparkList() {
       });
 
     const unsubscribe = sparkApi.subscribeApps(projectName, {
-      next: (event) => {
-        setApps((current) => {
-          const next = [...current];
-          const idx = next.findIndex((a) => a.name === event.object.name);
-          if (event.type === 'DELETED') {
-            if (idx !== -1) next.splice(idx, 1);
-          } else if (idx !== -1) {
-            next[idx] = event.object;
-          } else {
-            next.push(event.object);
-          }
-          return next;
-        });
-      },
+      next: (event) => setApps((current) => applyListEvent(current, event, (a) => a.name)),
     });
 
     return () => {

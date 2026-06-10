@@ -9,10 +9,11 @@ import {
   type ReactNode,
 } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { projectApi, type Project, type ProjectEvent } from '../api/project-api';
+import { projectApi, type Project } from '../api/project-api';
+import { applyListEvent } from '../api/sse';
+import { useAuth } from '../auth/auth-context';
+import { PROJECT_STORAGE_KEY as STORAGE_KEY } from '../storage-keys';
 import { logger } from '../services/logger';
-
-const STORAGE_KEY = 'okdp-selected-projectId';
 
 export interface ProjectContextValue {
   availableProjects: Project[];
@@ -28,22 +29,9 @@ export interface ProjectContextValue {
 
 const ProjectContext = createContext<ProjectContextValue | null>(null);
 
-function applyEvent(list: Project[], event: ProjectEvent): Project[] {
-  const project = event.object;
-  switch (event.type) {
-    case 'ADDED':
-      return list.some((p) => p.name === project.name) ? list : [...list, project];
-    case 'MODIFIED':
-      return list.map((p) => (p.name === project.name ? project : p));
-    case 'DELETED':
-      return list.filter((p) => p.name !== project.name);
-    default:
-      return list;
-  }
-}
-
 export function ProjectContextProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   const [availableProjects, setAvailableProjects] = useState<Project[]>([]);
   const [currentProjectId, setCurrentProjectId] = useState<string | null>(() =>
@@ -51,8 +39,15 @@ export function ProjectContextProvider({ children }: { children: ReactNode }) {
   );
   const [isLoading, setIsLoading] = useState(true);
 
-  // Projects list: initial REST fetch merged with SSE updates
+  // Projects list: initial REST fetch merged with SSE updates. Only while
+  // authenticated — the provider is mounted on every route (including the
+  // anonymous /login page), and an unauthenticated fetch would 401 and
+  // trigger the forced-logout handler.
   useEffect(() => {
+    if (!isAuthenticated) {
+      return;
+    }
+
     let cancelled = false;
 
     projectApi
@@ -71,7 +66,7 @@ export function ProjectContextProvider({ children }: { children: ReactNode }) {
       });
 
     const unsubscribe = projectApi.subscribeProjects({
-      next: (event) => setAvailableProjects((list) => applyEvent(list, event)),
+      next: (event) => setAvailableProjects((list) => applyListEvent(list, event, (p) => p.name)),
       error: (err) => logger.error('SSE Stream error', err),
     });
 
@@ -79,7 +74,7 @@ export function ProjectContextProvider({ children }: { children: ReactNode }) {
       cancelled = true;
       unsubscribe();
     };
-  }, []);
+  }, [isAuthenticated]);
 
   const selectProject = useCallback(
     (projectId: string) => {

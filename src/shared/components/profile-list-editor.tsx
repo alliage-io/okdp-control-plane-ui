@@ -34,6 +34,10 @@ const PROFILE_TYPE_OPTIONS = [
   { label: 'RStudio', value: 'rstudio' },
 ];
 
+// Stable default — an inline `[]` default would change identity on every
+// parent render and needlessly re-run the adoption effect.
+const NO_PROFILES: Profile[] = [];
+
 export interface ProfileListEditorProps {
   profileImages: Record<string, { label: string; image: string }[]>;
   initialProfiles?: Profile[];
@@ -73,7 +77,7 @@ function ResourceNumberField({ label, value, step, min, max, onChange }: NumberF
 
 export function ProfileListEditor({
   profileImages,
-  initialProfiles = [],
+  initialProfiles = NO_PROFILES,
   onProfilesChange,
 }: ProfileListEditorProps) {
   const [profiles, setProfiles] = useState<Profile[]>([]);

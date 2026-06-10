@@ -5,7 +5,6 @@ import { Tag } from 'primereact/tag';
 import { Toast } from 'primereact/toast';
 import { InputSwitch } from 'primereact/inputswitch';
 import { sparkApi } from '../../../core/api/spark-api';
-import { useProjectContext } from '../../../core/context/project-context';
 import type { SparkAppInstance } from '../../../core/models/spark.model';
 import { formatMediumDateTime } from '../services/service-utils';
 import { getExecutorSeverity, getStatusSeverity, isTerminalStatus } from './spark-utils';
@@ -13,18 +12,14 @@ import './spark-pages.css';
 
 export default function SparkDetailPage() {
   const navigate = useNavigate();
-  const { appName = '' } = useParams<{ appName: string }>();
-  const context = useProjectContext();
+  const { projectId = '', appName = '' } = useParams<{ projectId: string; appName: string }>();
   const toast = useRef<Toast>(null);
-
-  const projectId = context.currentProject?.name || '';
 
   const [app, setApp] = useState<SparkAppInstance | null>(null);
   const [loading, setLoading] = useState(true);
   const [logContent, setLogContent] = useState('');
   const [followMode, setFollowMode] = useState(false);
   const [sparkUILoading, setSparkUILoading] = useState(false);
-  const [appLoaded, setAppLoaded] = useState(false);
 
   useEffect(() => {
     if (!projectId || !appName) {
@@ -38,7 +33,6 @@ export default function SparkDetailPage() {
         if (cancelled) return;
         setApp(data);
         setLoading(false);
-        setAppLoaded(true);
       })
       .catch(() => {
         if (cancelled) return;
@@ -54,12 +48,13 @@ export default function SparkDetailPage() {
     };
   }, [projectId, appName]);
 
-  // Driver logs: snapshot fetch or follow-mode stream
+  // Driver logs: snapshot fetch or follow-mode stream (starts once the app
+  // details have loaded)
   const [logReloadTick, setLogReloadTick] = useState(0);
   const reloadLogs = useCallback(() => setLogReloadTick((t) => t + 1), []);
 
   useEffect(() => {
-    if (!appLoaded || !projectId || !appName) return;
+    if (!app || !projectId || !appName) return;
 
     if (followMode) {
       setLogContent('');
@@ -80,7 +75,7 @@ export default function SparkDetailPage() {
     return () => {
       cancelled = true;
     };
-  }, [appLoaded, projectId, appName, followMode, logReloadTick]);
+  }, [app, projectId, appName, followMode, logReloadTick]);
 
   const openSparkLink = (
     field: 'uiAddress' | 'historyServerUrl',

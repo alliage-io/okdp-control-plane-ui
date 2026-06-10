@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
@@ -18,11 +19,10 @@ import {
   type SecretStore,
   type SecretStoreRequest,
   type SecretStoreStatusDetail,
-  type SecretStoreCondition,
   type VaultAuthType,
 } from '../../../core/api/secret-store-api';
-import { useProjectContext } from '../../../core/context/project-context';
 import { apiErrorMessage, formatMediumDateTime } from '../services/service-utils';
+import { getConditionClass, getConditionIcon, statusSeverity } from './secret-status';
 import './secret-store-list.css';
 
 const NAME_PATTERN = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/;
@@ -59,34 +59,13 @@ const EMPTY_FORM: StoreForm = {
   isDefault: false,
 };
 
-function getStatusSeverity(status: string): 'success' | 'danger' | 'warning' | 'info' {
-  switch (status) {
-    case 'Ready':
-      return 'success';
-    case 'Error':
-      return 'danger';
-    case 'Pending':
-      return 'warning';
-    default:
-      return 'info';
-  }
-}
-
-function getConditionIcon(condition: SecretStoreCondition): string {
-  return condition.status === 'True' ? 'pi pi-check-circle' : 'pi pi-times-circle';
-}
-
-function getConditionClass(condition: SecretStoreCondition): string {
-  return condition.status === 'True' ? 'condition-ok' : 'condition-error';
-}
+const getStatusSeverity = (status: string) => statusSeverity(status, 'Ready');
 
 export function SecretStoreList() {
-  const context = useProjectContext();
+  const { projectId = '' } = useParams<{ projectId: string }>();
   const toast = useRef<Toast>(null);
   const menuRef = useRef<Menu>(null);
   const selectedStoreRef = useRef<SecretStore | null>(null);
-
-  const projectId = context.currentProject?.name ?? '';
 
   const [stores, setStores] = useState<SecretStore[]>([]);
   const [loading, setLoading] = useState(true);

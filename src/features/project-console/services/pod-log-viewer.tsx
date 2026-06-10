@@ -56,9 +56,14 @@ export function PodLogViewer({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pods, initialPodName]);
 
-  // Default to the first container whenever the pod (or its containers) change
+  // Default to the first container when the pod changes; keep the user's
+  // selection when a pods refresh re-creates the same options.
   useEffect(() => {
-    setSelectedContainer(containerOptions[0]?.value ?? '');
+    setSelectedContainer((current) =>
+      current && containerOptions.some((o) => o.value === current)
+        ? current
+        : (containerOptions[0]?.value ?? ''),
+    );
   }, [containerOptions]);
 
   // Load or stream logs whenever the selection or mode changes

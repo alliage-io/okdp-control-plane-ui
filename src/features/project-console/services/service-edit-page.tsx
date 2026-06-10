@@ -1,38 +1,28 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Dropdown } from 'primereact/dropdown';
 import { Toast } from 'primereact/toast';
 import { serviceApi } from '../../../core/api/service-api';
-import { useProjectContext } from '../../../core/context/project-context';
 import type { ServiceInstance } from '../../../core/models/service.model';
 import { DynamicSchemaForm } from '../../../shared/components/dynamic-schema-form';
 import { ProfileListEditor, type Profile } from '../../../shared/components/profile-list-editor';
-import { apiErrorMessage, parentLabel, tagClass } from './service-utils';
-
-function needsProfileEditor(schema: any): boolean {
-  if (!schema?.properties) return false;
-  return Object.values<any>(schema.properties).some(
-    (def) => def['x-ui-widget'] === 'profile-editor',
-  );
-}
-
-function stripProfileEditorFields(schema: any): any {
-  if (!schema?.properties) return schema;
-  const filtered = { ...schema, properties: { ...schema.properties } };
-  for (const [key, def] of Object.entries<any>(filtered.properties)) {
-    if (def['x-ui-widget'] === 'profile-editor') {
-      delete filtered.properties[key];
-    }
-  }
-  return filtered;
-}
+import {
+  apiErrorMessage,
+  areaBasePath,
+  hasProfileEditorWidget,
+  parentLabel,
+  stripProfileEditorFields,
+  tagClass,
+} from './service-utils';
 
 export default function ServiceEditPage() {
   const navigate = useNavigate();
-  const { serviceName } = useParams<{ serviceName: string }>();
+  const { projectId: projectName, serviceName } = useParams<{
+    projectId: string;
+    serviceName: string;
+  }>();
   const [searchParams] = useSearchParams();
-  const context = useProjectContext();
   const toast = useRef<Toast>(null);
 
   const [instance, setInstance] = useState<ServiceInstance | null>(null);
@@ -44,7 +34,6 @@ export default function ServiceEditPage() {
   const [paramsValid, setParamsValid] = useState(true);
   const [schemaLoading, setSchemaLoading] = useState(false);
   const [rawSchema, setRawSchema] = useState<any>(null);
-  const [filteredSchema, setFilteredSchema] = useState<any>(null);
   const [profileImages, setProfileImages] = useState<
     Record<string, { label: string; image: string }[]>
   >({});
@@ -58,7 +47,10 @@ export default function ServiceEditPage() {
   const profilesRef = useRef<Profile[]>([]);
 
   const hasPendingChanges = selectedTag !== originalTagRef.current;
-  const projectName = context.currentProject?.name;
+  const filteredSchema = useMemo(
+    () => (rawSchema ? stripProfileEditorFields(rawSchema) : null),
+    [rawSchema],
+  );
 
   const loadSchema = useCallback((service: string, tag: string) => {
     setSchemaLoading(true);
@@ -66,7 +58,6 @@ export default function ServiceEditPage() {
       .getServiceSchema(service, tag)
       .then((schema) => {
         setRawSchema(schema);
-        setFilteredSchema(stripProfileEditorFields(schema));
         setSchemaLoading(false);
       })
       .catch(() => {
@@ -138,7 +129,7 @@ export default function ServiceEditPage() {
   const onVersionChange = (tag: string) => {
     if (!instance || !tag) return;
     setSelectedTag(tag);
-    setFilteredSchema(null);
+    setRawSchema(null);
     loadSchema(instance.service, tag);
   };
 
@@ -147,7 +138,7 @@ export default function ServiceEditPage() {
     if (returnTo) {
       navigate(returnTo);
     } else {
-      navigate(`/project/${project}/services`);
+      navigate(`/project/${project}/${areaBasePath(instance?.service).join('/')}`);
     }
   };
 
@@ -165,7 +156,7 @@ export default function ServiceEditPage() {
     // (e.g. JupyterHub). Other services (Trino, Polaris, Superset, Airflow)
     // have `additionalProperties: false` and reject unknown keys.
     const mergedParams: Record<string, any> = { ...parametersRef.current };
-    if (needsProfileEditor(rawSchema)) {
+    if (hasProfileEditorWidget(rawSchema)) {
       mergedParams['profiles'] = profilesRef.current;
     }
     const body: { tag?: string; parameters: Record<string, any> } = { parameters: mergedParams };
@@ -338,7 +329,7 @@ export default function ServiceEditPage() {
                 </div>
               ) : null}
 
-              {(existingProfiles.length > 0 || needsProfileEditor(rawSchema)) && (
+              {(existingProfiles.length > 0 || hasProfileEditorWidget(rawSchema)) && (
                 <div className="form-section" style={{ marginTop: '20px' }}>
                   <div className="field-head">
                     <label style={{ margin: 0 }}>Profiles</label>

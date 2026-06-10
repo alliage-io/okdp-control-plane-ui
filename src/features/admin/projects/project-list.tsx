@@ -13,6 +13,7 @@ import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
 import type { MenuItem } from 'primereact/menuitem';
 import { projectApi, type Project, type ProjectEvent } from '../../../core/api/project-api';
+import { applyListEvent } from '../../../core/api/sse';
 import { logger } from '../../../core/services/logger';
 import './project-list.css';
 
@@ -22,6 +23,9 @@ export default function ProjectList() {
   const selectedProjectRef = useRef<Project | null>(null);
 
   const [projects, setProjects] = useState<Project[]>([]);
+  // Mirror of `projects` so the SSE handler can decide on toasts without
+  // side effects inside the state updater (updaters must stay pure).
+  const projectsRef = useRef<Project[]>([]);
   const [globalFilter, setGlobalFilter] = useState('');
   const [visible, setVisible] = useState(false);
   const [newProject, setNewProject] = useState<Project>({ name: '', description: '' });
@@ -32,38 +36,33 @@ export default function ProjectList() {
   const showError = (detail: string) =>
     toast.current?.show({ severity: 'error', summary: 'Error', detail, life: 5000 });
 
+  const applyProjects = (next: Project[]) => {
+    projectsRef.current = next;
+    setProjects(next);
+  };
+
   useEffect(() => {
     let unsubscribe: (() => void) | undefined;
     let cancelled = false;
 
     const handleProjectEvent = (event: ProjectEvent) => {
       const project = event.object;
-      switch (event.type) {
-        case 'ADDED':
-          setProjects((list) => {
-            if (list.some((p) => p.name === project.name)) return list;
-            showSuccess(`Project ${project.name} created`);
-            return [...list, project];
-          });
-          break;
-        case 'MODIFIED':
-          setProjects((list) => list.map((p) => (p.name === project.name ? project : p)));
-          break;
-        case 'DELETED':
-          setProjects((list) => {
-            if (!list.some((p) => p.name === project.name)) return list;
-            showSuccess(`Project ${project.name} deleted`);
-            return list.filter((p) => p.name !== project.name);
-          });
-          break;
+      const exists = projectsRef.current.some((p) => p.name === project.name);
+
+      if (event.type === 'ADDED' && !exists) {
+        showSuccess(`Project ${project.name} created`);
+      } else if (event.type === 'DELETED' && exists) {
+        showSuccess(`Project ${project.name} deleted`);
       }
+
+      applyProjects(applyListEvent(projectsRef.current, event, (p) => p.name));
     };
 
     projectApi
       .getProjects()
       .then((data) => {
         if (cancelled) return;
-        setProjects(data);
+        applyProjects(data);
         unsubscribe = projectApi.subscribeProjects({
           next: handleProjectEvent,
           error: (err) => logger.error('Stream error', err),

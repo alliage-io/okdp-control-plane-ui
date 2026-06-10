@@ -46,8 +46,8 @@ export function ProjectContextProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
 
   const [availableProjects, setAvailableProjects] = useState<Project[]>([]);
-  const [currentProjectId, setCurrentProjectId] = useState<string | null>(
-    () => sessionStorage.getItem(STORAGE_KEY),
+  const [currentProjectId, setCurrentProjectId] = useState<string | null>(() =>
+    sessionStorage.getItem(STORAGE_KEY),
   );
   const [isLoading, setIsLoading] = useState(true);
 
@@ -137,7 +137,14 @@ export function ProjectContextProvider({ children }: { children: ReactNode }) {
       getLastSelectedProjectId: () => sessionStorage.getItem(STORAGE_KEY),
       clearContext,
     }),
-    [availableProjects, currentProjectId, isLoading, selectProject, setProjectFromRoute, clearContext],
+    [
+      availableProjects,
+      currentProjectId,
+      isLoading,
+      selectProject,
+      setProjectFromRoute,
+      clearContext,
+    ],
   );
 
   return <ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>;

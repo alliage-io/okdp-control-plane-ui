@@ -36,7 +36,15 @@ function resourceUsage(metrics: ServiceMetrics | null, kind: 'cpu' | 'memory'): 
   };
 }
 
-function MetricCard({ label, usage, unit }: { label: string; usage: ResourceUsage; unit?: string }) {
+function MetricCard({
+  label,
+  usage,
+  unit,
+}: {
+  label: string;
+  usage: ResourceUsage;
+  unit?: string;
+}) {
   return (
     <div className={`metric${usage.unbounded ? ' unbounded' : ''}`}>
       <div className="metric-top">
@@ -385,7 +393,12 @@ export default function ServiceDetailPage() {
                     {instance.url && (
                       <div className="info-item info-item-wide">
                         <span className="info-label">URL</span>
-                        <a className="info-link mono" href={instance.url} target="_blank" rel="noopener">
+                        <a
+                          className="info-link mono"
+                          href={instance.url}
+                          target="_blank"
+                          rel="noopener"
+                        >
                           {instance.url}
                           <i className="pi pi-external-link" style={{ fontSize: '11px' }}></i>
                         </a>

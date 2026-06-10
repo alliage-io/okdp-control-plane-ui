@@ -255,9 +255,7 @@ export function SecretStoreList() {
       })
       .catch((err) => {
         setSaving(false);
-        showError(
-          apiErrorMessage(err, `Failed to ${editMode ? 'update' : 'create'} secret store`),
-        );
+        showError(apiErrorMessage(err, `Failed to ${editMode ? 'update' : 'create'} secret store`));
       });
   };
 
@@ -467,8 +465,7 @@ export function SecretStoreList() {
             <div className="empty-state-inline">
               <i className="pi pi-lock"></i>
               <span>
-                No secret stores configured. Click <strong>Add secret store</strong> to connect
-                one.
+                No secret stores configured. Click <strong>Add secret store</strong> to connect one.
               </span>
             </div>
           }

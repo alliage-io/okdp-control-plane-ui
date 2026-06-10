@@ -405,8 +405,7 @@ export default function ServiceDeployPage() {
                       <span className="muted-text small mono">{service.name}</span>
                     </div>
                     <small className="field-hint" style={{ marginTop: 0, marginBottom: '10px' }}>
-                      Pick a version. Each version ships its own schema; the parameters step
-                      adapts.
+                      Pick a version. Each version ships its own schema; the parameters step adapts.
                     </small>
                     <Dropdown
                       value={selectedTag}

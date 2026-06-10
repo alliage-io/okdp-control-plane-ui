@@ -198,8 +198,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       forceLogout,
       token,
       hasRole: (role: string) => state.roles.includes(role),
-      accountManagement: () =>
-        logger.warn('Account management not supported in generic OIDC mode'),
+      accountManagement: () => logger.warn('Account management not supported in generic OIDC mode'),
     }),
     [state, login, logout, forceLogout, token],
   );

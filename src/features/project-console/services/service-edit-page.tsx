@@ -342,7 +342,9 @@ export default function ServiceEditPage() {
                 <div className="form-section" style={{ marginTop: '20px' }}>
                   <div className="field-head">
                     <label style={{ margin: 0 }}>Profiles</label>
-                    <span className="muted-text small">Notebook environments users can launch.</span>
+                    <span className="muted-text small">
+                      Notebook environments users can launch.
+                    </span>
                   </div>
                   <ProfileListEditor
                     profileImages={profileImages}

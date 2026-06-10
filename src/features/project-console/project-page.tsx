@@ -124,7 +124,9 @@ export default function ProjectPage() {
                 appendTo={document.body}
                 onChange={(e) => context.selectProject((e.value as Project).name)}
                 valueTemplate={(project: Project | null) => (
-                  <span className="selected-project">{project ? project.name : 'Select Project'}</span>
+                  <span className="selected-project">
+                    {project ? project.name : 'Select Project'}
+                  </span>
                 )}
                 itemTemplate={(project: Project) => (
                   <div className="project-item">
@@ -172,7 +174,12 @@ export default function ProjectPage() {
       {/* Sidebar */}
       <aside className={`sidebar${sidebarCollapsed ? ' collapsed' : ''}`}>
         <nav className="nav">
-          <NavLink to={`/project/${projectName}`} end className={navLinkClass} title={title('Home')}>
+          <NavLink
+            to={`/project/${projectName}`}
+            end
+            className={navLinkClass}
+            title={title('Home')}
+          >
             <i className="pi pi-home"></i>
             <span>Home</span>
           </NavLink>

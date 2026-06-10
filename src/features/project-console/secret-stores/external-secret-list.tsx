@@ -463,8 +463,8 @@ export function ExternalSecretList() {
             <div className="empty-state-inline">
               <i className="pi pi-key"></i>
               <span>
-                No external secrets configured. Click <strong>Add external secret</strong> to
-                create one.
+                No external secrets configured. Click <strong>Add external secret</strong> to create
+                one.
               </span>
             </div>
           }
@@ -577,7 +577,9 @@ export function ExternalSecretList() {
             {readyStores.length === 0 ? (
               <div className="no-stores-hint">
                 <i className="pi pi-info-circle"></i>
-                <span>No ready secret stores available. Create and connect a secret store first.</span>
+                <span>
+                  No ready secret stores available. Create and connect a secret store first.
+                </span>
               </div>
             ) : (
               <Dropdown

@@ -238,9 +238,7 @@ export function ServiceList({
           </div>
           <h3>{hasFilter ? 'No instances match' : emptyTitle}</h3>
           <p>
-            {hasFilter
-              ? 'Try clearing the filter or searching by a different term.'
-              : emptyMessage}
+            {hasFilter ? 'Try clearing the filter or searching by a different term.' : emptyMessage}
           </p>
           {!hasFilter && (
             <button className="create-btn" onClick={onDeploy}>
@@ -292,7 +290,11 @@ export function ServiceList({
                   </td>
                   <td onClick={(e) => e.stopPropagation()}>
                     <div className="okdp-actions">
-                      <button className="icon-btn" title="View details" onClick={() => viewDetail(svc)}>
+                      <button
+                        className="icon-btn"
+                        title="View details"
+                        onClick={() => viewDetail(svc)}
+                      >
                         <i className="pi pi-eye"></i>
                       </button>
                       <button className="icon-btn" title="Edit" onClick={() => editService(svc)}>
@@ -308,7 +310,11 @@ export function ServiceList({
                           <i className="pi pi-external-link"></i>
                         </button>
                       )}
-                      <button className="icon-btn danger" title="Delete" onClick={() => confirmDelete(svc)}>
+                      <button
+                        className="icon-btn danger"
+                        title="Delete"
+                        onClick={() => confirmDelete(svc)}
+                      >
                         <i className="pi pi-trash"></i>
                       </button>
                     </div>

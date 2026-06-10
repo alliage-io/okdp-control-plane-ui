@@ -32,7 +32,9 @@ export const sparkApi = {
   },
 
   async listApps(projectId: string): Promise<SparkAppInstance[]> {
-    return (await http.get<SparkAppInstance[]>(`${baseUrl}/api/projects/${projectId}/spark-apps`)) || [];
+    return (
+      (await http.get<SparkAppInstance[]>(`${baseUrl}/api/projects/${projectId}/spark-apps`)) || []
+    );
   },
 
   getApp(projectId: string, appName: string): Promise<SparkAppInstance> {

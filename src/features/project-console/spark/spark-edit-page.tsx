@@ -29,9 +29,27 @@ const FALLBACK_SECTIONS: SchemaSection[] = [
     iconClass: 'core',
     properties: [
       { key: 'image', type: 'string', description: 'Spark image', isObject: false, isArray: false },
-      { key: 'mainClass', type: 'string', description: 'Main class', isObject: false, isArray: false },
-      { key: 'mainApplicationFile', type: 'string', description: 'Main application file', isObject: false, isArray: false },
-      { key: 'arguments', type: 'array', description: 'Application arguments', isObject: false, isArray: true },
+      {
+        key: 'mainClass',
+        type: 'string',
+        description: 'Main class',
+        isObject: false,
+        isArray: false,
+      },
+      {
+        key: 'mainApplicationFile',
+        type: 'string',
+        description: 'Main application file',
+        isObject: false,
+        isArray: false,
+      },
+      {
+        key: 'arguments',
+        type: 'array',
+        description: 'Application arguments',
+        isObject: false,
+        isArray: true,
+      },
     ],
   },
   {
@@ -39,8 +57,20 @@ const FALLBACK_SECTIONS: SchemaSection[] = [
     icon: 'pi-server',
     iconClass: 'resources',
     properties: [
-      { key: 'driver', type: 'object', description: 'Driver pod resources', isObject: true, isArray: false },
-      { key: 'executor', type: 'object', description: 'Executor pod resources', isObject: true, isArray: false },
+      {
+        key: 'driver',
+        type: 'object',
+        description: 'Driver pod resources',
+        isObject: true,
+        isArray: false,
+      },
+      {
+        key: 'executor',
+        type: 'object',
+        description: 'Executor pod resources',
+        isObject: true,
+        isArray: false,
+      },
     ],
   },
   {
@@ -48,7 +78,13 @@ const FALLBACK_SECTIONS: SchemaSection[] = [
     icon: 'pi-sliders-h',
     iconClass: 'config',
     properties: [
-      { key: 'sparkConf', type: 'object', description: 'Spark configuration (key=value)', isObject: true, isArray: false },
+      {
+        key: 'sparkConf',
+        type: 'object',
+        description: 'Spark configuration (key=value)',
+        isObject: true,
+        isArray: false,
+      },
     ],
   },
 ];
@@ -155,7 +191,8 @@ export default function SparkEditPage() {
     const executorStr = formValues['executor'];
     if (executorStr && typeof executorStr === 'string') {
       const parsed = parseKeyValue(executorStr);
-      if (parsed['instances']) req.executorInstances = parseInt(parsed['instances'], 10) || undefined;
+      if (parsed['instances'])
+        req.executorInstances = parseInt(parsed['instances'], 10) || undefined;
       if (parsed['cores']) req.executorCores = parseInt(parsed['cores'], 10) || undefined;
       if (parsed['memory']) req.executorMemory = parsed['memory'];
     }

@@ -7,8 +7,7 @@ import prettier from 'eslint-config-prettier';
 
 export default tseslint.config(
   {
-    // Legacy Angular sources awaiting migration (see REACT-ROADMAP.md)
-    ignores: ['src/app/**', 'src/environments/**', 'dist/**'],
+    ignores: ['dist/**'],
   },
   {
     files: ['**/*.{ts,tsx}'],

@@ -64,5 +64,5 @@ in the same commit that completes the step.
   detail pages.
 - [x] **15. Tests** — Vitest + Testing Library setup; port the auth service
   and project context specs.
-- [ ] **16. Cleanup** — delete remaining Angular sources and configs, update
+- [x] **16. Cleanup** — delete remaining Angular sources and configs, update
   `README.md` and `.vscode/`, final `lint` + `build` + `test` all green.

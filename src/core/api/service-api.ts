@@ -21,11 +21,15 @@ export const serviceApi = {
   },
 
   getService(projectId: string, serviceName: string): Promise<ServiceInstance> {
-    return http.get<ServiceInstance>(`${baseUrl}/api/projects/${projectId}/services/${serviceName}`);
+    return http.get<ServiceInstance>(
+      `${baseUrl}/api/projects/${projectId}/services/${serviceName}`,
+    );
   },
 
   async getServices(projectId: string): Promise<ServiceInstance[]> {
-    return (await http.get<ServiceInstance[]>(`${baseUrl}/api/projects/${projectId}/services`)) || [];
+    return (
+      (await http.get<ServiceInstance[]>(`${baseUrl}/api/projects/${projectId}/services`)) || []
+    );
   },
 
   deployService(projectId: string, req: DeployServiceRequest): Promise<ServiceInstance> {
@@ -70,8 +74,9 @@ export const serviceApi = {
 
   async getPods(projectId: string, serviceName: string): Promise<Pod[]> {
     return (
-      (await http.get<Pod[]>(`${baseUrl}/api/projects/${projectId}/services/${serviceName}/pods`)) ||
-      []
+      (await http.get<Pod[]>(
+        `${baseUrl}/api/projects/${projectId}/services/${serviceName}/pods`,
+      )) || []
     );
   },
 

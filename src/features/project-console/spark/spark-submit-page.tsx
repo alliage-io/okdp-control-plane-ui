@@ -29,12 +29,45 @@ const FALLBACK_SECTIONS: SchemaSection[] = [
     icon: 'pi-cog',
     iconClass: 'core',
     properties: [
-      { key: 'type', type: 'string', description: 'Application language type', enumValues: ['Java', 'Scala', 'Python', 'R'], isObject: false, isArray: false },
-      { key: 'mode', type: 'string', description: 'Deploy mode', enumValues: ['cluster', 'client'], isObject: false, isArray: false },
+      {
+        key: 'type',
+        type: 'string',
+        description: 'Application language type',
+        enumValues: ['Java', 'Scala', 'Python', 'R'],
+        isObject: false,
+        isArray: false,
+      },
+      {
+        key: 'mode',
+        type: 'string',
+        description: 'Deploy mode',
+        enumValues: ['cluster', 'client'],
+        isObject: false,
+        isArray: false,
+      },
       { key: 'image', type: 'string', description: 'Spark image', isObject: false, isArray: false },
-      { key: 'mainClass', type: 'string', description: 'Main class', isObject: false, isArray: false },
-      { key: 'mainApplicationFile', type: 'string', description: 'Main application file', isObject: false, isArray: false },
-      { key: 'arguments', type: 'array', description: 'Application arguments', isObject: false, isArray: true, itemType: 'string' },
+      {
+        key: 'mainClass',
+        type: 'string',
+        description: 'Main class',
+        isObject: false,
+        isArray: false,
+      },
+      {
+        key: 'mainApplicationFile',
+        type: 'string',
+        description: 'Main application file',
+        isObject: false,
+        isArray: false,
+      },
+      {
+        key: 'arguments',
+        type: 'array',
+        description: 'Application arguments',
+        isObject: false,
+        isArray: true,
+        itemType: 'string',
+      },
     ],
   },
 ];
@@ -53,8 +86,7 @@ export default function SparkSubmitPage() {
   const [formValues, setFormValues] = useState<Record<string, any>>({});
   const [yamlContent, setYamlContent] = useState('');
 
-  const setValue = (key: string, value: any) =>
-    setFormValues((v) => ({ ...v, [key]: value }));
+  const setValue = (key: string, value: any) => setFormValues((v) => ({ ...v, [key]: value }));
 
   useEffect(() => {
     let cancelled = false;

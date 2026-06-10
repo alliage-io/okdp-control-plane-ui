@@ -12,7 +12,9 @@ export default function AdminHome() {
           </div>
           <div className="banner-text">
             <h1>Administration</h1>
-            <p className="subtitle">Manage your projects, users, and platform settings from here.</p>
+            <p className="subtitle">
+              Manage your projects, users, and platform settings from here.
+            </p>
           </div>
         </div>
         <div className="banner-decoration"></div>

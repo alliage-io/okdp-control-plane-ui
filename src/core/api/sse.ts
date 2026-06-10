@@ -43,10 +43,7 @@ export function subscribeJsonStream<T>(
  * Subscribe to a server-sent events endpoint emitting raw text lines
  * (e.g. log streaming). Completes silently on error, like the legacy app.
  */
-export function subscribeTextStream(
-  url: string,
-  subscriber: StreamSubscriber<string>,
-): () => void {
+export function subscribeTextStream(url: string, subscriber: StreamSubscriber<string>): () => void {
   const eventSource = new EventSource(url);
   eventSource.onmessage = (event) => subscriber.next(event.data);
   eventSource.onerror = () => {

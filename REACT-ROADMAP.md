@@ -39,7 +39,7 @@ in the same commit that completes the step.
   forceLogout / token), silent renew, `autoLogin` query param support,
   deep-link return-URL restore, `<RequireAuth>` route guard and post-login
   space redirect (`SpaceService` equivalent).
-- [ ] **6. Project context** — `ProjectContextProvider` holding the project
+- [x] **6. Project context** — `ProjectContextProvider` holding the project
   list merged from REST + SSE events, current project selection persisted in
   `sessionStorage`, consistency effect (deleted project fallback), and the
   project-context guard equivalent (redirect to last/first project).

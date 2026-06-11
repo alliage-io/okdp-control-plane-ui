@@ -88,9 +88,9 @@ export function ConsoleShell({
     ...(auth.hasRole('admins')
       ? [
           {
-            label: 'Control plane settings',
-            icon: 'pi pi-shield',
-            command: () => navigate('/admin'),
+            label: 'Identity',
+            icon: 'pi pi-users',
+            command: () => navigate('/identity'),
           },
         ]
       : []),

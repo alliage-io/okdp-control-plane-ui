@@ -115,18 +115,18 @@ Scrolling is currently broken.
 
 In the user dropdown menu:
 
-* [ ] Remove `Control Plane Settings`.
-* [ ] Add a direct `Identity` link.
-* [ ] Ensure the label is exactly `Identity`.
-* [ ] Ensure the link target is correct.
-* [ ] Check mouse interaction.
-* [ ] Check keyboard interaction if the dropdown supports it.
+* [x] Remove `Control Plane Settings`.
+* [x] Add a direct `Identity` link.
+* [x] Ensure the label is exactly `Identity`.
+* [x] Ensure the link target is correct.
+* [x] Check mouse interaction.
+* [x] Check keyboard interaction if the dropdown supports it.
 
 ### Acceptance criteria
 
-* [ ] The user dropdown contains `Identity`.
-* [ ] `Control Plane Settings` is no longer shown.
-* [ ] Clicking `Identity` opens the correct page.
+* [x] The user dropdown contains `Identity`.
+* [x] `Control Plane Settings` is no longer shown.
+* [x] Clicking `Identity` opens the correct page.
 
 ---
 

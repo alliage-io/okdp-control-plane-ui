@@ -49,7 +49,9 @@ interface ConsoleShellProps {
   headerLeft?: ReactNode;
   /** Environment color painted as a strip across the top of the header. */
   accentColor?: string;
-  nav: ReactNode;
+  /** Sidebar content; when absent the sidebar rail is not rendered at all
+   *  and the content zone takes the full width. */
+  nav?: ReactNode;
   navBottom?: ReactNode;
   navBottomAriaLabel?: string;
   children: ReactNode;
@@ -100,16 +102,22 @@ export function ConsoleShell({
     },
   ];
 
+  const hasSidebar = Boolean(nav);
+
   return (
     <div
       className={`grid h-screen ${
-        collapsed
-          ? 'grid-cols-[var(--db-sidebar-collapsed-width)_1fr]'
-          : 'grid-cols-[var(--db-sidebar-width)_1fr]'
-      } grid-rows-[var(--db-header-height)_minmax(0,1fr)] overflow-hidden bg-surface transition-[grid-template-columns] duration-400 ease-smooth max-lg:grid-cols-[var(--db-sidebar-collapsed-width)_1fr] max-md:grid-cols-[1fr]`}
+        hasSidebar
+          ? `${
+              collapsed
+                ? 'grid-cols-[var(--db-sidebar-collapsed-width)_1fr]'
+                : 'grid-cols-[var(--db-sidebar-width)_1fr]'
+            } max-lg:grid-cols-[var(--db-sidebar-collapsed-width)_1fr] max-md:grid-cols-[1fr]`
+          : 'grid-cols-[1fr]'
+      } grid-rows-[var(--db-header-height)_minmax(0,1fr)] overflow-hidden bg-surface transition-[grid-template-columns] duration-400 ease-smooth`}
     >
       {/* Unified header */}
-      <header className="relative z-20 col-span-2 row-start-1 flex h-(--db-header-height) items-center justify-between border-b border-border-light bg-surface px-3 transition-[background-color,border-color] duration-150 ease-smooth max-md:col-span-1">
+      <header className="relative z-20 col-span-full row-start-1 flex h-(--db-header-height) items-center justify-between border-b border-border-light bg-surface px-3 transition-[background-color,border-color] duration-150 ease-smooth">
         {accentColor && envBarEnabled && (
           <div
             className="absolute inset-x-0 top-0 h-[3px]"
@@ -167,49 +175,56 @@ export function ConsoleShell({
         </div>
       </header>
 
-      {/* Sidebar */}
-      <aside className="z-[25] col-start-1 row-start-2 flex flex-col border-r border-border-light bg-surface transition-[width] duration-400 ease-smooth max-md:hidden">
-        {/* The sidebar is fixed with the shell. When the viewport is too
+      {/* Sidebar — only rendered when the page has menu content (project
+          console); other pages get the full-width content zone. */}
+      {hasSidebar && (
+        <aside className="z-[25] col-start-1 row-start-2 flex flex-col border-r border-border-light bg-surface transition-[width] duration-400 ease-smooth max-md:hidden">
+          {/* The sidebar is fixed with the shell. When the viewport is too
             short for the tree, the nav zone itself slides (scrolls) while
             the bottom collapse bar stays pinned. */}
-        <nav
-          className={`mt-0 min-h-0 flex-1 overflow-y-auto ${
-            collapsed ? 'px-[0.4rem] py-3' : 'py-2 pr-1.5 pl-0 max-lg:px-[0.4rem] max-lg:py-3'
-          }`}
-        >
-          {nav}
-        </nav>
-        {navBottom && (
           <nav
-            className={`shrink-0 border-t border-border-light ${
-              collapsed
-                ? 'px-[0.4rem] pt-2 pb-3'
-                : 'pt-1.5 pr-1.5 pb-2 pl-0 max-lg:px-[0.4rem] max-lg:pt-2 max-lg:pb-3'
+            className={`mt-0 min-h-0 flex-1 overflow-y-auto ${
+              collapsed ? 'px-[0.4rem] py-3' : 'py-2 pr-1.5 pl-0 max-lg:px-[0.4rem] max-lg:py-3'
             }`}
-            aria-label={navBottomAriaLabel}
           >
-            {navBottom}
+            {nav}
           </nav>
-        )}
-        {/* Bottom collapse bar — pinned at the bottom of the rail. */}
-        <div className="mt-auto flex shrink-0 border-t border-border-light p-1.5">
-          <button
-            className={`flex h-8 items-center justify-center rounded-md border-none bg-transparent text-fg-muted transition-[color,background-color] duration-150 ease-smooth hover:bg-surface-tertiary hover:text-fg ${
-              collapsed ? 'w-full' : 'ml-auto w-8 max-lg:w-full'
-            }`}
-            onClick={onToggleCollapsed}
-            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          >
-            <i
-              className={`pi ${collapsed ? 'pi-angle-double-right' : 'pi-angle-double-left'} text-[1rem]`}
-            ></i>
-          </button>
-        </div>
-      </aside>
+          {navBottom && (
+            <nav
+              className={`shrink-0 border-t border-border-light ${
+                collapsed
+                  ? 'px-[0.4rem] pt-2 pb-3'
+                  : 'pt-1.5 pr-1.5 pb-2 pl-0 max-lg:px-[0.4rem] max-lg:pt-2 max-lg:pb-3'
+              }`}
+              aria-label={navBottomAriaLabel}
+            >
+              {navBottom}
+            </nav>
+          )}
+          {/* Bottom collapse bar — pinned at the bottom of the rail. */}
+          <div className="mt-auto flex shrink-0 border-t border-border-light p-1.5">
+            <button
+              className={`flex h-8 items-center justify-center rounded-md border-none bg-transparent text-fg-muted transition-[color,background-color] duration-150 ease-smooth hover:bg-surface-tertiary hover:text-fg ${
+                collapsed ? 'w-full' : 'ml-auto w-8 max-lg:w-full'
+              }`}
+              onClick={onToggleCollapsed}
+              title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            >
+              <i
+                className={`pi ${collapsed ? 'pi-angle-double-right' : 'pi-angle-double-left'} text-[1rem]`}
+              ></i>
+            </button>
+          </div>
+        </aside>
+      )}
 
       {/* Main layout */}
-      <div className="col-start-2 row-start-2 m-0 flex h-full flex-col overflow-visible bg-surface-secondary transition-[background-color,border-color] duration-150 ease-smooth max-md:col-start-1">
+      <div
+        className={`row-start-2 m-0 flex h-full flex-col overflow-visible bg-surface-secondary transition-[background-color,border-color] duration-150 ease-smooth ${
+          hasSidebar ? 'col-start-2 max-md:col-start-1' : 'col-start-1'
+        }`}
+      >
         <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-auto p-0">
           <div className="flex w-full min-w-0 flex-1 flex-col px-7 py-5 max-lg:px-5 max-lg:py-3 max-md:p-3">
             {children}

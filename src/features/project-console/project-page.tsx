@@ -362,52 +362,50 @@ export default function ProjectPage() {
       headerLeft={headerLeft}
       accentColor={envColor}
       nav={
-        <>
-          {projectName && onProjectPage && (
-            <>
-              <SideNavLink
-                to={`/projects/${projectName}`}
-                end
-                icon="pi pi-objects-column"
-                label="Overview"
-                collapsed={sidebarCollapsed}
-              />
+        projectName && onProjectPage ? (
+          <>
+            <SideNavLink
+              to={`/projects/${projectName}`}
+              end
+              icon="pi pi-objects-column"
+              label="Overview"
+              collapsed={sidebarCollapsed}
+            />
 
-              {NAV_CATEGORIES.map((category) => (
-                <NavSection
-                  key={category.key}
-                  icon={category.icon}
-                  label={category.label}
-                  expanded={isExpanded(category)}
-                  collapsed={sidebarCollapsed}
-                  onToggle={() => toggleCategory(category)}
-                >
-                  {category.items.map((item) =>
-                    item.disabled ? (
-                      <DisabledNavLink
-                        key={item.label}
-                        icon={navItemIcon(item)}
-                        label={item.label}
-                        collapsed={sidebarCollapsed}
-                        title={futureTitle}
-                        collapsedTitle={item.collapsedTitle ?? item.label}
-                      />
-                    ) : (
-                      <SideNavLink
-                        key={item.label}
-                        to={`/projects/${projectName}/${item.segment}`}
-                        icon={navItemIcon(item)}
-                        label={item.label}
-                        collapsed={sidebarCollapsed}
-                        sub
-                      />
-                    ),
-                  )}
-                </NavSection>
-              ))}
-            </>
-          )}
-        </>
+            {NAV_CATEGORIES.map((category) => (
+              <NavSection
+                key={category.key}
+                icon={category.icon}
+                label={category.label}
+                expanded={isExpanded(category)}
+                collapsed={sidebarCollapsed}
+                onToggle={() => toggleCategory(category)}
+              >
+                {category.items.map((item) =>
+                  item.disabled ? (
+                    <DisabledNavLink
+                      key={item.label}
+                      icon={navItemIcon(item)}
+                      label={item.label}
+                      collapsed={sidebarCollapsed}
+                      title={futureTitle}
+                      collapsedTitle={item.collapsedTitle ?? item.label}
+                    />
+                  ) : (
+                    <SideNavLink
+                      key={item.label}
+                      to={`/projects/${projectName}/${item.segment}`}
+                      icon={navItemIcon(item)}
+                      label={item.label}
+                      collapsed={sidebarCollapsed}
+                      sub
+                    />
+                  ),
+                )}
+              </NavSection>
+            ))}
+          </>
+        ) : null
       }
     >
       <Outlet />

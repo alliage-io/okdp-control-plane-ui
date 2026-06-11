@@ -95,19 +95,19 @@ Scrolling is currently broken.
 
 ## 5. Show lateral menu only on `/projects/...` URLs
 
-* [ ] Update layout logic so the lateral menu appears only on routes matching `/projects/...`.
-* [ ] Hide the lateral menu outside `/projects/...`.
-* [ ] Remove empty reserved layout space when the lateral menu is hidden.
-* [ ] Check `/admin`.
-* [ ] Check Identity pages.
-* [ ] Check login/logout pages if applicable.
-* [ ] Check other non-project routes.
+* [x] Update layout logic so the lateral menu appears only on routes matching `/projects/...`.
+* [x] Hide the lateral menu outside `/projects/...`.
+* [x] Remove empty reserved layout space when the lateral menu is hidden.
+* [x] Check `/admin`.
+* [x] Check Identity pages.
+* [x] Check login/logout pages if applicable.
+* [x] Check other non-project routes.
 
 ### Acceptance criteria
 
-* [ ] The lateral menu is visible on `/projects/...` routes.
-* [ ] The lateral menu is hidden outside `/projects/...` routes.
-* [ ] Pages without the lateral menu are not shifted or misaligned.
+* [x] The lateral menu is visible on `/projects/...` routes.
+* [x] The lateral menu is hidden outside `/projects/...` routes.
+* [x] Pages without the lateral menu are not shifted or misaligned.
 
 ---
 

@@ -185,16 +185,6 @@ export function ConsoleShell({
               <span className="text-[1.075rem] font-normal text-fg-secondary">console</span>
             </div>
           </Link>
-          <button
-            className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-sm border-none bg-transparent p-0 text-fg-muted transition-[color,background-color] duration-150 ease-smooth hover:bg-surface-tertiary hover:text-fg"
-            onClick={onToggleCollapsed}
-            title={collapsed ? 'Expand' : 'Collapse'}
-            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          >
-            <i
-              className={`${collapsed ? 'pi pi-angle-right' : 'pi pi-angle-left'} text-[1.1rem]`}
-            ></i>
-          </button>
         </div>
 
         <div className="flex flex-1 items-center justify-start gap-2 pl-3">{headerLeft}</div>
@@ -276,6 +266,21 @@ export function ConsoleShell({
             {navBottom}
           </nav>
         )}
+        {/* Bottom collapse bar — the customary place for the rail toggle. */}
+        <div className="flex shrink-0 border-t border-border-light p-1.5">
+          <button
+            className={`flex h-8 items-center justify-center rounded-md border-none bg-transparent text-fg-muted transition-[color,background-color] duration-150 ease-smooth hover:bg-surface-tertiary hover:text-fg ${
+              collapsed ? 'w-full' : 'ml-auto w-8 max-lg:w-full'
+            }`}
+            onClick={onToggleCollapsed}
+            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            <i
+              className={`pi ${collapsed ? 'pi-angle-double-right' : 'pi-angle-double-left'} text-[1rem]`}
+            ></i>
+          </button>
+        </div>
       </aside>
 
       {/* Main layout */}

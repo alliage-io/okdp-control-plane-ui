@@ -2,8 +2,12 @@
  *  entries are structurally compatible; hand-vendored logos (brands missing
  *  from simple-icons) provide their own viewBox. */
 export interface BrandGlyph {
-  path: string;
-  hex: string;
+  /** Single-path monochrome mark (the simple-icons shape). */
+  path?: string;
+  hex?: string;
+  /** Multicolor mark: each path carries its own fill, winning over `hex`.
+   *  For brands whose mono simple-icons variant is unreadable at 16px. */
+  paths?: { d: string; fill: string }[];
   /** Defaults to the simple-icons 24x24 canvas. */
   viewBox?: string;
 }
@@ -17,9 +21,13 @@ export function BrandIcon({ icon, mono }: { icon: BrandGlyph; mono?: boolean }) 
       viewBox={icon.viewBox ?? '0 0 24 24'}
       aria-hidden="true"
       className="h-4 w-[18px] shrink-0"
-      fill={mono ? 'currentColor' : `#${icon.hex}`}
+      fill={mono ? 'currentColor' : icon.hex ? `#${icon.hex}` : undefined}
     >
-      <path d={icon.path} />
+      {icon.paths ? (
+        icon.paths.map((p, i) => <path key={i} d={p.d} fill={mono ? undefined : p.fill} />)
+      ) : (
+        <path d={icon.path} />
+      )}
     </svg>
   );
 }

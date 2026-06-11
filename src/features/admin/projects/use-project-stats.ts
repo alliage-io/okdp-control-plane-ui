@@ -12,6 +12,11 @@ export interface ProjectStats {
   cpuUsed: number | null;
   /** Summed memory usage in bytes; null when no instance reports it. */
   memUsed: number | null;
+  /** Summed CPU limit in cores; null when usage is unreported or any
+   *  usage-reporting instance has no limit configured (unbounded). */
+  cpuLimit: number | null;
+  /** Summed memory limit in bytes; same null semantics as cpuLimit. */
+  memLimit: number | null;
 }
 
 /** Per-project KPI aggregates for the projects list: instance counts arrive
@@ -47,6 +52,8 @@ export function useProjectStats(projectNames: string[]): Record<string, ProjectS
             metricsLoaded: instances.length === 0,
             cpuUsed: null,
             memUsed: null,
+            cpuLimit: null,
+            memLimit: null,
           };
           mergeStats(name, base);
 
@@ -56,16 +63,27 @@ export function useProjectStats(projectNames: string[]): Record<string, ProjectS
           );
           let cpu = 0;
           let mem = 0;
+          let cpuLimit = 0;
+          let memLimit = 0;
           let cpuSeen = false;
           let memSeen = false;
+          // A project roll-up only has a meaningful limit when every instance
+          // contributing usage is itself bounded; one unbounded instance makes
+          // the whole project unbounded.
+          let cpuBounded = true;
+          let memBounded = true;
           for (const m of metrics) {
             if (m?.cpu?.available) {
               cpu += m.cpu.usedRaw;
               cpuSeen = true;
+              if (m.cpu.limitRaw > 0) cpuLimit += m.cpu.limitRaw;
+              else cpuBounded = false;
             }
             if (m?.memory?.available) {
               mem += m.memory.usedRaw;
               memSeen = true;
+              if (m.memory.limitRaw > 0) memLimit += m.memory.limitRaw;
+              else memBounded = false;
             }
           }
           mergeStats(name, {
@@ -73,6 +91,8 @@ export function useProjectStats(projectNames: string[]): Record<string, ProjectS
             metricsLoaded: true,
             cpuUsed: cpuSeen ? cpu : null,
             memUsed: memSeen ? mem : null,
+            cpuLimit: cpuSeen && cpuBounded ? cpuLimit : null,
+            memLimit: memSeen && memBounded ? memLimit : null,
           });
         } catch {
           mergeStats(name, {
@@ -81,6 +101,8 @@ export function useProjectStats(projectNames: string[]): Record<string, ProjectS
             metricsLoaded: true,
             cpuUsed: null,
             memUsed: null,
+            cpuLimit: null,
+            memLimit: null,
           });
         }
       })();

@@ -7,8 +7,6 @@ import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Toast } from 'primereact/toast';
-import { IconField } from 'primereact/iconfield';
-import { InputIcon } from 'primereact/inputicon';
 import { projectApi, type Project, type ProjectEvent } from '../../../core/api/project-api';
 import { applyListEvent } from '../../../core/api/sse';
 import { logger } from '../../../core/services/logger';
@@ -21,6 +19,8 @@ import {
   setProjectColor,
 } from '../../../core/services/project-colors';
 import EmptyState from '../../../shared/components/empty-state';
+import MetricCell from '../../../shared/components/metric-cell';
+import type { MetricValue } from '../../../core/models/service.model';
 import { formatCpuCores, formatMemoryBytes } from '../../project-console/services/service-utils';
 import { useProjectStats, type ProjectStats } from './use-project-stats';
 
@@ -45,6 +45,27 @@ function StatCell({
   );
 }
 
+/** Project roll-up shaped as a MetricValue for the shared MetricCell:
+ *  null used = unreported (dash), null limit = unbounded ("no limit"). */
+function rollupMetric(
+  used: number | null,
+  limit: number | null,
+  format: (value: number) => string,
+): MetricValue {
+  if (used === null) {
+    return { available: false, usedRaw: 0, limitRaw: 0, used: '', limit: '', pct: 0 };
+  }
+  const limitRaw = limit ?? 0;
+  return {
+    available: true,
+    usedRaw: used,
+    limitRaw,
+    used: format(used),
+    limit: format(limitRaw),
+    pct: limitRaw > 0 ? used / limitRaw : 0,
+  };
+}
+
 export default function ProjectList() {
   const auth = useAuth();
   const isAdmin = auth.hasRole('admins');
@@ -56,6 +77,9 @@ export default function ProjectList() {
   // side effects inside the state updater (updaters must stay pure).
   const projectsRef = useRef<Project[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [loadError, setLoadError] = useState(false);
+  // Bumped by the error panel's retry button to re-run the load effect.
+  const [reloadKey, setReloadKey] = useState(0);
   const [globalFilter, setGlobalFilter] = useState('');
   const [visible, setVisible] = useState(false);
   const [newProject, setNewProject] = useState<Project>({ name: '', description: '' });
@@ -75,6 +99,10 @@ export default function ProjectList() {
   useEffect(() => {
     let unsubscribe: (() => void) | undefined;
     let cancelled = false;
+
+    // Re-entry (retry): back to the loading state before fetching again.
+    setLoaded(false);
+    setLoadError(false);
 
     const handleProjectEvent = (event: ProjectEvent) => {
       const project = event.object;
@@ -101,16 +129,20 @@ export default function ProjectList() {
           error: (err) => logger.error('Stream error', err),
         });
       })
-      .catch(() => {
-        if (!cancelled) setLoaded(true);
-        showError('Failed to load projects');
+      .catch((err) => {
+        if (cancelled) return;
+        logger.error('Failed to load projects', err);
+        // Dedicated error panel below; an empty list here must not be
+        // mistaken for the "no projects yet" wizard state.
+        setLoadError(true);
+        setLoaded(true);
       });
 
     return () => {
       cancelled = true;
       unsubscribe?.();
     };
-  }, []);
+  }, [reloadKey]);
 
   const showDialog = () => {
     setNewProject({ name: '', description: '' });
@@ -139,7 +171,11 @@ export default function ProjectList() {
     </div>
   );
 
-  const empty = loaded && projects.length === 0;
+  // Four distinct states: loading (placeholder), error (panel + retry),
+  // empty (getting-started wizard), populated (filter + table). The wizard
+  // must never flash while the list is still loading or failed to load.
+  const empty = loaded && !loadError && projects.length === 0;
+  const populated = loaded && !loadError && projects.length > 0;
 
   const projectStats = useProjectStats(projects.map((p) => p.name));
 
@@ -155,26 +191,32 @@ export default function ProjectList() {
       {/* Top Bar: Title (Left) | Create Button (Right), vertically aligned */}
       <div className="top-bar">
         <h1>Projects</h1>
-        {isAdmin && !empty && (
+        {isAdmin && populated && (
           <Button label="Create project" onClick={showDialog} className="create-btn" />
         )}
       </div>
 
-      {!empty && (
-        <div className="mb-5">
-          <IconField>
-            <InputIcon className="pi pi-search" />
-            <InputText
-              type="text"
-              placeholder="Filter projects..."
-              value={globalFilter}
-              onChange={(e) => setGlobalFilter(e.target.value)}
-            />
-          </IconField>
-        </div>
-      )}
-
-      {empty ? (
+      {!loaded ? (
+        /* Loading: same centered geometry as the wizard, so an empty result
+           settles into the wizard without layout shift. */
+        <EmptyState
+          icon="pi pi-spin pi-spinner"
+          title="Loading projects…"
+          description="Fetching the project list."
+        />
+      ) : loadError ? (
+        <EmptyState
+          icon="pi pi-exclamation-triangle"
+          title="Failed to load projects"
+          description="The project list could not be retrieved. Check your connection and try again."
+          action={
+            <button className="btn-secondary mt-3" onClick={() => setReloadKey((k) => k + 1)}>
+              <i className="pi pi-refresh"></i>
+              <span>Retry</span>
+            </button>
+          }
+        />
+      ) : empty ? (
         /* Getting started: the platform has no project yet. */
         <EmptyState
           icon="pi pi-sparkles"
@@ -196,80 +238,108 @@ export default function ProjectList() {
           }
         />
       ) : (
-        /* Data Table */
-        <div className="table-wrapper">
-          <DataTable
-            value={rows}
-            dataKey="name"
-            globalFilter={globalFilter}
-            globalFilterFields={['name', 'description']}
-            className="minimal-table"
-            emptyMessage="No projects found."
-            rowClassName={() => 'workspace-row'}
-          >
-            <Column
-              header="Name"
-              field="name"
-              style={{ width: '30%' }}
-              body={(project: ProjectRow) => (
-                <span className="flex items-center gap-2">
-                  <Link
-                    to={`/projects/${project.name}`}
-                    className="flex items-center gap-2 text-lg font-semibold text-fg no-underline transition-colors duration-150 ease-smooth hover:text-primary hover:underline"
-                  >
-                    <span
-                      className="h-2.5 w-2.5 shrink-0 rounded-full"
-                      style={{ background: getProjectColor(project.name) }}
-                    ></span>
-                    {project.name}
-                  </Link>
-                  {project.name === currentProjectId && (
-                    <span
-                      className="rounded-full border border-(--db-primary-200) bg-primary-50 px-2 py-0.5 text-xs font-semibold text-primary"
-                      title="The project currently open in the console"
+        <>
+          <div className="okdp-filter-bar">
+            <div className="okdp-search-wrapper">
+              <i className="pi pi-search search-icon"></i>
+              <input
+                className="okdp-search-input"
+                placeholder="Filter projects..."
+                value={globalFilter}
+                onChange={(e) => setGlobalFilter(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* Data Table */}
+          <div className="table-wrapper">
+            <DataTable
+              value={rows}
+              dataKey="name"
+              globalFilter={globalFilter}
+              globalFilterFields={['name', 'description']}
+              className="minimal-table"
+              emptyMessage="No projects found."
+              rowClassName={() => 'workspace-row'}
+            >
+              <Column
+                header="Name"
+                field="name"
+                style={{ width: '26%' }}
+                body={(project: ProjectRow) => (
+                  <span className="flex items-center gap-2">
+                    <Link
+                      to={`/projects/${project.name}`}
+                      className="flex items-center gap-2 text-lg font-semibold text-fg no-underline transition-colors duration-150 ease-smooth hover:text-primary hover:underline"
                     >
-                      Current
-                    </span>
-                  )}
-                </span>
-              )}
-            />
-            <Column
-              header="Description"
-              field="description"
-              style={{ width: '34%' }}
-              className="description-cell"
-              body={(project: Project) => project.description || '-'}
-            />
-            <Column
-              header="Instances"
-              style={{ width: '9%' }}
-              body={(project: ProjectRow) => (
-                <StatCell stats={project.stats} value={(s) => s.instances} />
-              )}
-            />
-            <Column
-              header="CPU"
-              style={{ width: '9%' }}
-              body={(project: ProjectRow) => (
-                <StatCell
-                  stats={project.stats}
-                  value={(s) => (s.cpuUsed === null ? null : formatCpuCores(s.cpuUsed))}
-                />
-              )}
-            />
-            <Column
-              header="Memory"
-              style={{ width: '9%' }}
-              body={(project: ProjectRow) => (
-                <StatCell
-                  stats={project.stats}
-                  value={(s) => (s.memUsed === null ? null : formatMemoryBytes(s.memUsed))}
-                />
-              )}
-            />
-          </DataTable>
-        </div>
+                      <span
+                        className="h-2.5 w-2.5 shrink-0 rounded-full"
+                        style={{ background: getProjectColor(project.name) }}
+                      ></span>
+                      {project.name}
+                    </Link>
+                    {project.name === currentProjectId && (
+                      <span
+                        className="rounded-full border border-(--db-primary-200) bg-primary-50 px-2 py-0.5 text-xs font-semibold text-primary"
+                        title="The project currently open in the console"
+                      >
+                        Current
+                      </span>
+                    )}
+                  </span>
+                )}
+              />
+              <Column
+                header="Description"
+                field="description"
+                style={{ width: '30%' }}
+                className="description-cell"
+                body={(project: Project) => project.description || '-'}
+              />
+              <Column
+                header="Instances"
+                style={{ width: '8%' }}
+                body={(project: ProjectRow) => (
+                  <StatCell stats={project.stats} value={(s) => s.instances} />
+                )}
+              />
+              <Column
+                header="CPU"
+                style={{ width: '18%' }}
+                body={(project: ProjectRow) => (
+                  <MetricCell
+                    metric={
+                      project.stats?.metricsLoaded
+                        ? rollupMetric(
+                            project.stats.cpuUsed,
+                            project.stats.cpuLimit,
+                            formatCpuCores,
+                          )
+                        : undefined
+                    }
+                  />
+                )}
+              />
+              <Column
+                header="Memory"
+                style={{ width: '18%' }}
+                body={(project: ProjectRow) => (
+                  <MetricCell
+                    metric={
+                      project.stats?.metricsLoaded
+                        ? rollupMetric(
+                            project.stats.memUsed,
+                            project.stats.memLimit,
+                            formatMemoryBytes,
+                          )
+                        : undefined
+                    }
+                  />
+                )}
+              />
+            </DataTable>
+          </div>
+        </>
       )}
 
       {/* Create Dialog */}

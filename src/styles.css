@@ -390,7 +390,9 @@ h1 {
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.9);
-    border-radius: var(--db-radius-2xl);
+    /* xl is the app-wide container radius (okdp-table-wrapper, cards,
+       empty-state-panel); the glass tables align on it too. */
+    border-radius: var(--db-radius-xl);
     overflow: hidden;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.03);
   }
@@ -438,18 +440,18 @@ h1 {
 /* Global Dialog Styles — .db-dialog styles PrimeReact Dialog internals. */
 @layer primereact-overrides {
   /* The lara theme hardcodes a 6px dialog radius and reads no design token;
-   align the frame on the same 2xl radius as the glass tables. Header and
-   footer corners must match the frame because the dialog root does not
-   clip its children. */
+   align the frame on the same xl container radius as the tables and cards.
+   Header and footer corners must match the frame because the dialog root
+   does not clip its children. */
   .db-dialog.p-dialog {
-    border-radius: var(--db-radius-2xl);
+    border-radius: var(--db-radius-xl);
   }
 
   .db-dialog .p-dialog-header {
     padding: var(--db-space-lg) var(--db-space-xl) var(--db-space-sm) var(--db-space-xl);
     border-bottom: none;
-    border-top-left-radius: var(--db-radius-2xl);
-    border-top-right-radius: var(--db-radius-2xl);
+    border-top-left-radius: var(--db-radius-xl);
+    border-top-right-radius: var(--db-radius-xl);
   }
 
   .db-dialog .p-dialog-content {
@@ -458,15 +460,15 @@ h1 {
 
   /* Footer-less dialogs: the content pane carries the bottom corners. */
   .db-dialog .p-dialog-content:last-of-type {
-    border-bottom-left-radius: var(--db-radius-2xl);
-    border-bottom-right-radius: var(--db-radius-2xl);
+    border-bottom-left-radius: var(--db-radius-xl);
+    border-bottom-right-radius: var(--db-radius-xl);
   }
 
   .db-dialog .p-dialog-footer {
     padding: var(--db-space-md) var(--db-space-xl);
     border-top: 1px solid var(--db-border-light);
-    border-bottom-left-radius: var(--db-radius-2xl);
-    border-bottom-right-radius: var(--db-radius-2xl);
+    border-bottom-left-radius: var(--db-radius-xl);
+    border-bottom-right-radius: var(--db-radius-xl);
   }
 }
 

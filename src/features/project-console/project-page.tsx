@@ -30,6 +30,27 @@ const siteApachepolaris: BrandGlyph = {
   path: 'M1.77396 5.30235C1.17886 4.57499 0 4.9958 0 5.93559V97.8878C0 99.0543 0.945669 100 2.11221 100H94.0452C94.9854 100 95.4059 98.8203 94.6778 98.2255L51.5956 63.0332C50.769 62.3579 49.5973 62.3044 48.7124 62.9013L23.4326 79.9586C21.4731 81.2806 19.1256 78.933 20.4475 76.9737L37.5039 51.6949C38.1012 50.8094 38.0472 49.6369 37.3709 48.8102L1.77396 5.30235ZM98.2255 94.6778C98.8203 95.4059 100 94.9854 100 94.0452V2.11221C100 0.945669 99.0543 0 97.8878 0H5.93558C4.99579 0 4.57499 1.17886 5.30235 1.77396L48.8102 37.3709C49.6369 38.0472 50.8094 38.1014 51.6949 37.5039L76.9735 20.4475C78.9328 19.1256 81.2805 21.4732 79.9586 23.4325L62.9013 48.7125C62.3043 49.5973 62.3579 50.769 63.0332 51.5957L98.2255 94.6778Z',
 };
 
+/** Spark mark with a clock badge: tells the History Server apart from plain
+ *  Spark applications by shape, not only by color. */
+function SparkHistoryIcon() {
+  return (
+    <span
+      className="relative inline-flex shrink-0"
+      role="img"
+      aria-label="Spark History Server"
+      title="Spark History Server"
+    >
+      <BrandIcon icon={siApachespark} />
+      <span className="absolute -right-[5px] -bottom-[4px] flex h-[11px] w-[11px] items-center justify-center rounded-full bg-surface">
+        <i
+          className="pi pi-history text-[9px] leading-none text-fg-secondary"
+          aria-hidden="true"
+        ></i>
+      </span>
+    </span>
+  );
+}
+
 interface NavItem {
   /** Path under /projects/:projectId — absent for inert placeholders. */
   segment?: string;
@@ -37,6 +58,8 @@ interface NavItem {
   icon: string;
   /** Brand logo (favicon equivalent) rendered instead of `icon`. */
   brand?: BrandGlyph;
+  /** Fully custom icon node, wins over `brand` (badged variants). */
+  iconNode?: React.ReactNode;
   /** Follow text color instead of brand hex (near-black brands). */
   brandMono?: boolean;
   label: string;
@@ -85,7 +108,7 @@ const NAV_CATEGORIES: NavCategory[] = [
       {
         segment: 'spark/history-server',
         icon: 'pi pi-history',
-        brand: siApachespark,
+        iconNode: <SparkHistoryIcon />,
         label: 'Spark History',
       },
       {
@@ -253,8 +276,9 @@ function DisabledNavLink({ icon, label, collapsed, title, collapsedTitle }: Disa
   );
 }
 
-/** Brand logo when the service has one, primeicons fallback otherwise. */
+/** Custom node first, then brand logo, then the primeicons fallback. */
 function navItemIcon(item: NavItem): React.ReactNode {
+  if (item.iconNode) return item.iconNode;
   return item.brand ? <BrandIcon icon={item.brand} mono={item.brandMono} /> : item.icon;
 }
 

@@ -134,19 +134,19 @@ In the user dropdown menu:
 
 Spark and Spark History Server currently use the same icon.
 
-* [ ] Keep the Spark base icon for Spark applications.
-* [ ] Add a clock/history badge to the Spark History Server icon.
-* [ ] Ensure the badge is visible at lateral-menu icon size.
-* [ ] Ensure the badge works in expanded menu state.
-* [ ] Ensure the badge works in collapsed menu state.
-* [ ] Add an accessible label or title if applicable.
-* [ ] Do not rely only on color to differentiate the icons.
+* [x] Keep the Spark base icon for Spark applications.
+* [x] Add a clock/history badge to the Spark History Server icon.
+* [x] Ensure the badge is visible at lateral-menu icon size.
+* [x] Ensure the badge works in expanded menu state.
+* [x] Ensure the badge works in collapsed menu state.
+* [x] Add an accessible label or title if applicable.
+* [x] Do not rely only on color to differentiate the icons.
 
 ### Acceptance criteria
 
-* [ ] Spark and Spark History Server are visually distinguishable.
-* [ ] Spark History Server uses a Spark icon with a clock/history badge.
-* [ ] The icon remains readable in the lateral menu.
+* [x] Spark and Spark History Server are visually distinguishable.
+* [x] Spark History Server uses a Spark icon with a clock/history badge.
+* [x] The icon remains readable in the lateral menu.
 
 ---
 

@@ -239,15 +239,28 @@ export default function ProjectList() {
               header="Name"
               field="name"
               style={{ width: '30%' }}
-              body={(project: Project) => (
-                <span className="project-name flex items-center gap-2">
-                  <span
-                    className="h-2.5 w-2.5 shrink-0 rounded-full"
-                    style={{ background: getProjectColor(project.name) }}
-                  ></span>
-                  {project.name}
-                </span>
-              )}
+              body={(project: Project & { deleting: boolean }) =>
+                project.deleting ? (
+                  <span className="flex items-center gap-2 text-lg font-semibold text-fg">
+                    <span
+                      className="h-2.5 w-2.5 shrink-0 rounded-full"
+                      style={{ background: getProjectColor(project.name) }}
+                    ></span>
+                    {project.name}
+                  </span>
+                ) : (
+                  <Link
+                    to={`/projects/${project.name}`}
+                    className="flex items-center gap-2 text-lg font-semibold text-fg no-underline transition-colors duration-150 ease-smooth hover:text-primary hover:underline"
+                  >
+                    <span
+                      className="h-2.5 w-2.5 shrink-0 rounded-full"
+                      style={{ background: getProjectColor(project.name) }}
+                    ></span>
+                    {project.name}
+                  </Link>
+                )
+              }
             />
             <Column
               header="Description"
@@ -268,14 +281,6 @@ export default function ProjectList() {
                   </div>
                 ) : (
                   <div className="actions">
-                    <Link
-                      to={`/projects/${project.name}`}
-                      className="action-link primary visible-btn"
-                      style={{ textDecoration: 'none' }}
-                    >
-                      Open <i className="pi pi-external-link"></i>
-                    </Link>
-
                     {isAdmin && (
                       <Button
                         icon="pi pi-ellipsis-v"

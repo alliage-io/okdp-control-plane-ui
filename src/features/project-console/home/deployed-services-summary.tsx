@@ -136,7 +136,14 @@ export default function DeployedServicesSummary({ projectId }: { projectId: stri
         <Column
           header="Instance"
           field="name"
-          body={(svc: SummaryRow) => <span className="font-medium">{svc.name}</span>}
+          body={(svc: SummaryRow) => (
+            <Link
+              to={`/projects/${projectId}/${areaBasePath(svc.service).join('/')}/${svc.name}`}
+              className="font-medium text-fg no-underline transition-colors duration-150 ease-smooth hover:text-primary hover:underline"
+            >
+              {svc.name}
+            </Link>
+          )}
         />
         <Column
           header="Service"
@@ -160,20 +167,6 @@ export default function DeployedServicesSummary({ projectId }: { projectId: stri
         <Column
           header="Memory"
           body={(svc: SummaryRow) => <MetricCell metric={svc.metrics?.memory} />}
-        />
-        <Column
-          style={{ textAlign: 'right' }}
-          body={(svc: SummaryRow) => (
-            <div className="actions">
-              <Link
-                to={`/projects/${projectId}/${areaBasePath(svc.service).join('/')}/${svc.name}`}
-                className="action-link primary"
-                style={{ textDecoration: 'none' }}
-              >
-                Open <i className="pi pi-arrow-right"></i>
-              </Link>
-            </div>
-          )}
         />
       </DataTable>
     </div>

@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import type { ReactNode } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Avatar } from 'primereact/avatar';
 import { Menu } from 'primereact/menu';
 import type { MenuItem } from 'primereact/menuitem';
@@ -68,6 +68,7 @@ export function ConsoleShell({
   children,
 }: ConsoleShellProps) {
   const auth = useAuth();
+  const navigate = useNavigate();
   const { envBarEnabled } = useEnvBar();
   const menuRef = useRef<Menu>(null);
 
@@ -77,6 +78,21 @@ export function ConsoleShell({
   const initials = `${first}${last || ''}`;
 
   const profileMenu: MenuItem[] = [
+    {
+      label: 'User settings',
+      icon: 'pi pi-cog',
+      command: () => navigate('/settings'),
+    },
+    ...(auth.hasRole('admins')
+      ? [
+          {
+            label: 'Control plane settings',
+            icon: 'pi pi-shield',
+            command: () => navigate('/admin'),
+          },
+        ]
+      : []),
+    { separator: true },
     {
       label: 'Sign out',
       icon: 'pi pi-sign-out',

@@ -3,7 +3,7 @@ import { Link, Outlet, useMatch } from 'react-router-dom';
 import { Dropdown } from 'primereact/dropdown';
 import { useProjectContext } from '../../core/context/project-context';
 import { useNavPrefs } from '../../core/preferences/nav-prefs-context';
-import { useCustomViews } from '../../core/preferences/custom-views-context';
+import { useCustomViews, type CustomView } from '../../core/preferences/custom-views-context';
 import { NAV_EXPANDED_KEY, SIDEBAR_COLLAPSED_KEY } from '../../core/storage-keys';
 import type { Project } from '../../core/api/project-api';
 import { getProjectColor } from '../../core/services/project-colors';
@@ -137,17 +137,6 @@ function ExternalNavLink({ href, icon, label, collapsed, title }: ExternalNavLin
   );
 }
 
-/** Trailing views-sidebar category for the user's own launchers — not part
- *  of NAV_CATEGORIES (it holds local, user-created entries), but it shares
- *  the same expand/collapse state machinery. */
-const CUSTOM_VIEWS_CATEGORY: NavCategory = {
-  key: 'custom-views',
-  label: 'Custom views',
-  icon: 'pi-bookmark',
-  defaultExpanded: true,
-  items: [],
-};
-
 export default function ProjectPage() {
   const context = useProjectContext();
   const { isNavItemHidden } = useNavPrefs();
@@ -215,14 +204,42 @@ export default function ProjectPage() {
   for (const { view } of allLaunchers) {
     launcherCounts.set(view.service, (launcherCounts.get(view.service) ?? 0) + 1);
   }
+  // User-created views flagged for the menu, slotted by their (mandatory)
+  // category: a lateral-menu category label merges them into that section,
+  // any other name opens its own trailing section.
+  const menuCustomViews = (projectName ? viewsFor(projectName) : []).filter((v) => v.inMenu);
+  const matchesCategory = (viewCategory: string, label: string) =>
+    viewCategory.trim().toLowerCase() === label.toLowerCase();
+
   const viewCategories = NAV_CATEGORIES.map((category) => ({
     category,
     launchers: allLaunchers.filter(({ view }) => view.categoryKey === category.key),
     builtInViews: BUILT_IN_VIEWS.filter((view) => view.categoryKey === category.key),
-  })).filter((entry) => entry.launchers.length + entry.builtInViews.length > 0);
+    customViews: menuCustomViews.filter((v) => matchesCategory(v.category, category.label)),
+  })).filter(
+    (entry) => entry.launchers.length + entry.builtInViews.length + entry.customViews.length > 0,
+  );
 
-  // User-created views flagged for the menu, in their own trailing category.
-  const menuCustomViews = (projectName ? viewsFor(projectName) : []).filter((v) => v.inMenu);
+  const extraViewCategories: { category: NavCategory; customViews: CustomView[] }[] = [];
+  for (const view of menuCustomViews) {
+    if (NAV_CATEGORIES.some((c) => matchesCategory(view.category, c.label))) continue;
+    const label = view.category.trim();
+    const entry = extraViewCategories.find((e) => matchesCategory(label, e.category.label));
+    if (entry) {
+      entry.customViews.push(view);
+    } else {
+      extraViewCategories.push({
+        category: {
+          key: `custom:${label.toLowerCase()}`,
+          label,
+          icon: 'pi-bookmark',
+          defaultExpanded: true,
+          items: [],
+        },
+        customViews: [view],
+      });
+    }
+  }
 
   const headerLeft = context.availableProjects.length > 0 && (
     /* project-switcher scopes the Dropdown overrides in the PrimeReact overrides section of styles.css */
@@ -345,7 +362,7 @@ export default function ProjectPage() {
               collapsed={sidebarCollapsed}
             />
 
-            {viewCategories.map(({ category, launchers, builtInViews }) => (
+            {viewCategories.map(({ category, launchers, builtInViews, customViews }) => (
               <NavSection
                 key={category.key}
                 icon={category.icon}
@@ -387,18 +404,7 @@ export default function ProjectPage() {
                     />
                   );
                 })}
-              </NavSection>
-            ))}
-
-            {menuCustomViews.length > 0 && (
-              <NavSection
-                icon={CUSTOM_VIEWS_CATEGORY.icon}
-                label={CUSTOM_VIEWS_CATEGORY.label}
-                expanded={isExpanded(CUSTOM_VIEWS_CATEGORY)}
-                collapsed={sidebarCollapsed}
-                onToggle={() => toggleCategory(CUSTOM_VIEWS_CATEGORY)}
-              >
-                {menuCustomViews.map((view) => (
+                {customViews.map((view) => (
                   <ExternalNavLink
                     key={view.id}
                     href={view.url}
@@ -409,7 +415,29 @@ export default function ProjectPage() {
                   />
                 ))}
               </NavSection>
-            )}
+            ))}
+
+            {extraViewCategories.map(({ category, customViews }) => (
+              <NavSection
+                key={category.key}
+                icon={category.icon}
+                label={category.label}
+                expanded={isExpanded(category)}
+                collapsed={sidebarCollapsed}
+                onToggle={() => toggleCategory(category)}
+              >
+                {customViews.map((view) => (
+                  <ExternalNavLink
+                    key={view.id}
+                    href={view.url}
+                    icon={view.icon}
+                    label={view.label}
+                    collapsed={sidebarCollapsed}
+                    title={`Open ${view.label} in a new tab`}
+                  />
+                ))}
+              </NavSection>
+            ))}
           </>
         ) : null
       }

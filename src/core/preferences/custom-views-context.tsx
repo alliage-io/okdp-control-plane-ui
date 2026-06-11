@@ -11,6 +11,9 @@ export interface CustomView {
   description?: string;
   /** primeicons class (e.g. "pi pi-chart-line"). */
   icon: string;
+  /** Sidebar category (mandatory): an existing lateral-menu category label
+   *  merges the view into that section; any other name opens its own. */
+  category: string;
   /** Also listed in the views sidebar. */
   inMenu: boolean;
 }
@@ -29,7 +32,14 @@ const CustomViewsContext = createContext<CustomViewsContextValue | null>(null);
 function storedViews(): CustomViewsByProject {
   try {
     const raw = localStorage.getItem(CUSTOM_VIEWS_KEY);
-    if (raw) return JSON.parse(raw) as CustomViewsByProject;
+    if (raw) {
+      const parsed = JSON.parse(raw) as CustomViewsByProject;
+      // Views saved before the category became mandatory get a fallback.
+      for (const views of Object.values(parsed)) {
+        for (const view of views) view.category ||= 'Custom views';
+      }
+      return parsed;
+    }
   } catch {
     // corrupt value — fall back to empty
   }

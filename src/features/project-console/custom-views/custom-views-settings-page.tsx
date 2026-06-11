@@ -3,10 +3,12 @@ import { useParams } from 'react-router-dom';
 import { Button } from 'primereact/button';
 import { Checkbox } from 'primereact/checkbox';
 import { Dialog } from 'primereact/dialog';
+import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { useCustomViews, type CustomView } from '../../../core/preferences/custom-views-context';
 import EmptyState from '../../../shared/components/empty-state';
+import { NAV_CATEGORIES } from '../nav-config';
 
 /** Curated primeicons palette for the tile icon picker. */
 const ICON_CHOICES = [
@@ -31,6 +33,7 @@ const EMPTY_DRAFT: Draft = {
   url: '',
   description: '',
   icon: ICON_CHOICES[0],
+  category: '',
   inMenu: true,
 };
 
@@ -48,7 +51,18 @@ export default function CustomViewsSettingsPage() {
   const views = projectId ? viewsFor(projectId) : [];
 
   const [draft, setDraft] = useState<Draft | null>(null);
-  const valid = !!draft && draft.label.trim().length > 0 && isValidUrl(draft.url);
+  const valid =
+    !!draft &&
+    draft.label.trim().length > 0 &&
+    isValidUrl(draft.url) &&
+    draft.category.trim().length > 0;
+
+  // Suggested categories: the lateral menu's own (Project configuration is
+  // fixed console chrome, not a views group) plus names already in use.
+  const categoryOptions = [
+    ...NAV_CATEGORIES.filter((c) => !c.fixed).map((c) => c.label),
+    ...new Set(views.map((v) => v.category)),
+  ].filter((label, i, all) => all.indexOf(label) === i);
 
   const openCreate = () => setDraft({ ...EMPTY_DRAFT });
   const openEdit = (view: CustomView) => setDraft({ ...view });
@@ -60,6 +74,7 @@ export default function CustomViewsSettingsPage() {
       label: draft.label.trim(),
       url: draft.url.trim(),
       description: draft.description?.trim() || undefined,
+      category: draft.category.trim(),
     };
     if (view.id) {
       updateView(projectId, view as CustomView);
@@ -122,10 +137,11 @@ export default function CustomViewsSettingsPage() {
           <table className="okdp-table">
             <thead>
               <tr>
-                <th style={{ width: '24%' }}>Name</th>
-                <th style={{ width: '32%' }}>URL</th>
-                <th style={{ width: '24%' }}>Description</th>
-                <th style={{ width: '10%' }}>In menu</th>
+                <th style={{ width: '20%' }}>Name</th>
+                <th style={{ width: '28%' }}>URL</th>
+                <th style={{ width: '14%' }}>Category</th>
+                <th style={{ width: '20%' }}>Description</th>
+                <th style={{ width: '8%' }}>In menu</th>
                 <th style={{ width: '10%' }}></th>
               </tr>
             </thead>
@@ -147,6 +163,9 @@ export default function CustomViewsSettingsPage() {
                     >
                       {view.url}
                     </a>
+                  </td>
+                  <td>
+                    <span className="text-sm text-fg-secondary">{view.category}</span>
                   </td>
                   <td>
                     <span className="muted-text">{view.description || '—'}</span>
@@ -233,6 +252,21 @@ export default function CustomViewsSettingsPage() {
                 onChange={(e) => setDraft((d) => d && { ...d, description: e.target.value })}
                 className="w-full dialog-input"
                 placeholder="Shown on the tile"
+              />
+            </div>
+
+            <div className="field">
+              <label htmlFor="cv-category">Category</label>
+              <Dropdown
+                inputId="cv-category"
+                editable
+                options={categoryOptions}
+                value={draft.category}
+                onChange={(e) =>
+                  setDraft((d) => d && { ...d, category: (e.value as string) ?? '' })
+                }
+                className="w-full"
+                placeholder="Pick a menu category or type a new one"
               />
             </div>
 

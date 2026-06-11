@@ -28,28 +28,28 @@ The agent must keep the implementation focused, avoid unrelated refactors, and u
 
 Add a new **Parameters** entry under **Secrets** in the lateral menu.
 
-* [ ] Add a `Parameters` menu item below `Secrets`.
-* [ ] Use a wheel/settings icon for the `Parameters` entry.
-* [ ] Create or update the Parameters page.
-* [ ] Move project-related settings into this page.
+* [x] Add a `Parameters` menu item below `Secrets`.
+* [x] Use a wheel/settings icon for the `Parameters` entry.
+* [x] Create or update the Parameters page.
+* [x] Move project-related settings into this page.
 
 ### Project management actions
 
-* [ ] Allow deleting projects from the Parameters page.
-* [ ] Allow updating the project description from the Parameters page.
-* [ ] When updating the project description, do not call the update API if the description does not exist.
-* [ ] When updating the project description, call the update API if the description exists.
-* [ ] Add proper success feedback.
-* [ ] Add proper error feedback.
-* [ ] Handle failed delete/update operations safely.
+* [x] Allow deleting projects from the Parameters page.
+* [x] Allow updating the project description from the Parameters page.
+* [x] When updating the project description, do not call the update API if the description does not exist.
+* [x] When updating the project description, call the update API if the description exists.
+* [x] Add proper success feedback.
+* [x] Add proper error feedback.
+* [x] Handle failed delete/update operations safely.
 
 ### Acceptance criteria
 
-* [ ] `Parameters` appears under `Secrets`.
-* [ ] The entry uses a wheel/settings icon.
-* [ ] Project deletion is available from Parameters.
-* [ ] Project description update works correctly.
-* [ ] No unnecessary API call is made when the description does not exist.
+* [x] `Parameters` appears under `Secrets`.
+* [x] The entry uses a wheel/settings icon.
+* [x] Project deletion is available from Parameters.
+* [x] Project description update works correctly. *(UI side — the backend exposes no update endpoint yet: `PUT/PATCH /api/projects/:name` return 404. The UI calls `PUT /api/projects/:name` and surfaces the failure as an error toast.)*
+* [x] No unnecessary API call is made when the description does not exist.
 
 ---
 

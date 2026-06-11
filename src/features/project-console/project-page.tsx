@@ -159,7 +159,10 @@ const NAV_CATEGORIES: NavCategory[] = [
     label: 'Project configuration',
     icon: 'pi-sliders-h',
     defaultExpanded: true,
-    items: [{ segment: 'secret-stores', icon: 'pi pi-lock', label: 'Secrets' }],
+    items: [
+      { segment: 'secret-stores', icon: 'pi pi-lock', label: 'Secrets' },
+      { segment: 'parameters', icon: 'pi pi-cog', label: 'Parameters' },
+    ],
   },
 ];
 

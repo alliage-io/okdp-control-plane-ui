@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Toast } from 'primereact/toast';
-import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
+import DeleteConfirmDialog from '../../../shared/components/delete-confirm-dialog';
 import { serviceApi } from '../../../core/api/service-api';
 import { applyListEvent } from '../../../core/api/sse';
 import type { ServiceInstance } from '../../../core/models/service.model';
@@ -39,6 +39,8 @@ export function ServiceList({
   // Deletion runs until the backend confirms (slow helm uninstall); these
   // names render as "Deleting…" with their row actions disabled.
   const [deletingNames, setDeletingNames] = useState<Set<string>>(new Set());
+  // Instance pending the type-to-confirm deletion dialog.
+  const [deleteTarget, setDeleteTarget] = useState<ServiceInstance | null>(null);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<StatusFilter>('All');
@@ -153,50 +155,56 @@ export function ServiceList({
     }
   };
 
-  const confirmDelete = (svc: ServiceInstance) => {
-    confirmDialog({
-      message: `This will remove "${svc.name}" and all its pods. This cannot be undone.`,
-      header: 'Delete this instance?',
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Delete',
-      rejectLabel: 'Cancel',
-      acceptClassName: 'p-button-danger',
-      accept: () => {
-        if (!projectName) return;
-        const clearDeleting = () =>
-          setDeletingNames((names) => {
-            const next = new Set(names);
-            next.delete(svc.name);
-            return next;
-          });
-        setDeletingNames((names) => new Set(names).add(svc.name));
-        serviceApi
-          .deleteService(projectName, svc.name)
-          .then(() => {
-            toast.current?.show({
-              severity: 'success',
-              summary: 'Instance deleted',
-              detail: `"${svc.name}" has been removed`,
-            });
-            clearDeleting();
-            setServices((current) => current.filter((s) => s.name !== svc.name));
-          })
-          .catch((err) => {
-            clearDeleting();
-            toast.current?.show({
-              severity: 'error',
-              summary: 'Error',
-              detail: apiErrorMessage(err, 'Failed to delete instance'),
-            });
-          });
-      },
-    });
+  const confirmDelete = (svc: ServiceInstance) => setDeleteTarget(svc);
+
+  const deleteInstance = (svc: ServiceInstance) => {
+    setDeleteTarget(null);
+    if (!projectName) return;
+    const clearDeleting = () =>
+      setDeletingNames((names) => {
+        const next = new Set(names);
+        next.delete(svc.name);
+        return next;
+      });
+    setDeletingNames((names) => new Set(names).add(svc.name));
+    serviceApi
+      .deleteService(projectName, svc.name)
+      .then(() => {
+        toast.current?.show({
+          severity: 'success',
+          summary: 'Instance deleted',
+          detail: `"${svc.name}" has been removed`,
+        });
+        clearDeleting();
+        setServices((current) => current.filter((s) => s.name !== svc.name));
+      })
+      .catch((err) => {
+        clearDeleting();
+        toast.current?.show({
+          severity: 'error',
+          summary: 'Error',
+          detail: apiErrorMessage(err, 'Failed to delete instance'),
+        });
+      });
   };
 
   return (
     <>
       <Toast ref={toast} />
-      <ConfirmDialog />
+      <DeleteConfirmDialog
+        resourceName={deleteTarget?.name ?? null}
+        resourceKind="instance"
+        message={
+          deleteTarget && (
+            <>
+              This will remove <strong>{deleteTarget.name}</strong> and all its pods. This cannot
+              be undone.
+            </>
+          )
+        }
+        onHide={() => setDeleteTarget(null)}
+        onConfirm={() => deleteTarget && deleteInstance(deleteTarget)}
+      />
 
       <div className="stat-strip">
         {statChips.map((chip) => (

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Toast } from 'primereact/toast';
-import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
+import DeleteConfirmDialog from '../../../shared/components/delete-confirm-dialog';
 import { serviceApi } from '../../../core/api/service-api';
 import type { Pod, ServiceInstance, ServiceMetrics } from '../../../core/models/service.model';
 import { PodList } from './pod-list';
@@ -110,6 +110,8 @@ export default function ServiceDetailPage() {
   const [selectedPod, setSelectedPod] = useState<Pod | null>(null);
   const [tab, setTab] = useState<Tab>('overview');
   const [metrics, setMetrics] = useState<ServiceMetrics | null>(null);
+  // Type-to-confirm deletion dialog visibility.
+  const [deleteVisible, setDeleteVisible] = useState(false);
 
   const runningPods = useMemo(
     () => pods.filter((p) => p.status === 'Running' || p.status === 'Ready').length,
@@ -201,32 +203,29 @@ export default function ServiceDetailPage() {
   };
 
   const confirmDelete = () => {
+    if (instance) setDeleteVisible(true);
+  };
+
+  const deleteInstance = () => {
+    setDeleteVisible(false);
     if (!instance) return;
-    confirmDialog({
-      message: `This will remove "${instance.name}" and all its pods. This cannot be undone.`,
-      header: 'Delete this instance?',
-      icon: 'pi pi-exclamation-triangle',
-      acceptClassName: 'p-button-danger',
-      accept: () => {
-        serviceApi
-          .deleteService(projectId, instance.name)
-          .then(() => {
-            toast.current?.show({
-              severity: 'success',
-              summary: 'Instance deleted',
-              detail: `"${instance.name}" has been removed`,
-            });
-            goBack();
-          })
-          .catch((err) => {
-            toast.current?.show({
-              severity: 'error',
-              summary: 'Error',
-              detail: apiErrorMessage(err, 'Failed to delete instance'),
-            });
-          });
-      },
-    });
+    serviceApi
+      .deleteService(projectId, instance.name)
+      .then(() => {
+        toast.current?.show({
+          severity: 'success',
+          summary: 'Instance deleted',
+          detail: `"${instance.name}" has been removed`,
+        });
+        goBack();
+      })
+      .catch((err) => {
+        toast.current?.show({
+          severity: 'error',
+          summary: 'Error',
+          detail: apiErrorMessage(err, 'Failed to delete instance'),
+        });
+      });
   };
 
   const onViewLogs = (pod: Pod) => {
@@ -239,7 +238,20 @@ export default function ServiceDetailPage() {
   return (
     <>
       <Toast ref={toast} />
-      <ConfirmDialog />
+      <DeleteConfirmDialog
+        resourceName={deleteVisible ? (instance?.name ?? null) : null}
+        resourceKind="instance"
+        message={
+          instance && (
+            <>
+              This will remove <strong>{instance.name}</strong> and all its pods. This cannot be
+              undone.
+            </>
+          )
+        }
+        onHide={() => setDeleteVisible(false)}
+        onConfirm={deleteInstance}
+      />
 
       <div className="detail-page animate-in">
         <div className="page-header">

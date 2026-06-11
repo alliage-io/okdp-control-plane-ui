@@ -29,8 +29,8 @@ Is at right of Logo - OKDP Console
 
 /admin page is a page that used to exists. Should now be the administration zone of control plane
 
-- [ ] Lateral menu does not contain project/services related (cf previous lateral menu)
-- [ ] Only a tile for identity for now
+- [x] Lateral menu does not contain project/services related (cf previous lateral menu)
+- [x] Only a tile for identity for now
 
 ## User settings page
 

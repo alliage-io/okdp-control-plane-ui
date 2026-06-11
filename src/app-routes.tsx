@@ -8,6 +8,7 @@ const HomePage = lazy(() => import('./features/landing/home-page'));
 const StartPage = lazy(() => import('./features/start/start-page'));
 const ProjectList = lazy(() => import('./features/admin/projects/project-list'));
 const SettingsPage = lazy(() => import('./features/settings/settings-page'));
+const AdminPage = lazy(() => import('./features/admin/admin-page'));
 const IdentityPage = lazy(() => import('./features/admin/identity/identity-page'));
 const ProjectPage = lazy(() => import('./features/project-console/project-page'));
 const ProjectHome = lazy(() => import('./features/project-console/home/project-home'));
@@ -74,6 +75,15 @@ export function AppRoutes() {
             </RequireAuth>
           }
         >
+          <Route
+            path="/admin"
+            element={
+              <RequireAdmin>
+                <AdminPage />
+              </RequireAdmin>
+            }
+          />
+
           <Route
             path="/identity"
             element={

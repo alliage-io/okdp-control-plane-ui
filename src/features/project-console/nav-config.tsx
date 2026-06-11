@@ -141,7 +141,9 @@ export const NAV_CATEGORIES: NavCategory[] = [
     label: 'Notebooks',
     icon: 'pi-book',
     defaultExpanded: true,
-    items: [{ segment: 'services', icon: 'pi pi-desktop', brand: siJupyter, label: 'JupyterHub' }],
+    items: [
+      { segment: 'jupyterhub', icon: 'pi pi-desktop', brand: siJupyter, label: 'JupyterHub' },
+    ],
   },
   {
     key: 'sql-bi',

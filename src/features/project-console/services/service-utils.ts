@@ -31,7 +31,7 @@ export interface ServiceArea {
  * app-routes.tsx and the sidebar links mirror these paths).
  */
 export const SERVICE_AREAS: Record<string, ServiceArea> = {
-  jupyterhub: { label: 'Jupyter', basePath: ['services'] },
+  jupyterhub: { label: 'JupyterHub', basePath: ['jupyterhub'] },
   'spark-history-server': { label: 'History Server', basePath: ['spark', 'history-server'] },
   trino: { label: 'Trino', basePath: ['trino'] },
   polaris: { label: 'Polaris', basePath: ['polaris'] },
@@ -46,7 +46,7 @@ export function parentLabel(service: string | undefined | null): string {
 
 /** URL segments of a service's console area, defaulting to the generic list. */
 export function areaBasePath(service: string | undefined | null): string[] {
-  return SERVICE_AREAS[service ?? '']?.basePath ?? ['services'];
+  return SERVICE_AREAS[service ?? '']?.basePath ?? ['jupyterhub'];
 }
 
 /**

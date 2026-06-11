@@ -15,9 +15,8 @@ export interface ServiceListProps {
   emptyTitle?: string;
   /**
    * URL segments under /projects/:projectId for the parent "area" (e.g.
-   * ['services'] for Jupyter, ['spark', 'history-server'] for Spark
-   * History Server). Used for detail/edit navigation so the sidebar
-   * highlights the correct entry.
+   * ['jupyterhub'], ['spark', 'history-server']). Used for detail/edit
+   * navigation so the sidebar highlights the correct entry.
    */
   basePath?: string[];
   onDeploy: () => void;
@@ -27,7 +26,7 @@ export function ServiceList({
   serviceFilter,
   emptyMessage = 'No instances deployed yet.',
   emptyTitle = 'No instances yet',
-  basePath = ['services'],
+  basePath = ['jupyterhub'],
   onDeploy,
 }: ServiceListProps) {
   const navigate = useNavigate();

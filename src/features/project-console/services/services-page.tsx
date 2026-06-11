@@ -21,17 +21,17 @@ interface ServiceAreaCopy {
 
 // Page copy per service area. Labels and the area base path (used so the
 // sidebar highlights the correct entry — otherwise anything under
-// /services/* lights up the Jupyter link, even when the user clicked Deploy
-// from the Spark History Server page) come from the SERVICE_AREAS registry
-// in service-utils.
+// /jupyterhub/* lights up the JupyterHub link, even when the user clicked
+// Deploy from the Spark History Server page) come from the SERVICE_AREAS
+// registry in service-utils.
 function areaCopy(serviceFilter: string): ServiceAreaCopy {
   switch (serviceFilter) {
     case 'jupyterhub':
       return {
-        breadcrumbParent: 'Notebook',
+        breadcrumbParent: 'Notebooks',
         subtitle:
           "Launch and manage per-user JupyterLab environments running in this project's namespace.",
-        emptyTitle: 'Launch your first Jupyter instance',
+        emptyTitle: 'Deploy JupyterHub',
       };
     case 'spark-history-server':
       return {

@@ -130,11 +130,11 @@ export function AppRoutes() {
                 <Route path="spark/applications" element={<SparkAppsPage />} />
               </Route>
 
-              {serviceRoutes('services', {
-                title: 'Jupyter Instances',
-                deployLabel: 'New instance',
+              {serviceRoutes('jupyterhub', {
+                title: 'JupyterHub',
+                deployLabel: 'Deploy',
                 serviceFilter: 'jupyterhub',
-                emptyMessage: 'No Jupyter instances deployed yet.',
+                emptyMessage: 'No JupyterHub instances deployed yet.',
               })}
 
               {serviceRoutes('spark/history-server', {

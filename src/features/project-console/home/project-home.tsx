@@ -31,14 +31,14 @@ export default function ProjectHome() {
           <SectionHeading>Quick Actions</SectionHeading>
           <QuickActions>
             <ActionCard
-              to={`/projects/${project.name}/services/deploy`}
+              to={`/projects/${project.name}/jupyterhub/deploy`}
               icon="pi pi-play"
               tone="primary"
               title="Deploy Notebook"
-              description="Launch a new Jupyter instance"
+              description="Launch a new JupyterHub instance"
             />
             <ActionCard
-              to={`/projects/${project.name}/services`}
+              to={`/projects/${project.name}/jupyterhub`}
               icon="pi pi-server"
               tone="blue"
               title="View Instances"

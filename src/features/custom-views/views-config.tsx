@@ -43,7 +43,7 @@ export const UI_SERVICE_VIEWS: UiServiceView[] = [
     icon: 'pi pi-desktop',
     tone: 'primary',
     categoryKey: 'notebooks',
-    navSegment: 'services',
+    navSegment: 'jupyterhub',
   },
   {
     service: 'superset',

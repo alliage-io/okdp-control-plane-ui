@@ -178,18 +178,18 @@ Rounded corners are inconsistent across form inputs, buttons, tiles, and view el
 
 Deployment service forms currently have inconsistent widths and the navigation flow is painful.
 
-* [ ] Audit all deployment service form steps.
-* [ ] Define a fixed content width for deployment forms.
-* [ ] Apply the same width across all deployment steps.
-* [ ] Align the form consistently inside the main view zone.
-* [ ] Prevent layout jumps between steps.
-* [ ] Ensure the fixed width remains responsive on smaller screens.
+* [x] Audit all deployment service form steps.
+* [x] Define a fixed content width for deployment forms.
+* [x] Apply the same width across all deployment steps.
+* [x] Align the form consistently inside the main view zone.
+* [x] Prevent layout jumps between steps.
+* [x] Ensure the fixed width remains responsive on smaller screens.
 
 ### Acceptance criteria
 
-* [ ] Deployment forms keep a stable width across the flow.
-* [ ] Navigation between steps does not cause visual jumps.
-* [ ] Forms remain usable in Chromium at common screen sizes.
+* [x] Deployment forms keep a stable width across the flow.
+* [x] Navigation between steps does not cause visual jumps.
+* [x] Forms remain usable in Chromium at common screen sizes.
 
 ---
 

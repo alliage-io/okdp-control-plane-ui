@@ -78,6 +78,10 @@
   --db-sidebar-collapsed-width: 68px;
   --db-header-height: 60px;
 
+  /* Shared content width of the deployment-flow forms (deploy / edit /
+     spark submit), centered inside the main view zone. */
+  --db-form-width: 820px;
+
   /* Legacy Mapping */
   --db-text: var(--db-text-primary);
   --db-border: var(--db-border-light);

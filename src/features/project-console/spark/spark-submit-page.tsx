@@ -213,7 +213,7 @@ export default function SparkSubmitPage() {
     <>
       <Toast ref={toast} />
 
-      <div className="mx-auto max-w-[860px] pt-3">
+      <div className="mx-auto w-full max-w-(--db-form-width) pt-3">
         <div className="mb-7">
           <nav className="mb-5 flex items-center gap-2 text-[13px]">
             <a

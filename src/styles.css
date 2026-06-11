@@ -1497,7 +1497,11 @@ button.create-btn:hover,
 /* ========== Deploy wizard ========== */
 @utility deploy-page {
   padding-top: 4px;
-  max-width: 820px;
+  /* Fill up to the shared form width: inside the shell's flex column the
+     auto margins would otherwise shrink-wrap the page to its widest step,
+     making the width jump between wizard steps. */
+  width: 100%;
+  max-width: var(--db-form-width);
   margin: 0 auto;
   & .page-header {
     margin-bottom: 20px;

@@ -1,4 +1,6 @@
+import { InputSwitch } from 'primereact/inputswitch';
 import { useTheme, type ThemeMode } from '../../core/theme/theme-context';
+import { useEnvBar } from '../../core/preferences/env-bar-context';
 import SectionHeading from '../../shared/components/section-heading';
 
 interface PreviewPalette {
@@ -113,6 +115,7 @@ function ThemeCard({ mode, label, description, icon }: ThemeCardProps) {
 
 /** /settings — personal preferences for the console. */
 export default function SettingsPage() {
+  const { envBarEnabled, setEnvBarEnabled } = useEnvBar();
   return (
     <section className="flex animate-[fadeInUp_0.4s_ease-out] flex-col gap-7">
       <div>
@@ -132,6 +135,23 @@ export default function SettingsPage() {
         />
         <ThemeCard mode="light" label="Light" description="Always light" icon="pi pi-sun" />
         <ThemeCard mode="dark" label="Dark" description="Always dark" icon="pi pi-moon" />
+      </div>
+
+      <SectionHeading>Environment</SectionHeading>
+      <div className="flex max-w-[560px] items-center justify-between gap-4 rounded-lg border border-border-light bg-surface px-4 py-3">
+        <div className="flex flex-col">
+          <label htmlFor="env-bar-switch" className="text-sm font-semibold text-fg">
+            Environment color bar
+          </label>
+          <span className="text-xs text-fg-muted">
+            Paint the selected project&apos;s color as a strip across the top banner.
+          </span>
+        </div>
+        <InputSwitch
+          inputId="env-bar-switch"
+          checked={envBarEnabled}
+          onChange={(e) => setEnvBarEnabled(e.value ?? false)}
+        />
       </div>
     </section>
   );

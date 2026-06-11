@@ -34,6 +34,8 @@ function storedViews(): CustomViewsByProject {
     const raw = localStorage.getItem(CUSTOM_VIEWS_KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as CustomViewsByProject;
+      // A pre-fix bug could store views under the empty project name.
+      delete parsed[''];
       // Views saved before the category became mandatory get a fallback.
       for (const views of Object.values(parsed)) {
         for (const view of views) view.category ||= 'Custom views';

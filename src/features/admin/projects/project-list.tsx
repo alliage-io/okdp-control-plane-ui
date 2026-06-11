@@ -17,6 +17,7 @@ import {
   clearProjectColor,
   getProjectColor,
   setProjectColor,
+  useProjectColorsVersion,
 } from '../../../core/services/project-colors';
 import EmptyState from '../../../shared/components/empty-state';
 import MetricCell from '../../../shared/components/metric-cell';
@@ -24,7 +25,7 @@ import type { MetricValue } from '../../../core/models/service.model';
 import { formatCpuCores, formatMemoryBytes } from '../../project-console/services/service-utils';
 import { useProjectStats, type ProjectStats } from './use-project-stats';
 
-type ProjectRow = Project & { stats?: ProjectStats };
+type ProjectRow = Project & { stats?: ProjectStats; color: string };
 
 /** KPI cell: pulse while loading, em dash when the metric is unreported. */
 function StatCell({
@@ -71,6 +72,8 @@ export default function ProjectList() {
   const isAdmin = auth.hasRole('admins');
   const { currentProjectId } = useProjectContext();
   const toast = useRef<Toast>(null);
+  // Row dots follow color edits live (other tab, or Project Settings).
+  const colorsVersion = useProjectColorsVersion();
 
   const [projects, setProjects] = useState<Project[]>([]);
   // Mirror of `projects` so the SSE handler can decide on toasts without
@@ -179,11 +182,14 @@ export default function ProjectList() {
 
   const projectStats = useProjectStats(projects.map((p) => p.name));
 
-  // DataTable memoizes its rows against `value`: the KPI aggregates must be
-  // part of the row objects for the cells to repaint when they change.
+  // DataTable deep-compares `value` to decide whether to repaint: anything a
+  // cell renders (KPI aggregates, the color dot) must be part of the row
+  // objects, or edits to it are invisible to the table.
   const rows = useMemo<ProjectRow[]>(
-    () => projects.map((p) => ({ ...p, stats: projectStats[p.name] })),
-    [projects, projectStats],
+    () =>
+      projects.map((p) => ({ ...p, stats: projectStats[p.name], color: getProjectColor(p.name) })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- colorsVersion re-reads the colors
+    [projects, projectStats, colorsVersion],
   );
 
   return (
@@ -274,7 +280,7 @@ export default function ProjectList() {
                     >
                       <span
                         className="h-2.5 w-2.5 shrink-0 rounded-full"
-                        style={{ background: getProjectColor(project.name) }}
+                        style={{ background: project.color }}
                       ></span>
                       {project.name}
                     </Link>

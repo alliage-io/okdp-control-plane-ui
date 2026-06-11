@@ -258,8 +258,9 @@ export default function ProjectPage() {
   // sidebar even while a project is still selected in the context.
   const viewsMatch = useMatch('/projects/:projectId/views/*');
   const viewsIndexMatch = useMatch('/projects/:projectId/views');
+  const projectMatch = useMatch('/projects/:projectId/*');
   const onViewsWorld = viewsMatch !== null || viewsIndexMatch !== null;
-  const onProjectConsole = useMatch('/projects/:projectId/*') !== null && !onViewsWorld;
+  const onProjectConsole = projectMatch !== null && !onViewsWorld;
 
   const projectName = context.currentProject?.name;
 
@@ -268,7 +269,10 @@ export default function ProjectPage() {
   const viewServices = useViewServices(onViewsWorld ? projectName : undefined);
   // Header accent and switcher follow color edits made in Project Settings.
   useProjectColorsVersion();
-  const envColor = projectName ? getProjectColor(projectName) : undefined;
+  // The accent keys on the URL param when present: it's known on the first
+  // frame, while `currentProject` waits for the projects list to load.
+  const accentProject = projectMatch?.params.projectId ?? projectName;
+  const envColor = accentProject ? getProjectColor(accentProject) : undefined;
   const futureTitle = 'Direction future, non engagé';
 
   // Views sidebar content: the lateral menu's categories, but holding the

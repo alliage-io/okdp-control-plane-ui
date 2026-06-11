@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { Button } from 'primereact/button';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Toast } from 'primereact/toast';
@@ -18,10 +19,15 @@ import CustomViewsSection from './custom-views-section';
  *  update and project deletion (moved here from the former /admin/projects
  *  page, keeping the type-to-confirm dialog). */
 export default function ProjectSettingsPage() {
+  // The route param is the project name and is available immediately;
+  // `currentProject` (the full record) only resolves once the projects
+  // list has loaded. Local edits (color, custom views) must key on the
+  // param — keying on the not-yet-loaded record stored them under "".
+  const { projectId } = useParams<{ projectId: string }>();
   const { currentProject } = useProjectContext();
   const toast = useRef<Toast>(null);
 
-  const projectName = currentProject?.name ?? '';
+  const projectName = projectId ?? '';
   const savedDescription = currentProject?.description ?? '';
 
   const [draft, setDraft] = useState(savedDescription);

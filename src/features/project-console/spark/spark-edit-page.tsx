@@ -334,7 +334,7 @@ export default function SparkEditPage() {
               ))}
             </div>
 
-            <div className="mt-2 flex items-center justify-end gap-3 pt-5">
+            <div className="deploy-actions mt-2 flex items-center justify-end gap-3 pt-5">
               <Button severity="secondary" outlined label="Cancel" onClick={goBack} />
               <Button label="Save changes" icon="pi pi-check" loading={saving} onClick={save} />
             </div>

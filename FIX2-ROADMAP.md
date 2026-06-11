@@ -197,19 +197,19 @@ Deployment service forms currently have inconsistent widths and the navigation f
 
 Action buttons in the deployment flow currently have variable sizes.
 
-* [ ] Audit all action buttons in the deployment flow.
-* [ ] Define consistent button sizing rules.
-* [ ] Apply consistent height.
-* [ ] Apply consistent padding.
-* [ ] Apply consistent width or `min-width` where appropriate.
-* [ ] Ensure primary and secondary actions align correctly.
-* [ ] Avoid inconsistent button widths caused only by label length.
+* [x] Audit all action buttons in the deployment flow.
+* [x] Define consistent button sizing rules.
+* [x] Apply consistent height.
+* [x] Apply consistent padding.
+* [x] Apply consistent width or `min-width` where appropriate.
+* [x] Ensure primary and secondary actions align correctly.
+* [x] Avoid inconsistent button widths caused only by label length.
 
 ### Acceptance criteria
 
-* [ ] Deployment action buttons have consistent dimensions.
-* [ ] Button alignment is stable between deployment steps.
-* [ ] Primary actions remain visually clear.
+* [x] Deployment action buttons have consistent dimensions.
+* [x] Button alignment is stable between deployment steps.
+* [x] Primary actions remain visually clear.
 
 ---
 

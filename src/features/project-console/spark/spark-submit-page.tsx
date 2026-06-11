@@ -320,7 +320,7 @@ export default function SparkSubmitPage() {
                   </div>
                 ))}
 
-                <div className="mt-5 flex justify-end gap-2 border-t border-t-border-light pt-3">
+                <div className="deploy-actions mt-5 flex justify-end gap-2 border-t border-t-border-light pt-3">
                   <Button label="Cancel" severity="secondary" outlined onClick={goBack} />
                   <Button
                     label="Submit"
@@ -347,7 +347,7 @@ export default function SparkSubmitPage() {
                   onChange={(e) => setYamlContent(e.target.value)}
                 />
               </div>
-              <div className="mt-5 flex justify-end gap-2 border-t border-t-border-light pt-3">
+              <div className="deploy-actions mt-5 flex justify-end gap-2 border-t border-t-border-light pt-3">
                 <Button label="Cancel" severity="secondary" outlined onClick={goBack} />
                 <Button
                   label="Submit YAML"

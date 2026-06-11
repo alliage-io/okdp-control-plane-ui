@@ -1672,6 +1672,22 @@ button.create-btn:hover,
   flex-wrap: wrap;
 }
 
+/* Uniform action-button footprint across the deployment flow, whatever the
+   underlying button system (.create-btn / .btn-secondary natives in the
+   wizard, PrimeReact .p-button rows on the spark pages — tagged with
+   .deploy-actions): one height, one padding, and a minimum width so size
+   differences only come from genuinely longer labels. */
+.wizard-actions button,
+.deploy-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 40px;
+  min-width: 96px;
+  padding: 0 16px;
+}
+
 @utility wa-right {
   display: flex;
   gap: 8px;

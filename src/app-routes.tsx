@@ -78,9 +78,6 @@ export function AppRoutes() {
           <Route path="/projects" element={<ProjectList />} />
           <Route path="/identity" element={<IdentityPage />} />
         </Route>
-        {/* Legacy bookmarks */}
-        <Route path="/admin/projects" element={<Navigate to="/projects" replace />} />
-        <Route path="/admin/identity" element={<Navigate to="/identity" replace />} />
 
         <Route
           path="/project"

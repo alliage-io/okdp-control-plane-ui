@@ -81,7 +81,7 @@ export function ConsoleShell({
 
   const profileMenu: MenuItem[] = [
     {
-      label: 'User settings',
+      label: 'User Settings',
       icon: 'pi pi-cog',
       command: () => navigate('/settings'),
     },

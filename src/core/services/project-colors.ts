@@ -64,7 +64,7 @@ export function clearProjectColor(name: string): void {
 
 // Change notification: colors are read at render time all over the shell
 // (header accent, project switcher, list dots), so editing one — e.g. from
-// Project Parameters — must re-render those readers.
+// Project Settings — must re-render those readers.
 const colorListeners = new Set<() => void>();
 let colorsVersion = 0;
 

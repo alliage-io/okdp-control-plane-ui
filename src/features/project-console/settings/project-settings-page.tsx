@@ -14,10 +14,10 @@ import SectionHeading from '../../../shared/components/section-heading';
 import DeleteConfirmDialog from '../../../shared/components/delete-confirm-dialog';
 import CustomViewsSection from './custom-views-section';
 
-/** /projects/:projectId/parameters — per-project settings: description
+/** /projects/:projectId/settings — per-project settings: description
  *  update and project deletion (moved here from the former /admin/projects
  *  page, keeping the type-to-confirm dialog). */
-export default function ParametersPage() {
+export default function ProjectSettingsPage() {
   const { currentProject } = useProjectContext();
   const toast = useRef<Toast>(null);
 
@@ -34,7 +34,7 @@ export default function ParametersPage() {
   const currentColor = projectName ? getProjectColor(projectName) : undefined;
 
   // Re-seed the editor when the selected project changes (the project
-  // switcher preserves the /parameters sub-route) or when an SSE MODIFIED
+  // switcher preserves the /settings sub-route) or when an SSE MODIFIED
   // event delivers a fresh description.
   useEffect(() => {
     setDraft(savedDescription);
@@ -89,7 +89,7 @@ export default function ParametersPage() {
   return (
     <section className="form-page flex animate-[fadeInUp_0.4s_ease-out] flex-col gap-7">
       <div>
-        <h1>Project Parameters</h1>
+        <h1>Project Settings</h1>
         <p className="mt-1 text-base text-fg-secondary">
           Settings for the <strong>{projectName}</strong> project.
         </p>

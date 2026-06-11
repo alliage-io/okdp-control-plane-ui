@@ -275,7 +275,7 @@ export default function ProjectPage() {
   // Deployed instances backing the views sidebar and, via outlet context,
   // the views pages themselves — one fetch + SSE stream for both.
   const viewServices = useViewServices(onViewsWorld ? projectName : undefined);
-  // Header accent and switcher follow color edits made in Project Parameters.
+  // Header accent and switcher follow color edits made in Project Settings.
   useProjectColorsVersion();
   const envColor = projectName ? getProjectColor(projectName) : undefined;
   const futureTitle = 'Direction future, non engagé';

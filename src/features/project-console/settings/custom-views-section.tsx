@@ -40,7 +40,7 @@ function isValidUrl(url: string): boolean {
   return /^https?:\/\/.+/.test(url.trim());
 }
 
-/** Project Parameters section for user-created views: launcher tiles
+/** Project Settings section for user-created views: launcher tiles
  *  (URL, description, icon) shown on the views page and, when flagged, in
  *  the views sidebar under their category. Stored in this browser only —
  *  the API is not involved and other users never see them. */

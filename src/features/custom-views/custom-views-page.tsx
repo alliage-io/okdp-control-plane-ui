@@ -67,7 +67,7 @@ export default function CustomViewsPage() {
             <div className="flex items-baseline justify-between">
               <SectionHeading>Custom views</SectionHeading>
               <Link
-                to={`/projects/${projectName}/parameters`}
+                to={`/projects/${projectName}/settings`}
                 className="text-sm font-medium text-primary no-underline hover:underline"
               >
                 Manage
@@ -91,10 +91,10 @@ export default function CustomViewsPage() {
               <p className="m-0 text-base text-fg-muted">
                 No custom views yet — create your own launcher tiles in{' '}
                 <Link
-                  to={`/projects/${projectName}/parameters`}
+                  to={`/projects/${projectName}/settings`}
                   className="text-primary no-underline hover:underline"
                 >
-                  Project Parameters
+                  Project Settings
                 </Link>
                 .
               </p>

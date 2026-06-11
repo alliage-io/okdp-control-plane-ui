@@ -204,8 +204,8 @@ export const NAV_CATEGORIES: NavCategory[] = [
     fixed: true,
     items: [
       { segment: 'secret-stores', icon: 'pi pi-lock', label: 'Secrets' },
-      // Parameters also hosts the local-only custom views (custom-views-context).
-      { segment: 'parameters', icon: 'pi pi-cog', label: 'Parameters' },
+      // Settings also hosts the local-only custom views (custom-views-context).
+      { segment: 'settings', icon: 'pi pi-cog', label: 'Settings' },
     ],
   },
 ];

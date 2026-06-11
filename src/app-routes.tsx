@@ -24,7 +24,9 @@ const IdentityPage = lazy(() => import('./features/admin/identity/identity-page'
 const ProjectPage = lazy(() => import('./features/project-console/project-page'));
 const ProjectHome = lazy(() => import('./features/project-console/home/project-home'));
 const SecretsPage = lazy(() => import('./features/project-console/secret-stores/secrets-page'));
-const ParametersPage = lazy(() => import('./features/project-console/parameters/parameters-page'));
+const ProjectSettingsPage = lazy(
+  () => import('./features/project-console/settings/project-settings-page'),
+);
 const ServicesPage = lazy(() => import('./features/project-console/services/services-page'));
 const ServiceDeployPage = lazy(
   () => import('./features/project-console/services/service-deploy-page'),
@@ -116,7 +118,7 @@ export function AppRoutes() {
             <Route path=":projectId" element={<ProjectRouteSync />}>
               <Route index element={<ProjectHome />} />
               <Route path="secret-stores" element={<SecretsPage />} />
-              <Route path="parameters" element={<ParametersPage />} />
+              <Route path="settings" element={<ProjectSettingsPage />} />
 
               {/* Views world: the project's view launchers and the rich
                   technology views (Spark pages). Lives beside the console

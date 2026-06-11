@@ -198,14 +198,14 @@ export const NAV_CATEGORIES: NavCategory[] = [
   },
   {
     key: 'project-configuration',
-    label: 'Project configuration',
+    label: 'Project Panel',
     icon: 'pi-sliders-h',
     defaultExpanded: true,
     fixed: true,
     items: [
       { segment: 'secret-stores', icon: 'pi pi-lock', label: 'Secrets' },
       // Settings also hosts the local-only custom views (custom-views-context).
-      { segment: 'settings', icon: 'pi pi-cog', label: 'Settings' },
+      { segment: 'settings', icon: 'pi pi-cog', label: 'Project Settings' },
     ],
   },
 ];

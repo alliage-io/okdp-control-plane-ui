@@ -55,8 +55,8 @@ export default function CustomViewsSection({ projectName }: { projectName: strin
     isValidUrl(draft.url) &&
     draft.category.trim().length > 0;
 
-  // Suggested categories: the lateral menu's own (Project configuration is
-  // fixed console chrome, not a views group) plus names already in use.
+  // Suggested categories: the lateral menu's own (Project Panel is fixed
+  // console chrome, not a views group) plus names already in use.
   const categoryOptions = [
     ...NAV_CATEGORIES.filter((c) => !c.fixed).map((c) => c.label),
     ...new Set(views.map((v) => v.category)),

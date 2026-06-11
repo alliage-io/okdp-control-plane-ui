@@ -116,7 +116,7 @@ function ThemeCard({ mode, label, description, icon }: ThemeCardProps) {
 }
 
 /** Per-category groups of lateral-menu entries with show/hide switches.
- *  Core entries (Overview, Project configuration) are not listed: they
+ *  Core entries (the world switcher, Project Panel) are not listed: they
  *  always stay in the menu. */
 function NavMenuPrefs() {
   const { isNavItemHidden, setNavItemHidden } = useNavPrefs();

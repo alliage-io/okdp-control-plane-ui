@@ -12,7 +12,7 @@ function shouldRedirect(target: string): boolean {
   // Already inside a space: never clobber a deep link. This keeps the effect
   // idempotent — it re-runs on every navigation because `navigate` changes
   // identity with the location.
-  const spacePrefixes = ['/home', '/admin', '/project', '/identity'];
+  const spacePrefixes = ['/home', '/project', '/identity'];
   if (spacePrefixes.some((p) => current.startsWith(p))) {
     return false;
   }

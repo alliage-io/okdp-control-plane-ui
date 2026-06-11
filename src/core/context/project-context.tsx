@@ -112,8 +112,8 @@ export function ProjectContextProvider({ children }: { children: ReactNode }) {
 
       if (availableProjects.length === 0) {
         clearContext();
-        const adminPaths = ['/admin', '/projects', '/identity'];
-        if (!adminPaths.some((p) => window.location.pathname.startsWith(p))) {
+        const projectlessPaths = ['/projects', '/identity', '/home'];
+        if (!projectlessPaths.some((p) => window.location.pathname.startsWith(p))) {
           navigate('/projects');
         }
       } else {

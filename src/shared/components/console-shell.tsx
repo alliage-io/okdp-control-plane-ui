@@ -45,8 +45,6 @@ interface ConsoleShellProps {
   onToggleCollapsed: () => void;
   /** Header widgets rendered right after the brand block (e.g. project switcher). */
   headerLeft?: ReactNode;
-  /** Extra header widgets rendered before the GitHub link (e.g. admin link). */
-  headerExtras?: ReactNode;
   nav: ReactNode;
   navBottom?: ReactNode;
   navBottomAriaLabel?: string;
@@ -59,7 +57,6 @@ export function ConsoleShell({
   collapsed,
   onToggleCollapsed,
   headerLeft,
-  headerExtras,
   nav,
   navBottom,
   navBottomAriaLabel,
@@ -153,7 +150,6 @@ export function ConsoleShell({
         <div className="flex flex-1 items-center justify-start gap-2 pl-3">{headerLeft}</div>
 
         <div className="flex items-center gap-2">
-          {headerExtras}
           <a
             href={environment.githubUrl}
             target="_blank"

@@ -21,7 +21,7 @@ Contains project dropdown <- space separation -> user dropdown
 Is at right of Logo - OKDP Console
 
 - [x] Banner: delete toggle theme
-- [ ] Banner: delete GitHub (to set with a link 'logo - GitHub' next to Copyright, in bottom banner)
+- [x] Banner: delete GitHub (to set with a link 'logo - GitHub' next to Copyright, in bottom banner)
 - [ ] Top banner should be sticky / fixed, as lateral menu
 - [ ] Dropdown user should contain: user settings (page), control plane admin settings (page), separator, logout (action)
 

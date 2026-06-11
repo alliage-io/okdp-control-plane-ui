@@ -42,9 +42,6 @@ export function SideNavLink({ to, end, icon, label, collapsed, sub }: SideNavLin
   );
 }
 
-const TOPBAR_BTN_CLASS =
-  'relative flex h-8 w-8 items-center justify-center rounded-sm border-none bg-transparent text-fg-muted no-underline transition-[color,background-color] duration-150 ease-smooth hover:bg-surface-tertiary hover:text-fg';
-
 interface ConsoleShellProps {
   collapsed: boolean;
   onToggleCollapsed: () => void;
@@ -127,16 +124,6 @@ export function ConsoleShell({
         <div className="flex flex-1 items-center justify-start gap-2 pl-3">{headerLeft}</div>
 
         <div className="flex items-center gap-2">
-          <a
-            href={environment.githubUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={TOPBAR_BTN_CLASS}
-            title="GitHub"
-          >
-            <i className="pi pi-github text-[1rem]"></i>
-          </a>
-
           <div
             className="flex items-center gap-2 rounded-md border-none bg-transparent py-1 pr-2 pl-1 transition-[background-color] duration-150 ease-smooth hover:bg-surface-tertiary"
             onClick={(e) => menuRef.current?.toggle(e)}
@@ -220,10 +207,19 @@ export function ConsoleShell({
         </main>
 
         <footer className="flex min-h-7 w-full shrink-0 items-center justify-between border-t border-border-light bg-transparent px-7 py-1.5">
-          <div>
+          <div className="flex items-center gap-3">
             <span className="text-xs font-normal text-fg-muted">
               © 2026 OKDP. All rights reserved.
             </span>
+            <a
+              href={environment.githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-xs font-normal text-fg-muted no-underline transition-colors duration-150 ease-smooth hover:text-fg"
+            >
+              <i className="pi pi-github text-[0.8rem]"></i>
+              GitHub
+            </a>
           </div>
           <div>
             <span className="text-xs font-normal text-fg-muted">v1.0.0</span>

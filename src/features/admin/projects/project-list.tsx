@@ -121,13 +121,14 @@ export default function ProjectList() {
   };
 
   const createProject = () => {
+    // Store the color before the request: the watch ADDED event often beats
+    // the HTTP response, and the new row must not flash the fallback color.
+    setProjectColor(newProject.name, newColor);
     projectApi
       .createProject(newProject)
-      .then(() => {
-        setProjectColor(newProject.name, newColor);
-        setVisible(false);
-      })
+      .then(() => setVisible(false))
       .catch((err) => {
+        clearProjectColor(newProject.name);
         showError('Failed to create project');
         logger.error('Failed to create project', err);
       });

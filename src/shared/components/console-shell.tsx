@@ -117,20 +117,13 @@ export function ConsoleShell({
             aria-hidden="true"
           ></div>
         )}
-        <div
-          className={`flex items-center gap-2 ${
-            collapsed
-              ? 'w-(--db-sidebar-collapsed-width) min-w-(--db-sidebar-collapsed-width)'
-              : 'w-(--db-sidebar-width) min-w-(--db-sidebar-width)'
-          } max-lg:w-(--db-sidebar-collapsed-width) max-lg:min-w-(--db-sidebar-collapsed-width) max-md:w-auto max-md:min-w-auto`}
-        >
+        {/* The brand zone keeps the expanded-sidebar width in both collapse
+            states so the "okdp console" title and the widgets after it never
+            shift when the rail below collapses. */}
+        <div className="flex w-(--db-sidebar-width) min-w-(--db-sidebar-width) items-center gap-2 max-md:w-auto max-md:min-w-auto">
           <Link to="/home" title="Home" className="flex items-center justify-center no-underline">
             <img src="/images/okdp-notext.svg" alt="okdp" className="h-auto w-6" />
-            <div
-              className={`flex flex-row items-baseline gap-1 overflow-hidden leading-none whitespace-nowrap transition-[max-width,margin] duration-400 ease-smooth ${
-                collapsed ? 'ml-0 max-w-0' : 'ml-2 max-w-[150px] max-lg:ml-0 max-lg:max-w-0'
-              } max-md:ml-2 max-md:max-w-[150px]`}
-            >
+            <div className="ml-2 flex flex-row items-baseline gap-1 leading-none whitespace-nowrap">
               <span className="text-[1.075rem] font-bold tracking-[-0.02em] text-fg">okdp</span>
               <span className="text-[1.075rem] font-normal text-fg-secondary">console</span>
             </div>

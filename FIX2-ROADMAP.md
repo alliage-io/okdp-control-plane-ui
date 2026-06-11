@@ -55,16 +55,16 @@ Add a new **Parameters** entry under **Secrets** in the lateral menu.
 
 ## 3. Keep “OKDP Console” visible when collapsing the lateral menu
 
-* [ ] Review the lateral menu collapse behavior.
-* [ ] Ensure the top banner title `OKDP Console` does not collapse.
-* [ ] Ensure `OKDP Console` does not disappear when the lateral menu is collapsed.
-* [ ] Keep the top banner visually stable in both expanded and collapsed states.
-* [ ] Fix any clipping, shrinking, or unwanted horizontal shift.
+* [x] Review the lateral menu collapse behavior.
+* [x] Ensure the top banner title `OKDP Console` does not collapse.
+* [x] Ensure `OKDP Console` does not disappear when the lateral menu is collapsed.
+* [x] Keep the top banner visually stable in both expanded and collapsed states.
+* [x] Fix any clipping, shrinking, or unwanted horizontal shift.
 
 ### Acceptance criteria
 
-* [ ] Collapsing the lateral menu does not affect the `OKDP Console` title.
-* [ ] The top banner remains stable and readable.
+* [x] Collapsing the lateral menu does not affect the `OKDP Console` title.
+* [x] The top banner remains stable and readable.
 
 ---
 

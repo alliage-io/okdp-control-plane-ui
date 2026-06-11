@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { useRef, useState } from 'react';
+import { Link, Outlet } from 'react-router-dom';
 import { Dropdown } from 'primereact/dropdown';
 import { useAuth } from '../../core/auth/auth-context';
 import { useProjectContext } from '../../core/context/project-context';
@@ -82,6 +82,7 @@ function DisabledNavLink({ icon, label, collapsed, title, collapsedTitle }: Disa
 export default function ProjectPage() {
   const auth = useAuth();
   const context = useProjectContext();
+  const switcherRef = useRef<Dropdown>(null);
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(
     () => localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === 'true',
@@ -107,6 +108,7 @@ export default function ProjectPage() {
     /* project-switcher scopes the Dropdown overrides in the PrimeReact overrides section of styles.css */
     <div className="project-switcher flex items-center">
       <Dropdown
+        ref={switcherRef}
         value={context.currentProject}
         options={context.availableProjects}
         optionLabel="name"
@@ -128,6 +130,16 @@ export default function ProjectPage() {
               <small className="text-xs text-fg-muted">{project.description}</small>
             )}
           </div>
+        )}
+        panelFooterTemplate={() => (
+          <Link
+            to="/projects"
+            className="flex items-center gap-2 border-t border-border-light px-4 py-2.5 text-sm font-medium text-fg-secondary no-underline transition-colors duration-150 ease-smooth hover:bg-surface-secondary hover:text-fg"
+            onClick={() => switcherRef.current?.hide()}
+          >
+            <i className="pi pi-th-large text-[0.85rem]"></i>
+            All projects
+          </Link>
         )}
       />
     </div>

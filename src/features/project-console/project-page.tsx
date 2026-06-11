@@ -149,6 +149,13 @@ const NAV_CATEGORIES: NavCategory[] = [
       },
     ],
   },
+  {
+    key: 'project-configuration',
+    label: 'Project configuration',
+    icon: 'pi-sliders-h',
+    defaultExpanded: true,
+    items: [{ segment: 'secret-stores', icon: 'pi pi-lock', label: 'Secrets' }],
+  },
 ];
 
 /** Per-category unfold overrides persisted across reloads; categories absent
@@ -394,33 +401,21 @@ export default function ProjectPage() {
         </>
       }
       navBottom={
-        (projectName || isAdmin) && (
+        isAdmin && (
           <>
-            {projectName && (
-              <SideNavLink
-                to={`/projects/${projectName}/secret-stores`}
-                icon="pi pi-lock"
-                label="Secrets"
-                collapsed={sidebarCollapsed}
-              />
+            {sidebarCollapsed ? (
+              <div className="mx-1 my-2 border-t border-border-light"></div>
+            ) : (
+              <div className="mt-3 mb-1 px-2.5 text-[0.65rem] font-bold tracking-[0.08em] text-fg-muted uppercase">
+                Admin
+              </div>
             )}
-            {isAdmin && (
-              <>
-                {sidebarCollapsed ? (
-                  <div className="mx-1 my-2 border-t border-border-light"></div>
-                ) : (
-                  <div className="mt-3 mb-1 px-2.5 text-[0.65rem] font-bold tracking-[0.08em] text-fg-muted uppercase">
-                    Admin
-                  </div>
-                )}
-                <SideNavLink
-                  to="/identity"
-                  icon="pi pi-users"
-                  label="Identity"
-                  collapsed={sidebarCollapsed}
-                />
-              </>
-            )}
+            <SideNavLink
+              to="/identity"
+              icon="pi pi-users"
+              label="Identity"
+              collapsed={sidebarCollapsed}
+            />
           </>
         )
       }

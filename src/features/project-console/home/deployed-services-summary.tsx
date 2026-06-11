@@ -114,9 +114,12 @@ export default function DeployedServicesSummary({ projectId }: { projectId: stri
 
   if (!loaded) {
     return (
-      <div className="flex items-center gap-2.5 py-2 text-fg-secondary">
-        <i className="pi pi-spin pi-spinner text-primary"></i>
-        <span>Loading services…</span>
+      <div className="flex items-center gap-3 py-2">
+        <i className="pi pi-spin pi-spinner text-[18px] text-primary"></i>
+        <div>
+          <strong className="text-fg">Loading deployed services…</strong>
+          <div className="text-sm text-fg-muted">Fetching service instances and metrics.</div>
+        </div>
       </div>
     );
   }

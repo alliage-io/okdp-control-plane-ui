@@ -86,7 +86,7 @@ export function ConsoleShell({
       command: () => navigate('/settings'),
     },
     {
-      label: 'Custom views',
+      label: 'Views',
       icon: 'pi pi-th-large',
       command: () => navigate('/views'),
     },

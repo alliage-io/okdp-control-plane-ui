@@ -114,8 +114,8 @@ export const NAV_CATEGORIES: NavCategory[] = [
         label: 'Airflow',
       },
       // Single service entry like every other technology: the instance list.
-      // The richer Spark views (Applications, History Server) live on the
-      // /views page, reachable from the user dropdown.
+      // The richer Spark Applications view lives on the /views page,
+      // reachable from the user dropdown.
       {
         segment: 'spark/history-server',
         icon: 'pi pi-bolt',

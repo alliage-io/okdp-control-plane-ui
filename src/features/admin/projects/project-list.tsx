@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -29,6 +29,9 @@ export default function ProjectList() {
   // Mirror of `projects` so the SSE handler can decide on toasts without
   // side effects inside the state updater (updaters must stay pure).
   const projectsRef = useRef<Project[]>([]);
+  // Deletion runs until the backend's DELETED event removes the row; these
+  // names render as "Deleting…" in the meantime.
+  const [deletingNames, setDeletingNames] = useState<Set<string>>(new Set());
   const [loaded, setLoaded] = useState(false);
   const [globalFilter, setGlobalFilter] = useState('');
   const [visible, setVisible] = useState(false);
@@ -57,6 +60,12 @@ export default function ProjectList() {
         showSuccess(`Project ${project.name} created`);
       } else if (event.type === 'DELETED' && exists) {
         showSuccess(`Project ${project.name} deleted`);
+        setDeletingNames((names) => {
+          if (!names.has(project.name)) return names;
+          const next = new Set(names);
+          next.delete(project.name);
+          return next;
+        });
       }
 
       applyProjects(applyListEvent(projectsRef.current, event, (p) => p.name));
@@ -125,7 +134,15 @@ export default function ProjectList() {
       acceptLabel: 'Delete',
       rejectLabel: 'Cancel',
       accept: () => {
-        projectApi.deleteProject(project.name).catch(() => showError('Failed to delete project'));
+        setDeletingNames((names) => new Set(names).add(project.name));
+        projectApi.deleteProject(project.name).catch(() => {
+          setDeletingNames((names) => {
+            const next = new Set(names);
+            next.delete(project.name);
+            return next;
+          });
+          showError('Failed to delete project');
+        });
       },
     });
   };
@@ -138,6 +155,13 @@ export default function ProjectList() {
   );
 
   const empty = loaded && projects.length === 0;
+
+  // DataTable memoizes its rows against `value`: the deleting flag must be
+  // part of the row objects for the cells to repaint when it flips.
+  const rows = useMemo<(Project & { deleting: boolean })[]>(
+    () => projects.map((p) => ({ ...p, deleting: deletingNames.has(p.name) })),
+    [projects, deletingNames],
+  );
 
   return (
     <div className="workspace-container">
@@ -188,12 +212,15 @@ export default function ProjectList() {
         /* Data Table */
         <div className="table-wrapper">
           <DataTable
-            value={projects}
+            value={rows}
+            dataKey="name"
             globalFilter={globalFilter}
             globalFilterFields={['name', 'description']}
             className="minimal-table"
             emptyMessage="No projects found."
-            rowClassName={() => 'workspace-row'}
+            rowClassName={(row: Project & { deleting: boolean }) =>
+              row.deleting ? 'workspace-row opacity-50' : 'workspace-row'
+            }
           >
             <Column
               header="Name"
@@ -210,29 +237,38 @@ export default function ProjectList() {
             />
             <Column
               style={{ width: '10%', textAlign: 'right' }}
-              body={(project: Project) => (
-                <div className="actions">
-                  <Link
-                    to={`/projects/${project.name}`}
-                    className="action-link primary visible-btn"
-                    style={{ textDecoration: 'none' }}
-                  >
-                    Open <i className="pi pi-external-link"></i>
-                  </Link>
+              body={(project: Project & { deleting: boolean }) =>
+                project.deleting ? (
+                  <div className="actions">
+                    <span className="flex items-center gap-1.5 px-2 py-1 text-sm font-medium text-fg-secondary">
+                      <i className="pi pi-spin pi-spinner text-[0.85rem]"></i>
+                      Deleting…
+                    </span>
+                  </div>
+                ) : (
+                  <div className="actions">
+                    <Link
+                      to={`/projects/${project.name}`}
+                      className="action-link primary visible-btn"
+                      style={{ textDecoration: 'none' }}
+                    >
+                      Open <i className="pi pi-external-link"></i>
+                    </Link>
 
-                  {isAdmin && (
-                    <Button
-                      icon="pi pi-ellipsis-v"
-                      text
-                      rounded
-                      onClick={(e) => {
-                        selectedProjectRef.current = project;
-                        menuRef.current?.toggle(e);
-                      }}
-                    />
-                  )}
-                </div>
-              )}
+                    {isAdmin && (
+                      <Button
+                        icon="pi pi-ellipsis-v"
+                        text
+                        rounded
+                        onClick={(e) => {
+                          selectedProjectRef.current = project;
+                          menuRef.current?.toggle(e);
+                        }}
+                      />
+                    )}
+                  </div>
+                )
+              }
             />
           </DataTable>
           <Menu ref={menuRef} model={menuItems} popup appendTo={document.body} />

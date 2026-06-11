@@ -146,9 +146,9 @@ export default function SparkEditPage() {
 
   const goBack = () => {
     if (projectName && app) {
-      navigate(`/projects/${projectName}/spark/applications/${app.name}`);
+      navigate(`/projects/${projectName}/views/spark/applications/${app.name}`);
     } else if (projectName) {
-      navigate(`/projects/${projectName}/spark/applications`);
+      navigate(`/projects/${projectName}/views/spark/applications`);
     }
   };
 
@@ -204,7 +204,7 @@ export default function SparkEditPage() {
           detail: `Spark job "${app.name}" has been updated`,
         });
         setSaving(false);
-        navigate(`/projects/${projectName}/spark/applications/${app.name}`);
+        navigate(`/projects/${projectName}/views/spark/applications/${app.name}`);
       })
       .catch((err) => {
         toast.current?.show({

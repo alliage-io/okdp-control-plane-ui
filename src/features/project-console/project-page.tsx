@@ -176,18 +176,20 @@ export default function ProjectPage() {
     });
   };
 
-  // The project tree only belongs to project pages (/projects/:projectId/…);
-  // /views gets its own tree of view launchers; every other page under the
-  // shell (/projects, /identity, …) gets an empty sidebar even while a
-  // project is still selected in the context.
-  const onProjectPage = useMatch('/projects/:projectId/*') !== null;
-  const onViewsPage = useMatch('/views') !== null;
+  // Two project-scoped worlds share the shell: the console (project tree
+  // sidebar) and the views world under /projects/:projectId/views (views
+  // tree sidebar). Every other page (/projects, /identity, …) gets an empty
+  // sidebar even while a project is still selected in the context.
+  const viewsMatch = useMatch('/projects/:projectId/views/*');
+  const viewsIndexMatch = useMatch('/projects/:projectId/views');
+  const onViewsWorld = viewsMatch !== null || viewsIndexMatch !== null;
+  const onProjectConsole = useMatch('/projects/:projectId/*') !== null && !onViewsWorld;
 
   const projectName = context.currentProject?.name;
 
   // Deployed instances backing the views sidebar and, via outlet context,
-  // the /views page itself — one fetch + SSE stream for both.
-  const viewServices = useViewServices(onViewsPage ? projectName : undefined);
+  // the views pages themselves — one fetch + SSE stream for both.
+  const viewServices = useViewServices(onViewsWorld ? projectName : undefined);
   const envColor = projectName ? getProjectColor(projectName) : undefined;
   const futureTitle = 'Direction future, non engagé';
 
@@ -274,7 +276,7 @@ export default function ProjectPage() {
       headerLeft={headerLeft}
       accentColor={envColor}
       nav={
-        projectName && onProjectPage ? (
+        projectName && onProjectConsole ? (
           <>
             <SideNavLink
               to={`/projects/${projectName}`}
@@ -317,10 +319,10 @@ export default function ProjectPage() {
               </NavSection>
             ))}
           </>
-        ) : projectName && onViewsPage ? (
+        ) : projectName && onViewsWorld ? (
           <>
             <SideNavLink
-              to="/views"
+              to={`/projects/${projectName}/views`}
               end
               icon="pi pi-th-large"
               label="All views"
@@ -374,6 +376,27 @@ export default function ProjectPage() {
           </>
         ) : null
       }
+      navBottom={
+        /* World switcher pinned under the tree: console ↔ views, one click,
+           same project — no state reset on either side. */
+        projectName && onProjectConsole ? (
+          <SideNavLink
+            to={`/projects/${projectName}/views`}
+            icon="pi pi-th-large"
+            label="Views"
+            collapsed={sidebarCollapsed}
+          />
+        ) : projectName && onViewsWorld ? (
+          <SideNavLink
+            to={`/projects/${projectName}`}
+            end
+            icon="pi pi-objects-column"
+            label="Project console"
+            collapsed={sidebarCollapsed}
+          />
+        ) : null
+      }
+      navBottomAriaLabel="Switch between console and views"
     >
       <Outlet context={viewServices} />
     </ConsoleShell>

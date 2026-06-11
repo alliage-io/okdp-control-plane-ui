@@ -64,7 +64,7 @@ export function SparkList() {
 
   const viewDetail = (app: SparkAppInstance) => {
     if (projectName) {
-      navigate(`/projects/${projectName}/spark/applications/${app.name}`);
+      navigate(`/projects/${projectName}/views/spark/applications/${app.name}`);
     }
   };
 

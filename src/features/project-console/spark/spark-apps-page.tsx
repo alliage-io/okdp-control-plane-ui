@@ -8,7 +8,7 @@ export default function SparkAppsPage() {
 
   const goToSubmit = () => {
     if (projectId) {
-      navigate(`/projects/${projectId}/spark/applications/submit`);
+      navigate(`/projects/${projectId}/views/spark/applications/submit`);
     }
   };
 

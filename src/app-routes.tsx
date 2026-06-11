@@ -3,6 +3,16 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { RequireAuth } from './core/auth/require-auth';
 import { RequireAdmin } from './core/auth/require-admin';
 import { ProjectRouteSync } from './core/guards/project-route';
+import { useProjectContext } from './core/context/project-context';
+
+/** /views convenience target: the views world lives under the project scope
+ *  (/projects/:projectId/views) so deep links and project switching keep it. */
+function ViewsRedirect() {
+  const { currentProjectId } = useProjectContext();
+  return (
+    <Navigate to={currentProjectId ? `/projects/${currentProjectId}/views` : '/projects'} replace />
+  );
+}
 
 const HomePage = lazy(() => import('./features/landing/home-page'));
 const StartPage = lazy(() => import('./features/start/start-page'));
@@ -96,7 +106,9 @@ export function AppRoutes() {
           />
 
           <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/views" element={<CustomViewsPage />} />
+          {/* Convenience entry point (user dropdown, old links): the views
+              world is project-scoped — forward to the current project's. */}
+          <Route path="/views" element={<ViewsRedirect />} />
 
           {/* REST-style: /projects is the collection, /projects/:projectId a member. */}
           <Route path="/projects">
@@ -105,6 +117,18 @@ export function AppRoutes() {
               <Route index element={<ProjectHome />} />
               <Route path="secret-stores" element={<SecretsPage />} />
               <Route path="parameters" element={<ParametersPage />} />
+
+              {/* Views world: the project's view launchers and the rich
+                  technology views (Spark pages). Lives beside the console
+                  pages under the same project scope, but renders the views
+                  sidebar instead of the project tree. */}
+              <Route path="views">
+                <Route index element={<CustomViewsPage />} />
+                <Route path="spark/applications/submit" element={<SparkSubmitPage />} />
+                <Route path="spark/applications/:appName/edit" element={<SparkEditPage />} />
+                <Route path="spark/applications/:appName" element={<SparkDetailPage />} />
+                <Route path="spark/applications" element={<SparkAppsPage />} />
+              </Route>
 
               {serviceRoutes('services', {
                 title: 'Jupyter Instances',
@@ -119,11 +143,6 @@ export function AppRoutes() {
                 serviceFilter: 'spark-history-server',
                 emptyMessage: 'No Spark History Server instances deployed yet.',
               })}
-
-              <Route path="spark/applications/submit" element={<SparkSubmitPage />} />
-              <Route path="spark/applications/:appName/edit" element={<SparkEditPage />} />
-              <Route path="spark/applications/:appName" element={<SparkDetailPage />} />
-              <Route path="spark/applications" element={<SparkAppsPage />} />
 
               {/* Services on the OKDP roadmap but not yet packaged. */}
               {/* Polaris (Lakehouse / data-catalog) — kubocd Package: polaris@0.1.0 */}

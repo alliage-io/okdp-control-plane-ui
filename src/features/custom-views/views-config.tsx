@@ -74,7 +74,7 @@ export const CUSTOM_VIEWS: CustomView[] = [
     badge: 'pi pi-bolt',
     tone: 'blue',
     categoryKey: 'data-engineering',
-    path: (projectName) => `/projects/${projectName}/spark/applications`,
+    path: (projectName) => `/projects/${projectName}/views/spark/applications`,
   },
 ];
 

@@ -154,151 +154,168 @@ export default function ProjectPage() {
       headerLeft={headerLeft}
       navBottomAriaLabel="Project tools"
       nav={
-        !projectName ? null : (
-          <>
-            <SideNavLink
-              to={`/project/${projectName}`}
-              end
-              icon="pi pi-home"
-              label="Home"
-              collapsed={sidebarCollapsed}
-            />
+        <>
+          <SideNavLink
+            to="/projects"
+            end
+            icon="pi pi-th-large"
+            label="Projects"
+            collapsed={sidebarCollapsed}
+          />
 
-            {/* Lakehouse */}
-            <NavSection
-              icon="pi-database"
-              label="Lakehouse"
-              expanded={lakehouseExpanded}
-              collapsed={sidebarCollapsed}
-              onToggle={() => setLakehouseExpanded((v) => !v)}
-            >
+          {projectName && (
+            <>
+              {sidebarCollapsed ? (
+                <div className="mx-1 my-2 border-t border-border-light"></div>
+              ) : (
+                <div className="mt-3 mb-1 px-2.5 text-[0.65rem] font-bold tracking-[0.08em] text-fg-muted uppercase">
+                  {projectName}
+                </div>
+              )}
               <SideNavLink
-                to={`/project/${projectName}/lakehouse/polaris`}
-                icon="pi pi-table"
-                label="Polaris"
+                to={`/project/${projectName}`}
+                end
+                icon="pi pi-home"
+                label="Home"
                 collapsed={sidebarCollapsed}
-                sub
               />
-              <SideNavLink
-                to={`/project/${projectName}/lakehouse/trino`}
-                icon="pi pi-bolt"
-                label="Trino"
-                collapsed={sidebarCollapsed}
-                sub
-              />
-            </NavSection>
 
-            {/* Data Engineering */}
-            <NavSection
-              icon="pi-cog"
-              label="Data Engineering"
-              expanded={dataEngExpanded}
-              collapsed={sidebarCollapsed}
-              onToggle={() => setDataEngExpanded((v) => !v)}
-            >
-              <SideNavLink
-                to={`/project/${projectName}/data-engineering/airflow`}
-                icon="pi pi-sitemap"
-                label="Airflow"
+              {/* Lakehouse */}
+              <NavSection
+                icon="pi-database"
+                label="Lakehouse"
+                expanded={lakehouseExpanded}
                 collapsed={sidebarCollapsed}
-                sub
-              />
-              <SideNavLink
-                to={`/project/${projectName}/spark/applications`}
-                icon="pi pi-play"
-                label="Spark Applications"
-                collapsed={sidebarCollapsed}
-                sub
-              />
-              <SideNavLink
-                to={`/project/${projectName}/spark/history-server`}
-                icon="pi pi-history"
-                label="Spark History"
-                collapsed={sidebarCollapsed}
-                sub
-              />
-              <DisabledNavLink
-                icon="pi pi-share-alt"
-                label="Kafka"
-                collapsed={sidebarCollapsed}
-                title={futureTitle}
-                collapsedTitle="Kafka — exploration"
-              />
-            </NavSection>
+                onToggle={() => setLakehouseExpanded((v) => !v)}
+              >
+                <SideNavLink
+                  to={`/project/${projectName}/lakehouse/polaris`}
+                  icon="pi pi-table"
+                  label="Polaris"
+                  collapsed={sidebarCollapsed}
+                  sub
+                />
+                <SideNavLink
+                  to={`/project/${projectName}/lakehouse/trino`}
+                  icon="pi pi-bolt"
+                  label="Trino"
+                  collapsed={sidebarCollapsed}
+                  sub
+                />
+              </NavSection>
 
-            {/* Notebooks */}
-            <NavSection
-              icon="pi-book"
-              label="Notebooks"
-              expanded={notebookExpanded}
-              collapsed={sidebarCollapsed}
-              onToggle={() => setNotebookExpanded((v) => !v)}
-            >
-              <SideNavLink
-                to={`/project/${projectName}/services`}
-                icon="pi pi-desktop"
-                label="JupyterHub"
+              {/* Data Engineering */}
+              <NavSection
+                icon="pi-cog"
+                label="Data Engineering"
+                expanded={dataEngExpanded}
                 collapsed={sidebarCollapsed}
-                sub
-              />
-            </NavSection>
+                onToggle={() => setDataEngExpanded((v) => !v)}
+              >
+                <SideNavLink
+                  to={`/project/${projectName}/data-engineering/airflow`}
+                  icon="pi pi-sitemap"
+                  label="Airflow"
+                  collapsed={sidebarCollapsed}
+                  sub
+                />
+                <SideNavLink
+                  to={`/project/${projectName}/spark/applications`}
+                  icon="pi pi-play"
+                  label="Spark Applications"
+                  collapsed={sidebarCollapsed}
+                  sub
+                />
+                <SideNavLink
+                  to={`/project/${projectName}/spark/history-server`}
+                  icon="pi pi-history"
+                  label="Spark History"
+                  collapsed={sidebarCollapsed}
+                  sub
+                />
+                <DisabledNavLink
+                  icon="pi pi-share-alt"
+                  label="Kafka"
+                  collapsed={sidebarCollapsed}
+                  title={futureTitle}
+                  collapsedTitle="Kafka — exploration"
+                />
+              </NavSection>
 
-            {/* SQL & BI */}
-            <NavSection
-              icon="pi-chart-bar"
-              label="SQL & BI"
-              expanded={sqlBiExpanded}
-              collapsed={sidebarCollapsed}
-              onToggle={() => setSqlBiExpanded((v) => !v)}
-            >
-              <SideNavLink
-                to={`/project/${projectName}/bi/superset`}
-                icon="pi pi-chart-line"
-                label="Superset"
+              {/* Notebooks */}
+              <NavSection
+                icon="pi-book"
+                label="Notebooks"
+                expanded={notebookExpanded}
                 collapsed={sidebarCollapsed}
-                sub
-              />
-              <DisabledNavLink
-                icon="pi pi-pencil"
-                label="SQL Editor"
-                collapsed={sidebarCollapsed}
-                title={futureTitle}
-                collapsedTitle="SQL Editor — exploration"
-              />
-            </NavSection>
+                onToggle={() => setNotebookExpanded((v) => !v)}
+              >
+                <SideNavLink
+                  to={`/project/${projectName}/services`}
+                  icon="pi pi-desktop"
+                  label="JupyterHub"
+                  collapsed={sidebarCollapsed}
+                  sub
+                />
+              </NavSection>
 
-            {/* Machine Learning */}
-            <NavSection
-              icon="pi-microchip"
-              label="Machine Learning"
-              expanded={mlExpanded}
-              collapsed={sidebarCollapsed}
-              onToggle={() => setMlExpanded((v) => !v)}
-            >
-              <DisabledNavLink
-                icon="pi pi-sitemap"
-                label="Kubeflow"
+              {/* SQL & BI */}
+              <NavSection
+                icon="pi-chart-bar"
+                label="SQL & BI"
+                expanded={sqlBiExpanded}
                 collapsed={sidebarCollapsed}
-                title={futureTitle}
-                collapsedTitle="Kubeflow — exploration"
-              />
-              <DisabledNavLink
-                icon="pi pi-flag"
-                label="MLflow"
+                onToggle={() => setSqlBiExpanded((v) => !v)}
+              >
+                <SideNavLink
+                  to={`/project/${projectName}/bi/superset`}
+                  icon="pi pi-chart-line"
+                  label="Superset"
+                  collapsed={sidebarCollapsed}
+                  sub
+                />
+                <DisabledNavLink
+                  icon="pi pi-pencil"
+                  label="SQL Editor"
+                  collapsed={sidebarCollapsed}
+                  title={futureTitle}
+                  collapsedTitle="SQL Editor — exploration"
+                />
+              </NavSection>
+
+              {/* Machine Learning */}
+              <NavSection
+                icon="pi-microchip"
+                label="Machine Learning"
+                expanded={mlExpanded}
                 collapsed={sidebarCollapsed}
-                title={futureTitle}
-                collapsedTitle="MLflow — exploration"
-              />
-              <DisabledNavLink
-                icon="pi pi-send"
-                label="KServe"
-                collapsed={sidebarCollapsed}
-                title={futureTitle}
-                collapsedTitle="KServe — exploration"
-              />
-            </NavSection>
-          </>
-        )
+                onToggle={() => setMlExpanded((v) => !v)}
+              >
+                <DisabledNavLink
+                  icon="pi pi-sitemap"
+                  label="Kubeflow"
+                  collapsed={sidebarCollapsed}
+                  title={futureTitle}
+                  collapsedTitle="Kubeflow — exploration"
+                />
+                <DisabledNavLink
+                  icon="pi pi-flag"
+                  label="MLflow"
+                  collapsed={sidebarCollapsed}
+                  title={futureTitle}
+                  collapsedTitle="MLflow — exploration"
+                />
+                <DisabledNavLink
+                  icon="pi pi-send"
+                  label="KServe"
+                  collapsed={sidebarCollapsed}
+                  title={futureTitle}
+                  collapsedTitle="KServe — exploration"
+                />
+              </NavSection>
+            </>
+          )}
+        </>
       }
       navBottom={
         (projectName || isAdmin) && (

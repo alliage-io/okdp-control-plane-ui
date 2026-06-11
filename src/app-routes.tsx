@@ -123,7 +123,7 @@ export function AppRoutes() {
 
               {/* Services on the OKDP roadmap but not yet packaged. */}
               {/* Polaris (Lakehouse / data-catalog) — kubocd Package: polaris@0.1.0 */}
-              {serviceRoutes('lakehouse/polaris', {
+              {serviceRoutes('polaris', {
                 title: 'Polaris',
                 deployLabel: 'Deploy',
                 serviceFilter: 'polaris',
@@ -131,7 +131,7 @@ export function AppRoutes() {
               })}
 
               {/* Trino (Lakehouse / data-querying) — kubocd Package: trino@0.1.0 */}
-              {serviceRoutes('lakehouse/trino', {
+              {serviceRoutes('trino', {
                 title: 'Trino',
                 deployLabel: 'Deploy',
                 serviceFilter: 'trino',
@@ -139,7 +139,7 @@ export function AppRoutes() {
               })}
 
               {/* Airflow (Data Engineering / orchestration) — kubocd Package: airflow@0.1.0 */}
-              {serviceRoutes('data-engineering/airflow', {
+              {serviceRoutes('airflow', {
                 title: 'Airflow',
                 deployLabel: 'Deploy',
                 serviceFilter: 'airflow',
@@ -147,7 +147,7 @@ export function AppRoutes() {
               })}
 
               {/* Superset (SQL & BI / data-visualization) — kubocd Package: superset@0.1.0 */}
-              {serviceRoutes('bi/superset', {
+              {serviceRoutes('superset', {
                 title: 'Superset',
                 deployLabel: 'Deploy',
                 serviceFilter: 'superset',

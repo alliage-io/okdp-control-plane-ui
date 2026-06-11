@@ -54,8 +54,8 @@ const NAV_CATEGORIES: NavCategory[] = [
     defaultExpanded: true,
     items: [
       // Apache Polaris has no simple-icons entry yet — generic icon.
-      { segment: 'lakehouse/polaris', icon: 'pi pi-table', label: 'Polaris' },
-      { segment: 'lakehouse/trino', icon: 'pi pi-bolt', brand: siTrino, label: 'Trino' },
+      { segment: 'polaris', icon: 'pi pi-table', label: 'Polaris' },
+      { segment: 'trino', icon: 'pi pi-bolt', brand: siTrino, label: 'Trino' },
     ],
   },
   {
@@ -65,7 +65,7 @@ const NAV_CATEGORIES: NavCategory[] = [
     defaultExpanded: true,
     items: [
       {
-        segment: 'data-engineering/airflow',
+        segment: 'airflow',
         icon: 'pi pi-sitemap',
         brand: siApacheairflow,
         label: 'Airflow',
@@ -108,7 +108,7 @@ const NAV_CATEGORIES: NavCategory[] = [
     defaultExpanded: true,
     items: [
       {
-        segment: 'bi/superset',
+        segment: 'superset',
         icon: 'pi pi-chart-line',
         brand: siApachesuperset,
         label: 'Superset',

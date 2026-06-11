@@ -52,5 +52,5 @@ Is at right of Logo - OKDP Console
 
 /projects/{project_id} : Overview
 
-- [ ] Remove category from path of services /projects/dev/lakehouse/polaris -> /projects/dev/polaris
+- [x] Remove category from path of services /projects/dev/lakehouse/polaris -> /projects/dev/polaris
 - [ ] Add some global KPI before running services (ex: number of instances, accredited users (if existing), etc). Not too many.

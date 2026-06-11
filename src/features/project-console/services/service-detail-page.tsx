@@ -175,7 +175,7 @@ export default function ServiceDetailPage() {
   }, [projectId, serviceName]);
 
   // Navigation stays inside the instance's own console area (e.g. a Trino
-  // instance edits/returns under /lakehouse/trino, not /services).
+  // instance edits/returns under /trino, not /services).
   const basePath = areaBasePath(instance?.service).join('/');
 
   const goBack = () => {

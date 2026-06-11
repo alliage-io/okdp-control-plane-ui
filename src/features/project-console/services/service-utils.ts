@@ -33,10 +33,10 @@ export interface ServiceArea {
 export const SERVICE_AREAS: Record<string, ServiceArea> = {
   jupyterhub: { label: 'Jupyter', basePath: ['services'] },
   'spark-history-server': { label: 'History Server', basePath: ['spark', 'history-server'] },
-  trino: { label: 'Trino', basePath: ['lakehouse', 'trino'] },
-  polaris: { label: 'Polaris', basePath: ['lakehouse', 'polaris'] },
-  superset: { label: 'Superset', basePath: ['bi', 'superset'] },
-  airflow: { label: 'Airflow', basePath: ['data-engineering', 'airflow'] },
+  trino: { label: 'Trino', basePath: ['trino'] },
+  polaris: { label: 'Polaris', basePath: ['polaris'] },
+  superset: { label: 'Superset', basePath: ['superset'] },
+  airflow: { label: 'Airflow', basePath: ['airflow'] },
 };
 
 /** Breadcrumb back-link label for a service name. */

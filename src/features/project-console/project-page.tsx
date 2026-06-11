@@ -100,9 +100,7 @@ const NAV_CATEGORIES: NavCategory[] = [
     label: 'Notebooks',
     icon: 'pi-book',
     defaultExpanded: true,
-    items: [
-      { segment: 'services', icon: 'pi pi-desktop', brand: siJupyter, label: 'JupyterHub' },
-    ],
+    items: [{ segment: 'services', icon: 'pi pi-desktop', brand: siJupyter, label: 'JupyterHub' }],
   },
   {
     key: 'sql-bi',
@@ -175,26 +173,34 @@ interface NavSectionProps {
 }
 
 function NavSection({ icon, label, expanded, collapsed, onToggle, children }: NavSectionProps) {
+  // Collapsed rail: no room for an unfoldable tree — the category reduces
+  // to a separator and its services stay visible as icons.
+  if (collapsed) {
+    return (
+      <div className="mt-1">
+        <div
+          className="mx-1 my-2 border-t border-border-light"
+          title={label}
+          aria-hidden="true"
+        ></div>
+        {children}
+      </div>
+    );
+  }
+
   return (
     <div className="mt-1">
       <button
-        className={`group flex w-full cursor-pointer items-center border-0 bg-transparent text-base font-medium text-fg-secondary transition-[color,background-color] duration-150 ease-smooth hover:bg-surface-secondary hover:text-fg ${
-          collapsed
-            ? 'justify-center border-l-0 p-2'
-            : 'rounded-r-md border-l-2 border-l-transparent px-2.5 py-1.5'
-        }`}
+        className="group flex w-full cursor-pointer items-center rounded-r-md border-0 border-l-2 border-l-transparent bg-transparent px-2.5 py-1.5 text-base font-medium text-fg-secondary transition-[color,background-color] duration-150 ease-smooth hover:bg-surface-secondary hover:text-fg"
         onClick={onToggle}
-        title={collapsed ? label : ''}
         type="button"
       >
         <i
           className={`pi ${icon} w-[18px] text-center text-[1rem] text-fg-muted transition-colors duration-150 ease-smooth group-hover:text-fg-secondary`}
         ></i>
-        <span className={sideNavLabelClass(collapsed)}>{label}</span>
+        <span className={sideNavLabelClass(false)}>{label}</span>
         <i
-          className={`pi ${expanded ? 'pi-chevron-down' : 'pi-chevron-right'} ml-auto text-[0.6rem] text-fg-muted transition-transform duration-250 ease-smooth ${
-            collapsed ? 'hidden' : ''
-          }`}
+          className={`pi ${expanded ? 'pi-chevron-down' : 'pi-chevron-right'} ml-auto text-[0.6rem] text-fg-muted transition-transform duration-250 ease-smooth`}
         ></i>
       </button>
       {/* Bumped from 200px — Data Engineering holds 4 sub-items and Machine

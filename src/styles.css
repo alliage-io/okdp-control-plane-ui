@@ -242,8 +242,8 @@
 }
 
 /* Keyframe animations — still referenced by legacy component CSS.
-   fadeInUp uses the 8px offset: okdp-design.css redefined it that way after
-   base.css, so 8px has always been the effective value. */
+   fadeInUp uses the 8px offset, which has always been the effective value
+   carried over from the legacy stylesheets. */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -275,8 +275,7 @@
 }
 
 /* ========== Utilities ========== */
-/* 0.35s: the okdp-design.css redefinition of .animate-in was the one that
-   applied, so its timing is the canonical one. */
+/* 0.35s is the canonical timing carried over from the legacy stylesheets. */
 @utility animate-in {
   animation: fadeInUp 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -421,10 +420,11 @@ button.create-btn:hover,
 
 /* Unified Table Styles
    These rules style PrimeReact DataTable internals through the
-   .minimal-table wrapper class. They must stay plain (unlayered) CSS:
-   the PrimeReact theme stylesheet is unlayered, so utility-layer rules
-   could not override it, and PrimeReact 10 has no --p-* design tokens
-   to move them to. */
+   .minimal-table wrapper class. They stay unlayered so they override the
+   lara theme, which ships in @layer primereact (unlayered rules outrank
+   any cascade layer). They target the DataTable's internal DOM, so they
+   cannot be Tailwind @utility classes, and PrimeReact 10's styled theme
+   exposes no design tokens to retheme through. */
 
 .p-datatable.minimal-table {
   background: rgba(255, 255, 255, 0.4);
@@ -476,17 +476,14 @@ button.create-btn:hover,
 }
 
 /* Global Dialog Styles
-   Base PrimeNG dialog theming is handled via CSS vars in variables.css:
-   --p-dialog-border-radius, --p-dialog-header-background, etc.
+   The .db-dialog rules style PrimeReact Dialog internals; they stay
+   unlayered so they keep overriding the lara theme (which ships in
+   @layer primereact — unlayered rules outrank any cascade layer). */
 
-   The .db-dialog rules style PrimeReact Dialog internals and must stay
-   plain (unlayered) CSS so they keep overriding the unlayered PrimeReact
-   theme stylesheet. */
-
-/* The lara theme renders dialogs at 6px (the --p-dialog-border-radius token
-   is inert with PrimeReact 10); align the frame on the same 2xl radius as
-   the glass tables. Header and footer corners must match the frame because
-   the dialog root does not clip its children. */
+/* The lara theme hardcodes a 6px dialog radius and reads no design token;
+   align the frame on the same 2xl radius as the glass tables. Header and
+   footer corners must match the frame because the dialog root does not
+   clip its children. */
 .db-dialog.p-dialog {
   border-radius: var(--db-radius-2xl);
 }
@@ -529,12 +526,12 @@ button.create-btn:hover,
 }
 
 /* Unified Form Styles
-   PrimeNG input theming is handled via CSS vars in variables.css:
-   --p-inputtext-border-radius, --p-inputtext-focus-border-color, etc. */
+   PrimeReact 10's lara theme hardcodes its input styling and reads no
+   design tokens, so form theming uses the unlayered overrides below
+   rather than CSS variables. */
 
 /* Uniform control corners. PrimeReact 10's lara theme hardcodes 6px on
-   inputs and buttons (the --p-*-border-radius tokens in variables.css are
-   PrimeNG-era and inert here), so every regular control aligns on the md
+   inputs and buttons, so every regular control aligns on the md
    token instead. Circular .p-button-rounded buttons and fused input-group
    corners keep their theme values through higher-specificity theme rules. */
 .p-inputtext,
@@ -569,8 +566,8 @@ button.create-btn:hover,
 }
 
 /* Common input class. Applied to PrimeReact InputText components, so it
-   must stay plain (unlayered) CSS to keep overriding the unlayered
-   PrimeReact theme's .p-inputtext rules. */
+   stays unlayered to keep overriding the lara theme's .p-inputtext rules
+   (the theme ships in @layer primereact; unlayered rules outrank it). */
 .dialog-input {
   width: 100%;
   box-sizing: border-box;
@@ -631,8 +628,8 @@ button.create-btn:hover,
    utility even when toggled dynamically at runtime.
 
    A few rules stay as plain (unlayered) CSS because they are
-   cascade-coupled with layout.css rules that migrate with the
-   feature pages; they are marked "legacy cascade".
+   cascade-coupled with the legacy page-layout rules earlier in this
+   file; they are marked "legacy cascade".
    ============================================================ */
 
 /* Shared utility classes */
@@ -657,8 +654,8 @@ button.create-btn:hover,
   margin-bottom: 20px;
 }
 
-/* Legacy cascade: must out-rank the global `.page-title, h1` rule still
-   living in layout.css, so it cannot move into the utilities layer yet. */
+/* Legacy cascade: must out-rank the global `.page-title, h1` rule defined
+   earlier in this file, so it cannot move into the utilities layer yet. */
 .page-heading h1.page-title {
   margin: 6px 0 4px;
   font-size: 26px;
@@ -848,8 +845,8 @@ button.create-btn:hover,
   max-width: 360px;
 }
 
-/* Legacy cascade: must out-rank the global .search-icon rule still living
-   in layout.css. */
+/* Positions the search icon inside .okdp-search-wrapper; unlayered to sit
+   with the rest of the okdp-filter-bar overrides. */
 .okdp-search-wrapper i.search-icon {
   position: absolute;
   left: 12px;
@@ -1772,9 +1769,10 @@ button.create-btn:hover,
 }
 
 /* PrimeReact-internal overrides that cannot be expressed as Tailwind
-   utilities: the PrimeReact 10 theme stylesheet is unlayered, so it would
-   out-rank utility-layer rules, and this PrimeReact major has no --p-*
-   design tokens to target instead. Keep this file small. */
+   utilities: they target PrimeReact's internal DOM (descendant selectors),
+   not single elements. The lara theme ships in @layer primereact and
+   exposes no design tokens, so these stay unlayered to override it.
+   Keep this file small. */
 
 /* DynamicSchemaForm — invalid-field highlight on PrimeReact inputs */
 .dsf-root .field-invalid,

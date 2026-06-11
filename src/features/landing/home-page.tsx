@@ -18,7 +18,7 @@ export default function HomePage() {
 
         {/* Welcome Message */}
         <div className="text-center">
-          {/* ! overrides the global h1 sizing still living in layout.css */}
+          {/* ! overrides the global h1 sizing from styles.css */}
           <h1 className="m-0 text-[1.5rem]! font-semibold tracking-[-0.01em] text-fg max-[480px]:text-[1.25rem]!">
             Welcome
           </h1>

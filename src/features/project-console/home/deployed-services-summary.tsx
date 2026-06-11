@@ -2,46 +2,10 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import type {
-  MetricValue,
-  ServiceInstance,
-  ServiceMetrics,
-} from '../../../core/models/service.model';
+import type { ServiceInstance, ServiceMetrics } from '../../../core/models/service.model';
+import MetricCell from '../../../shared/components/metric-cell';
 import { areaBasePath, parentLabel, tagClass } from '../services/service-utils';
 import type { ProjectServicesSummary } from './use-project-services-summary';
-
-/** Compact version of the detail page's metric card: used / limit over a
- *  tone-colored usage bar. `metric` undefined = request still in flight. */
-function MetricCell({ metric }: { metric: MetricValue | undefined }) {
-  if (!metric) {
-    return <div className="metric-bar h-[5px] w-[110px] animate-pulse"></div>;
-  }
-  if (!metric.available) {
-    return <span className="text-sm text-fg-muted">—</span>;
-  }
-  // limitRaw 0 = no limit configured; a bar against 0 would read as exhausted.
-  if (metric.limitRaw <= 0) {
-    return (
-      <span className="text-sm text-fg-secondary">
-        {metric.used} <span className="text-xs text-fg-muted">· no limit</span>
-      </span>
-    );
-  }
-  const tone = metric.pct > 0.8 ? 'tone-danger' : metric.pct > 0.6 ? 'tone-warn' : '';
-  return (
-    <div className="flex w-[110px] flex-col gap-1">
-      <span className="text-sm text-fg-secondary">
-        {metric.used} <span className="text-fg-muted">/ {metric.limit}</span>
-      </span>
-      <div className="metric-bar h-[5px]!">
-        <div
-          className={`metric-fill ${tone}`}
-          style={{ width: `${Math.min(metric.pct, 1) * 100}%` }}
-        ></div>
-      </div>
-    </div>
-  );
-}
 
 type SummaryRow = ServiceInstance & { metrics?: ServiceMetrics };
 

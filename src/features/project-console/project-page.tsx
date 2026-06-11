@@ -143,9 +143,11 @@ interface WorldSwitcherProps {
   collapsed: boolean;
 }
 
-/** Segmented console ↔ views switcher pinned under the tree. Both worlds
- *  stay visible at all times: the raised segment is where you are, the
- *  muted one is where the click goes — no flipping-label ambiguity. */
+/** Segmented console ↔ views switcher at the head of the tree. It doubles
+ *  as the world-root link (replacing separate Overview / All views entries):
+ *  the raised segment is the current world and clicks back to its root, the
+ *  muted one switches worlds — both always visible, no flipping-label
+ *  ambiguity, no icon duplicated elsewhere in the rail. */
 function WorldSwitcher({ projectName, world, collapsed }: WorldSwitcherProps) {
   const segments = [
     {
@@ -153,12 +155,14 @@ function WorldSwitcher({ projectName, world, collapsed }: WorldSwitcherProps) {
       label: 'Console',
       icon: 'pi pi-objects-column',
       to: `/projects/${projectName}`,
+      rootTitle: 'Project overview',
     },
     {
       key: 'views' as const,
       label: 'Views',
       icon: 'pi pi-th-large',
       to: `/projects/${projectName}/views`,
+      rootTitle: 'All views',
     },
   ];
 
@@ -166,56 +170,43 @@ function WorldSwitcher({ projectName, world, collapsed }: WorldSwitcherProps) {
   if (collapsed) {
     return (
       <div className="flex flex-col gap-1">
-        {segments.map((segment) =>
-          segment.key === world ? (
-            <span
-              key={segment.key}
-              aria-current="page"
-              title={`${segment.label} — you are here`}
-              className="flex items-center justify-center rounded-md bg-primary-50 p-2 text-primary"
-            >
-              <i className={`${segment.icon} text-[1rem]`}></i>
-            </span>
-          ) : (
-            <Link
-              key={segment.key}
-              to={segment.to}
-              title={`Switch to ${segment.label}`}
-              className="flex items-center justify-center rounded-md p-2 text-fg-muted transition-colors duration-150 ease-smooth hover:bg-surface-tertiary hover:text-fg"
-            >
-              <i className={`${segment.icon} text-[1rem]`}></i>
-            </Link>
-          ),
-        )}
+        {segments.map((segment) => (
+          <Link
+            key={segment.key}
+            to={segment.to}
+            aria-current={segment.key === world ? 'true' : undefined}
+            title={segment.key === world ? segment.rootTitle : `Switch to ${segment.label}`}
+            className={
+              segment.key === world
+                ? 'flex items-center justify-center rounded-md bg-primary-50 p-2 text-primary'
+                : 'flex items-center justify-center rounded-md p-2 text-fg-muted transition-colors duration-150 ease-smooth hover:bg-surface-tertiary hover:text-fg'
+            }
+          >
+            <i className={`${segment.icon} text-[1rem]`}></i>
+          </Link>
+        ))}
       </div>
     );
   }
 
   return (
-    <div className="ml-1.5 flex gap-0.5 rounded-md border border-border-light bg-surface-secondary p-0.5">
-      {segments.map((segment) =>
-        segment.key === world ? (
-          <span
-            key={segment.key}
-            aria-current="page"
-            title={`${segment.label} — you are here`}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-[7px] bg-surface px-2 py-1.5 text-sm font-semibold text-fg shadow-xs"
-          >
-            <i className={`${segment.icon} text-[0.8rem]`}></i>
-            {segment.label}
-          </span>
-        ) : (
-          <Link
-            key={segment.key}
-            to={segment.to}
-            title={`Switch to ${segment.label}`}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-[7px] px-2 py-1.5 text-sm font-medium text-fg-muted no-underline transition-colors duration-150 ease-smooth hover:bg-surface hover:text-fg"
-          >
-            <i className={`${segment.icon} text-[0.8rem]`}></i>
-            {segment.label}
-          </Link>
-        ),
-      )}
+    <div className="mx-1.5 flex gap-0.5 rounded-md border border-border-light bg-surface-secondary p-0.5">
+      {segments.map((segment) => (
+        <Link
+          key={segment.key}
+          to={segment.to}
+          aria-current={segment.key === world ? 'true' : undefined}
+          title={segment.key === world ? segment.rootTitle : `Switch to ${segment.label}`}
+          className={
+            segment.key === world
+              ? 'flex flex-1 items-center justify-center gap-1.5 rounded-[7px] bg-surface px-2 py-1.5 text-sm font-semibold text-fg no-underline shadow-xs'
+              : 'flex flex-1 items-center justify-center gap-1.5 rounded-[7px] px-2 py-1.5 text-sm font-medium text-fg-muted no-underline transition-colors duration-150 ease-smooth hover:bg-surface hover:text-fg'
+          }
+        >
+          <i className={`${segment.icon} text-[0.8rem]`}></i>
+          {segment.label}
+        </Link>
+      ))}
     </div>
   );
 }
@@ -396,13 +387,7 @@ export default function ProjectPage() {
       nav={
         projectName && onProjectConsole ? (
           <>
-            <SideNavLink
-              to={`/projects/${projectName}`}
-              end
-              icon="pi pi-objects-column"
-              label="Overview"
-              collapsed={sidebarCollapsed}
-            />
+            <WorldSwitcher projectName={projectName} world="console" collapsed={sidebarCollapsed} />
 
             {visibleCategories.map((category) => (
               <NavSection
@@ -439,13 +424,7 @@ export default function ProjectPage() {
           </>
         ) : projectName && onViewsWorld ? (
           <>
-            <SideNavLink
-              to={`/projects/${projectName}/views`}
-              end
-              icon="pi pi-th-large"
-              label="All views"
-              collapsed={sidebarCollapsed}
-            />
+            <WorldSwitcher projectName={projectName} world="views" collapsed={sidebarCollapsed} />
 
             {viewCategories.map(({ category, launchers, builtInViews, customViews }) => (
               <NavSection
@@ -526,16 +505,6 @@ export default function ProjectPage() {
           </>
         ) : null
       }
-      navBottom={
-        projectName && (onProjectConsole || onViewsWorld) ? (
-          <WorldSwitcher
-            projectName={projectName}
-            world={onViewsWorld ? 'views' : 'console'}
-            collapsed={sidebarCollapsed}
-          />
-        ) : null
-      }
-      navBottomAriaLabel="Switch between console and views"
     >
       <Outlet context={viewServices} />
     </ConsoleShell>

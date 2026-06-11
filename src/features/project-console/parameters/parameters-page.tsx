@@ -78,7 +78,7 @@ export default function ParametersPage() {
   return (
     <section className="flex animate-[fadeInUp_0.4s_ease-out] flex-col gap-7">
       <div>
-        <h1>Parameters</h1>
+        <h1>Project Parameters</h1>
         <p className="mt-1 text-base text-fg-secondary">
           Settings for the <strong>{projectName}</strong> project.
         </p>

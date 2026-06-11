@@ -8,6 +8,7 @@ const HomePage = lazy(() => import('./features/landing/home-page'));
 const StartPage = lazy(() => import('./features/start/start-page'));
 const ProjectList = lazy(() => import('./features/admin/projects/project-list'));
 const SettingsPage = lazy(() => import('./features/settings/settings-page'));
+const CustomViewsPage = lazy(() => import('./features/custom-views/custom-views-page'));
 const AdminPage = lazy(() => import('./features/admin/admin-page'));
 const IdentityPage = lazy(() => import('./features/admin/identity/identity-page'));
 const ProjectPage = lazy(() => import('./features/project-console/project-page'));
@@ -95,6 +96,7 @@ export function AppRoutes() {
           />
 
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/views" element={<CustomViewsPage />} />
 
           {/* REST-style: /projects is the collection, /projects/:projectId a member. */}
           <Route path="/projects">

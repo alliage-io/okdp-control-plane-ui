@@ -85,6 +85,11 @@ export function ConsoleShell({
       icon: 'pi pi-cog',
       command: () => navigate('/settings'),
     },
+    {
+      label: 'Custom views',
+      icon: 'pi pi-th-large',
+      command: () => navigate('/views'),
+    },
     ...(auth.hasRole('admins')
       ? [
           {

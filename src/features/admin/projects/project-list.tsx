@@ -13,6 +13,7 @@ import { projectApi, type Project, type ProjectEvent } from '../../../core/api/p
 import { applyListEvent } from '../../../core/api/sse';
 import { logger } from '../../../core/services/logger';
 import { useAuth } from '../../../core/auth/auth-context';
+import { useProjectContext } from '../../../core/context/project-context';
 import {
   PROJECT_COLOR_PALETTE,
   clearProjectColor,
@@ -47,6 +48,7 @@ function StatCell({
 export default function ProjectList() {
   const auth = useAuth();
   const isAdmin = auth.hasRole('admins');
+  const { currentProjectId } = useProjectContext();
   const toast = useRef<Toast>(null);
 
   const [projects, setProjects] = useState<Project[]>([]);
@@ -210,16 +212,26 @@ export default function ProjectList() {
               field="name"
               style={{ width: '30%' }}
               body={(project: ProjectRow) => (
-                <Link
-                  to={`/projects/${project.name}`}
-                  className="flex items-center gap-2 text-lg font-semibold text-fg no-underline transition-colors duration-150 ease-smooth hover:text-primary hover:underline"
-                >
-                  <span
-                    className="h-2.5 w-2.5 shrink-0 rounded-full"
-                    style={{ background: getProjectColor(project.name) }}
-                  ></span>
-                  {project.name}
-                </Link>
+                <span className="flex items-center gap-2">
+                  <Link
+                    to={`/projects/${project.name}`}
+                    className="flex items-center gap-2 text-lg font-semibold text-fg no-underline transition-colors duration-150 ease-smooth hover:text-primary hover:underline"
+                  >
+                    <span
+                      className="h-2.5 w-2.5 shrink-0 rounded-full"
+                      style={{ background: getProjectColor(project.name) }}
+                    ></span>
+                    {project.name}
+                  </Link>
+                  {project.name === currentProjectId && (
+                    <span
+                      className="rounded-full border border-(--db-primary-200) bg-primary-50 px-2 py-0.5 text-xs font-semibold text-primary"
+                      title="The project currently open in the console"
+                    >
+                      Current
+                    </span>
+                  )}
+                </span>
               )}
             />
             <Column

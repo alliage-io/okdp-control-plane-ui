@@ -46,7 +46,7 @@ Is at right of Logo - OKDP Console
 - [x] If allowed to create/modify (as for now): Create project button should be visible and vertically aligned with title
 - [x] Bigger env name, link to /projects/<envname>. Replace useless open link. In general, "open" link (with text "open") should be removed, and a click action on name is preferred
 - [x] Remove open link
-- [ ] Add columns for welcomed KPI like number of services or instances total in projects, and/or CPU/RAM (like in overview, but per project instead of services)
+- [x] Add columns for welcomed KPI like number of services or instances total in projects, and/or CPU/RAM (like in overview, but per project instead of services)
 
 ## Overview Page
 

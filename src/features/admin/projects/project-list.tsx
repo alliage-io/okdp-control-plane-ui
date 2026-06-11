@@ -23,6 +23,29 @@ import {
   setProjectColor,
 } from '../../../core/services/project-colors';
 import EmptyState from '../../../shared/components/empty-state';
+import { formatCpuCores, formatMemoryBytes } from '../../project-console/services/service-utils';
+import { useProjectStats, type ProjectStats } from './use-project-stats';
+
+type ProjectRow = Project & { deleting: boolean; stats?: ProjectStats };
+
+/** KPI cell: pulse while loading, em dash when the metric is unreported. */
+function StatCell({
+  stats,
+  value,
+}: {
+  stats: ProjectStats | undefined;
+  value: (stats: ProjectStats) => string | number | null;
+}) {
+  if (!stats || !stats.metricsLoaded) {
+    return <div className="metric-bar h-[5px] w-[48px] animate-pulse"></div>;
+  }
+  const v = value(stats);
+  return v === null ? (
+    <span className="text-sm text-fg-muted">—</span>
+  ) : (
+    <span className="text-sm text-fg-secondary">{v}</span>
+  );
+}
 
 export default function ProjectList() {
   const auth = useAuth();
@@ -169,11 +192,19 @@ export default function ProjectList() {
 
   const empty = loaded && projects.length === 0;
 
-  // DataTable memoizes its rows against `value`: the deleting flag must be
-  // part of the row objects for the cells to repaint when it flips.
-  const rows = useMemo<(Project & { deleting: boolean })[]>(
-    () => projects.map((p) => ({ ...p, deleting: deletingNames.has(p.name) })),
-    [projects, deletingNames],
+  const projectStats = useProjectStats(projects.map((p) => p.name));
+
+  // DataTable memoizes its rows against `value`: the deleting flag and the
+  // KPI aggregates must be part of the row objects for the cells to repaint
+  // when they change.
+  const rows = useMemo<ProjectRow[]>(
+    () =>
+      projects.map((p) => ({
+        ...p,
+        deleting: deletingNames.has(p.name),
+        stats: projectStats[p.name],
+      })),
+    [projects, deletingNames, projectStats],
   );
 
   return (
@@ -265,12 +296,39 @@ export default function ProjectList() {
             <Column
               header="Description"
               field="description"
-              style={{ width: '60%' }}
+              style={{ width: '34%' }}
               className="description-cell"
               body={(project: Project) => project.description || '-'}
             />
             <Column
-              style={{ width: '10%', textAlign: 'right' }}
+              header="Instances"
+              style={{ width: '9%' }}
+              body={(project: ProjectRow) => (
+                <StatCell stats={project.stats} value={(s) => s.instances} />
+              )}
+            />
+            <Column
+              header="CPU"
+              style={{ width: '9%' }}
+              body={(project: ProjectRow) => (
+                <StatCell
+                  stats={project.stats}
+                  value={(s) => (s.cpuUsed === null ? null : formatCpuCores(s.cpuUsed))}
+                />
+              )}
+            />
+            <Column
+              header="Memory"
+              style={{ width: '9%' }}
+              body={(project: ProjectRow) => (
+                <StatCell
+                  stats={project.stats}
+                  value={(s) => (s.memUsed === null ? null : formatMemoryBytes(s.memUsed))}
+                />
+              )}
+            />
+            <Column
+              style={{ width: '9%', textAlign: 'right' }}
               body={(project: Project & { deleting: boolean }) =>
                 project.deleting ? (
                   <div className="actions">

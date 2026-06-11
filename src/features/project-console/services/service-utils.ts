@@ -94,6 +94,26 @@ export function stripProfileEditorFields(schema: any): any {
 
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
+/** Mirror of the backend's formatCPU: compact human-readable core count. */
+export function formatCpuCores(cores: number): string {
+  if (cores === 0) return '0';
+  return cores < 1 ? cores.toFixed(3) : cores.toFixed(2);
+}
+
+/** Mirror of the backend's formatMemory: byte value in binary units. */
+export function formatMemoryBytes(bytes: number): string {
+  if (bytes === 0) return '0';
+  const units: [number, string][] = [
+    [1024 ** 3, 'Gi'],
+    [1024 ** 2, 'Mi'],
+    [1024, 'Ki'],
+  ];
+  for (const [threshold, suffix] of units) {
+    if (bytes >= threshold) return `${(bytes / threshold).toFixed(2)}${suffix}`;
+  }
+  return `${bytes.toFixed(0)}B`;
+}
+
 /** Angular `date: 'mediumDate'` equivalent (e.g. "Jun 10, 2026"). */
 export function formatMediumDate(value: string | undefined | null): string {
   if (!value) return '—';

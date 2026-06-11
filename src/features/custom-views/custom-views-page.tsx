@@ -1,10 +1,11 @@
 import { Link, useOutletContext } from 'react-router-dom';
 import { useProjectContext } from '../../core/context/project-context';
+import { useCustomViews } from '../../core/preferences/custom-views-context';
 import { ActionCard, QuickActions } from '../../shared/components/action-card';
 import SectionHeading from '../../shared/components/section-heading';
 import {
-  CUSTOM_VIEWS,
-  customViewIcon,
+  BUILT_IN_VIEWS,
+  builtInViewIcon,
   uiServiceLaunchers,
   uiServiceViewIcon,
 } from './views-config';
@@ -16,7 +17,9 @@ import type { ViewServicesState } from './use-view-services';
  *  the selected project. */
 export default function CustomViewsPage() {
   const { currentProject } = useProjectContext();
+  const { viewsFor } = useCustomViews();
   const projectName = currentProject?.name;
+  const customViews = projectName ? viewsFor(projectName) : [];
 
   // Fetched once by the project shell, which feeds the views sidebar from
   // the same subscription.
@@ -45,19 +48,57 @@ export default function CustomViewsPage() {
       {projectName ? (
         <>
           <div className="flex flex-col gap-3">
-            <SectionHeading>Custom views</SectionHeading>
+            <SectionHeading>Built-in views</SectionHeading>
             <QuickActions>
-              {CUSTOM_VIEWS.map((view) => (
+              {BUILT_IN_VIEWS.map((view) => (
                 <ActionCard
                   key={view.label}
                   to={view.path(projectName)}
-                  icon={customViewIcon(view)}
+                  icon={builtInViewIcon(view)}
                   tone={view.tone}
                   title={view.label}
                   description={view.description}
                 />
               ))}
             </QuickActions>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <div className="flex items-baseline justify-between">
+              <SectionHeading>Custom views</SectionHeading>
+              <Link
+                to={`/projects/${projectName}/custom-views`}
+                className="text-sm font-medium text-primary no-underline hover:underline"
+              >
+                Manage
+              </Link>
+            </div>
+            {customViews.length > 0 ? (
+              <QuickActions>
+                {customViews.map((view) => (
+                  <ActionCard
+                    key={view.id}
+                    to={view.url}
+                    external
+                    icon={view.icon}
+                    tone="primary"
+                    title={view.label}
+                    description={view.description || view.url}
+                  />
+                ))}
+              </QuickActions>
+            ) : (
+              <p className="m-0 text-base text-fg-muted">
+                No custom views yet — create your own launcher tiles in{' '}
+                <Link
+                  to={`/projects/${projectName}/custom-views`}
+                  className="text-primary no-underline hover:underline"
+                >
+                  Project configuration → Custom views
+                </Link>
+                .
+              </p>
+            )}
           </div>
 
           <div className="flex flex-col gap-3">

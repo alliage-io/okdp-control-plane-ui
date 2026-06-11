@@ -47,7 +47,7 @@ export const UI_SERVICE_VIEWS: UiServiceView[] = [
   },
 ];
 
-export interface CustomView {
+export interface BuiltInView {
   label: string;
   description: string;
   /** primeicons fallback when the view has no brand logo. */
@@ -65,7 +65,7 @@ export interface CustomView {
 
 /** Rich technology-specific views that don't fit the "one service, one
  *  instance list" shape of the lateral menu (currently the Spark pages). */
-export const CUSTOM_VIEWS: CustomView[] = [
+export const BUILT_IN_VIEWS: BuiltInView[] = [
   {
     label: 'Spark Applications',
     description: 'Submitted Spark jobs and their live status',
@@ -82,7 +82,7 @@ export const CUSTOM_VIEWS: CustomView[] = [
  *  otherwise — the views' counterpart of nav-config's navItemIcon. The badge
  *  inherits the surrounding text color, so it adapts to tiles and sidebar
  *  items alike. */
-export function customViewIcon(view: CustomView): ReactNode {
+export function builtInViewIcon(view: BuiltInView): ReactNode {
   if (!view.brand) return view.icon;
   if (!view.badge) return <BrandIcon icon={view.brand} />;
   return (

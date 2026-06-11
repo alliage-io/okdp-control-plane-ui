@@ -3,6 +3,7 @@ import { Link, Outlet, useMatch } from 'react-router-dom';
 import { Dropdown } from 'primereact/dropdown';
 import { useProjectContext } from '../../core/context/project-context';
 import { useNavPrefs } from '../../core/preferences/nav-prefs-context';
+import { useCustomViews } from '../../core/preferences/custom-views-context';
 import { NAV_EXPANDED_KEY, SIDEBAR_COLLAPSED_KEY } from '../../core/storage-keys';
 import type { Project } from '../../core/api/project-api';
 import { getProjectColor } from '../../core/services/project-colors';
@@ -14,8 +15,8 @@ import {
 } from '../../shared/components/console-nav-classes';
 import { NAV_CATEGORIES, navItemIcon, type NavCategory } from './nav-config';
 import {
-  CUSTOM_VIEWS,
-  customViewIcon,
+  BUILT_IN_VIEWS,
+  builtInViewIcon,
   uiServiceLaunchers,
   uiServiceViewIcon,
 } from '../custom-views/views-config';
@@ -136,9 +137,21 @@ function ExternalNavLink({ href, icon, label, collapsed, title }: ExternalNavLin
   );
 }
 
+/** Trailing views-sidebar category for the user's own launchers — not part
+ *  of NAV_CATEGORIES (it holds local, user-created entries), but it shares
+ *  the same expand/collapse state machinery. */
+const CUSTOM_VIEWS_CATEGORY: NavCategory = {
+  key: 'custom-views',
+  label: 'Custom views',
+  icon: 'pi-bookmark',
+  defaultExpanded: true,
+  items: [],
+};
+
 export default function ProjectPage() {
   const context = useProjectContext();
   const { isNavItemHidden } = useNavPrefs();
+  const { viewsFor } = useCustomViews();
   const switcherRef = useRef<Dropdown>(null);
 
   // Entries hidden by default or from the user's settings drop out of the
@@ -195,7 +208,7 @@ export default function ProjectPage() {
 
   // Views sidebar content: the lateral menu's categories, but holding the
   // /views tiles — external launchers for deployed UI services plus the
-  // custom views. Categories with nothing to show disappear.
+  // built-in views. Categories with nothing to show disappear.
   const allLaunchers = uiServiceLaunchers(viewServices.instances);
   // With several instances of one service, the instance name disambiguates.
   const launcherCounts = new Map<string, number>();
@@ -205,8 +218,11 @@ export default function ProjectPage() {
   const viewCategories = NAV_CATEGORIES.map((category) => ({
     category,
     launchers: allLaunchers.filter(({ view }) => view.categoryKey === category.key),
-    customViews: CUSTOM_VIEWS.filter((view) => view.categoryKey === category.key),
-  })).filter((entry) => entry.launchers.length + entry.customViews.length > 0);
+    builtInViews: BUILT_IN_VIEWS.filter((view) => view.categoryKey === category.key),
+  })).filter((entry) => entry.launchers.length + entry.builtInViews.length > 0);
+
+  // User-created views flagged for the menu, in their own trailing category.
+  const menuCustomViews = (projectName ? viewsFor(projectName) : []).filter((v) => v.inMenu);
 
   const headerLeft = context.availableProjects.length > 0 && (
     /* project-switcher scopes the Dropdown overrides in the PrimeReact overrides section of styles.css */
@@ -329,7 +345,7 @@ export default function ProjectPage() {
               collapsed={sidebarCollapsed}
             />
 
-            {viewCategories.map(({ category, launchers, customViews }) => (
+            {viewCategories.map(({ category, launchers, builtInViews }) => (
               <NavSection
                 key={category.key}
                 icon={category.icon}
@@ -338,11 +354,11 @@ export default function ProjectPage() {
                 collapsed={sidebarCollapsed}
                 onToggle={() => toggleCategory(category)}
               >
-                {customViews.map((view) => (
+                {builtInViews.map((view) => (
                   <SideNavLink
                     key={view.label}
                     to={view.path(projectName)}
-                    icon={customViewIcon(view)}
+                    icon={builtInViewIcon(view)}
                     label={view.label}
                     collapsed={sidebarCollapsed}
                     sub
@@ -373,6 +389,27 @@ export default function ProjectPage() {
                 })}
               </NavSection>
             ))}
+
+            {menuCustomViews.length > 0 && (
+              <NavSection
+                icon={CUSTOM_VIEWS_CATEGORY.icon}
+                label={CUSTOM_VIEWS_CATEGORY.label}
+                expanded={isExpanded(CUSTOM_VIEWS_CATEGORY)}
+                collapsed={sidebarCollapsed}
+                onToggle={() => toggleCategory(CUSTOM_VIEWS_CATEGORY)}
+              >
+                {menuCustomViews.map((view) => (
+                  <ExternalNavLink
+                    key={view.id}
+                    href={view.url}
+                    icon={view.icon}
+                    label={view.label}
+                    collapsed={sidebarCollapsed}
+                    title={`Open ${view.label} in a new tab`}
+                  />
+                ))}
+              </NavSection>
+            )}
           </>
         ) : null
       }

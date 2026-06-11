@@ -203,6 +203,8 @@ export const NAV_CATEGORIES: NavCategory[] = [
     items: [
       { segment: 'secret-stores', icon: 'pi pi-lock', label: 'Secrets' },
       { segment: 'parameters', icon: 'pi pi-cog', label: 'Parameters' },
+      // Local-only definitions (this browser); see custom-views-context.
+      { segment: 'custom-views', icon: 'pi pi-bookmark', label: 'Custom views' },
     ],
   },
 ];

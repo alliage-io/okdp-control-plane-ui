@@ -10,3 +10,6 @@ export const THEME_STORAGE_KEY = 'okdp-theme';
 export const PROJECT_COLORS_KEY = 'okdp-project-colors';
 export const ENV_BAR_STORAGE_KEY = 'okdp-env-bar';
 export const NAV_HIDDEN_KEY = 'okdp-nav-hidden';
+// User-created view launchers, keyed by project. Local-only for now — the
+// API knows nothing about them.
+export const CUSTOM_VIEWS_KEY = 'okdp-custom-views';

@@ -1,0 +1,279 @@
+import { useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { Button } from 'primereact/button';
+import { Checkbox } from 'primereact/checkbox';
+import { Dialog } from 'primereact/dialog';
+import { InputText } from 'primereact/inputtext';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
+import { useCustomViews, type CustomView } from '../../../core/preferences/custom-views-context';
+import EmptyState from '../../../shared/components/empty-state';
+
+/** Curated primeicons palette for the tile icon picker. */
+const ICON_CHOICES = [
+  'pi pi-globe',
+  'pi pi-link',
+  'pi pi-chart-line',
+  'pi pi-chart-bar',
+  'pi pi-database',
+  'pi pi-table',
+  'pi pi-book',
+  'pi pi-code',
+  'pi pi-bolt',
+  'pi pi-eye',
+  'pi pi-compass',
+  'pi pi-wrench',
+];
+
+type Draft = Omit<CustomView, 'id'> & { id?: string };
+
+const EMPTY_DRAFT: Draft = {
+  label: '',
+  url: '',
+  description: '',
+  icon: ICON_CHOICES[0],
+  inMenu: true,
+};
+
+function isValidUrl(url: string): boolean {
+  return /^https?:\/\/.+/.test(url.trim());
+}
+
+/** Project configuration page for user-created views: launcher tiles
+ *  (URL, description, icon) shown on the views page and, when flagged, in
+ *  the views sidebar. Stored in this browser only — the API is not involved
+ *  and other users never see them. */
+export default function CustomViewsSettingsPage() {
+  const { projectId } = useParams<{ projectId: string }>();
+  const { viewsFor, addView, updateView, removeView } = useCustomViews();
+  const views = projectId ? viewsFor(projectId) : [];
+
+  const [draft, setDraft] = useState<Draft | null>(null);
+  const valid = !!draft && draft.label.trim().length > 0 && isValidUrl(draft.url);
+
+  const openCreate = () => setDraft({ ...EMPTY_DRAFT });
+  const openEdit = (view: CustomView) => setDraft({ ...view });
+
+  const save = () => {
+    if (!projectId || !draft || !valid) return;
+    const view = {
+      ...draft,
+      label: draft.label.trim(),
+      url: draft.url.trim(),
+      description: draft.description?.trim() || undefined,
+    };
+    if (view.id) {
+      updateView(projectId, view as CustomView);
+    } else {
+      addView(projectId, view);
+    }
+    setDraft(null);
+  };
+
+  const confirmRemove = (view: CustomView) =>
+    confirmDialog({
+      message: `Remove the "${view.label}" view? Only this browser is affected.`,
+      header: 'Remove custom view',
+      icon: 'pi pi-exclamation-triangle',
+      acceptClassName: 'p-button-danger',
+      acceptLabel: 'Remove',
+      accept: () => projectId && removeView(projectId, view.id),
+    });
+
+  const dialogFooter = (
+    <div className="dialog-actions">
+      <Button severity="secondary" outlined label="Cancel" onClick={() => setDraft(null)} />
+      <Button disabled={!valid} onClick={save} label={draft?.id ? 'Save' : 'Create'} />
+    </div>
+  );
+
+  return (
+    <div className="workspace-container">
+      <ConfirmDialog />
+
+      <div className="top-bar">
+        <h1>Custom views</h1>
+        {views.length > 0 && (
+          <button className="create-btn" onClick={openCreate}>
+            <i className="pi pi-plus"></i>
+            <span>New view</span>
+          </button>
+        )}
+      </div>
+
+      <p className="mt-0 mb-5 text-base text-fg-secondary">
+        Personal launcher tiles for the <strong>{projectId}</strong> views space. Stored in this
+        browser only — other users don&apos;t see them.
+      </p>
+
+      {views.length === 0 ? (
+        <EmptyState
+          icon="pi pi-bookmark"
+          title="No custom views yet"
+          description="Add your own launcher tiles — a Grafana dashboard, a wiki page, any URL — and optionally pin them to the views menu."
+          action={
+            <button className="create-btn mt-3" onClick={openCreate}>
+              <i className="pi pi-plus"></i>
+              <span>New view</span>
+            </button>
+          }
+        />
+      ) : (
+        <div className="okdp-table-wrapper">
+          <table className="okdp-table">
+            <thead>
+              <tr>
+                <th style={{ width: '24%' }}>Name</th>
+                <th style={{ width: '32%' }}>URL</th>
+                <th style={{ width: '24%' }}>Description</th>
+                <th style={{ width: '10%' }}>In menu</th>
+                <th style={{ width: '10%' }}></th>
+              </tr>
+            </thead>
+            <tbody>
+              {views.map((view) => (
+                <tr key={view.id}>
+                  <td>
+                    <span className="flex items-center gap-2 font-medium text-fg">
+                      <i className={`${view.icon} text-[0.95rem] text-fg-secondary`}></i>
+                      {view.label}
+                    </span>
+                  </td>
+                  <td>
+                    <a
+                      href={view.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mono text-sm break-all text-primary no-underline hover:underline"
+                    >
+                      {view.url}
+                    </a>
+                  </td>
+                  <td>
+                    <span className="muted-text">{view.description || '—'}</span>
+                  </td>
+                  <td>
+                    {view.inMenu ? (
+                      <i
+                        className="pi pi-check text-sm text-(--db-success)"
+                        title="Shown in the views menu"
+                      ></i>
+                    ) : (
+                      <span className="muted-text">—</span>
+                    )}
+                  </td>
+                  <td>
+                    <div className="okdp-actions">
+                      <button className="icon-btn" title="Edit" onClick={() => openEdit(view)}>
+                        <i className="pi pi-pencil"></i>
+                      </button>
+                      <button
+                        className="icon-btn danger"
+                        title="Remove"
+                        onClick={() => confirmRemove(view)}
+                      >
+                        <i className="pi pi-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <Dialog
+        header={draft?.id ? 'Edit custom view' : 'New custom view'}
+        visible={draft !== null}
+        modal
+        draggable={false}
+        resizable={false}
+        style={{ width: '560px' }}
+        className="db-dialog"
+        closable
+        onHide={() => setDraft(null)}
+        footer={dialogFooter}
+      >
+        {draft && (
+          <div className="dialog-content">
+            <div className="field">
+              <label htmlFor="cv-name">Name</label>
+              <InputText
+                id="cv-name"
+                value={draft.label}
+                onChange={(e) => setDraft((d) => d && { ...d, label: e.target.value })}
+                className="w-full dialog-input"
+                placeholder="e.g., Grafana"
+              />
+            </div>
+
+            <div className="field">
+              <label htmlFor="cv-url">URL</label>
+              <InputText
+                id="cv-url"
+                value={draft.url}
+                onChange={(e) => setDraft((d) => d && { ...d, url: e.target.value })}
+                className="w-full dialog-input"
+                placeholder="https://…"
+              />
+              {draft.url.trim() !== '' && !isValidUrl(draft.url) && (
+                <small className="text-sm text-(--db-danger)">
+                  Must be an http:// or https:// URL.
+                </small>
+              )}
+            </div>
+
+            <div className="field">
+              <label htmlFor="cv-desc">
+                Description <span className="optional">(optional)</span>
+              </label>
+              <InputText
+                id="cv-desc"
+                value={draft.description ?? ''}
+                onChange={(e) => setDraft((d) => d && { ...d, description: e.target.value })}
+                className="w-full dialog-input"
+                placeholder="Shown on the tile"
+              />
+            </div>
+
+            <div className="field">
+              <label id="cv-icon-label">Icon</label>
+              <div
+                className="flex flex-wrap items-center gap-2"
+                role="radiogroup"
+                aria-labelledby="cv-icon-label"
+              >
+                {ICON_CHOICES.map((icon) => (
+                  <button
+                    key={icon}
+                    type="button"
+                    role="radio"
+                    aria-checked={draft.icon === icon}
+                    aria-label={`Icon ${icon.replace('pi pi-', '')}`}
+                    className={`flex h-9 w-9 cursor-pointer items-center justify-center rounded-md border transition-colors duration-150 ease-smooth ${
+                      draft.icon === icon
+                        ? 'border-primary bg-primary-50 text-primary'
+                        : 'border-border-light bg-surface text-fg-secondary hover:border-border'
+                    }`}
+                    onClick={() => setDraft((d) => d && { ...d, icon })}
+                  >
+                    <i className={`${icon} text-[1rem]`}></i>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="field-checkbox">
+              <Checkbox
+                inputId="cv-in-menu"
+                checked={draft.inMenu}
+                onChange={(e) => setDraft((d) => d && { ...d, inMenu: !!e.checked })}
+              />
+              <label htmlFor="cv-in-menu">Show in the views lateral menu</label>
+            </div>
+          </div>
+        )}
+      </Dialog>
+    </div>
+  );
+}

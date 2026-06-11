@@ -7,12 +7,10 @@ import { AUTH_RETURN_URL_KEY } from '../storage-keys';
 const mocks = vi.hoisted(() => ({
   useAuth: vi.fn(),
   setUnauthorizedHandler: vi.fn(),
-  resolveInitialRoute: vi.fn(),
 }));
 
 vi.mock('./auth-context', () => ({ useAuth: mocks.useAuth }));
 vi.mock('../api/http', () => ({ setUnauthorizedHandler: mocks.setUnauthorizedHandler }));
-vi.mock('../context/space', () => ({ resolveInitialRoute: mocks.resolveInitialRoute }));
 
 import { AuthRedirector } from './auth-redirector';
 
@@ -55,7 +53,6 @@ describe('AuthRedirector', () => {
       roles: [],
       forceLogout: vi.fn(),
     });
-    mocks.resolveInitialRoute.mockReturnValue('/project');
   });
 
   describe('Deep links', () => {
@@ -82,10 +79,10 @@ describe('AuthRedirector', () => {
   });
 
   describe('Post-login routing', () => {
-    it('should route an authenticated user from /login to the preferred space', async () => {
+    it('should route an authenticated user from /login to /home', async () => {
       renderAt('/login');
 
-      await waitFor(() => expect(currentPath).toBe('/project'));
+      await waitFor(() => expect(currentPath).toBe('/home'));
     });
 
     it('should restore and consume the saved return URL', async () => {

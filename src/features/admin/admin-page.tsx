@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import { rememberSpace } from '../../core/context/space';
 import { SIDEBAR_COLLAPSED_KEY } from '../../core/storage-keys';
 import { ConsoleShell, SideNavLink } from '../../shared/components/console-shell';
 
@@ -8,10 +7,6 @@ export default function AdminPage() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(
     () => localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === 'true',
   );
-
-  useEffect(() => {
-    rememberSpace('admin');
-  }, []);
 
   const toggleSidebar = () => {
     setSidebarCollapsed((collapsed) => {

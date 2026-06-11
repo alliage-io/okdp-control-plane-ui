@@ -1,9 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { Dropdown } from 'primereact/dropdown';
 import { useAuth } from '../../core/auth/auth-context';
 import { useProjectContext } from '../../core/context/project-context';
-import { rememberSpace } from '../../core/context/space';
 import { SIDEBAR_COLLAPSED_KEY } from '../../core/storage-keys';
 import type { Project } from '../../core/api/project-api';
 import { ConsoleShell, SideNavLink } from '../../shared/components/console-shell';
@@ -92,10 +91,6 @@ export default function ProjectPage() {
   const [notebookExpanded, setNotebookExpanded] = useState(true);
   const [sqlBiExpanded, setSqlBiExpanded] = useState(true);
   const [mlExpanded, setMlExpanded] = useState(false);
-
-  useEffect(() => {
-    rememberSpace('project');
-  }, []);
 
   const toggleSidebar = () => {
     setSidebarCollapsed((collapsed) => {

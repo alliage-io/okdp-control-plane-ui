@@ -106,7 +106,7 @@ export function ConsoleShell({
         collapsed
           ? 'grid-cols-[var(--db-sidebar-collapsed-width)_1fr]'
           : 'grid-cols-[var(--db-sidebar-width)_1fr]'
-      } grid-rows-[var(--db-header-height)_1fr] overflow-hidden bg-surface transition-[grid-template-columns] duration-400 ease-smooth max-lg:grid-cols-[var(--db-sidebar-collapsed-width)_1fr] max-md:grid-cols-[1fr]`}
+      } grid-rows-[var(--db-header-height)_minmax(0,1fr)] overflow-hidden bg-surface transition-[grid-template-columns] duration-400 ease-smooth max-lg:grid-cols-[var(--db-sidebar-collapsed-width)_1fr] max-md:grid-cols-[1fr]`}
     >
       {/* Unified header */}
       <header className="relative z-20 col-span-2 row-start-1 flex h-(--db-header-height) items-center justify-between border-b border-border-light bg-surface px-3 transition-[background-color,border-color] duration-150 ease-smooth max-md:col-span-1">

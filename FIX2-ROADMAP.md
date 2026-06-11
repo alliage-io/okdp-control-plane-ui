@@ -72,24 +72,24 @@ Add a new **Parameters** entry under **Secrets** in the lateral menu.
 
 Scrolling is currently broken.
 
-* [ ] Identify the intended scrollable container.
-* [ ] Make only the main content/view zone scrollable.
-* [ ] Keep the top banner fixed.
-* [ ] Keep the lateral menu fixed.
-* [ ] Prevent unwanted body-level scrolling if not intended.
-* [ ] Prevent double scrollbars.
-* [ ] Test pages with long content.
-* [ ] Test pages with forms.
-* [ ] Test pages with tiles.
-* [ ] Test the deployment flow.
+* [x] Identify the intended scrollable container.
+* [x] Make only the main content/view zone scrollable.
+* [x] Keep the top banner fixed.
+* [x] Keep the lateral menu fixed.
+* [x] Prevent unwanted body-level scrolling if not intended.
+* [x] Prevent double scrollbars.
+* [x] Test pages with long content.
+* [x] Test pages with forms.
+* [x] Test pages with tiles.
+* [x] Test the deployment flow.
 
 ### Acceptance criteria
 
-* [ ] Main content scrolls correctly.
-* [ ] Top banner remains visible.
-* [ ] Lateral menu remains visible.
-* [ ] No content is hidden behind fixed layout elements.
-* [ ] No unwanted double scrollbar appears.
+* [x] Main content scrolls correctly.
+* [x] Top banner remains visible.
+* [x] Lateral menu remains visible.
+* [x] No content is hidden behind fixed layout elements.
+* [x] No unwanted double scrollbar appears.
 
 ---
 

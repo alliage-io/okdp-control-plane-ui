@@ -4,6 +4,7 @@ import { RequireAuth } from './core/auth/require-auth';
 import { ProjectIndexRedirect, ProjectRouteSync } from './core/guards/project-route';
 
 const HomePage = lazy(() => import('./features/landing/home-page'));
+const StartPage = lazy(() => import('./features/start/start-page'));
 const AdminPage = lazy(() => import('./features/admin/admin-page'));
 const AdminHome = lazy(() => import('./features/admin/home/admin-home'));
 const ProjectList = lazy(() => import('./features/admin/projects/project-list'));
@@ -51,9 +52,18 @@ export function AppRoutes() {
   return (
     <Suspense fallback={null}>
       <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/" element={<Navigate to="/home" replace />} />
         <Route path="/login" element={<HomePage />} />
-        <Route path="/home" element={<Navigate to="/login" replace />} />
+        {/* Authenticated entry point: default project, or getting started
+            when the platform has no project yet. */}
+        <Route
+          path="/home"
+          element={
+            <RequireAuth>
+              <StartPage />
+            </RequireAuth>
+          }
+        />
 
         {/* Admin space: pathless layout so the project list and identity
             pages live at top-level /projects and /identity. */}
@@ -139,7 +149,7 @@ export function AppRoutes() {
           </Route>
         </Route>
 
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to="/home" replace />} />
       </Routes>
     </Suspense>
   );

@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import type { ReactNode } from 'react';
-import { NavLink } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { Avatar } from 'primereact/avatar';
 import { Menu } from 'primereact/menu';
 import type { MenuItem } from 'primereact/menuitem';
@@ -124,26 +124,26 @@ export function ConsoleShell({
               : 'w-(--db-sidebar-width) min-w-(--db-sidebar-width)'
           } max-lg:w-(--db-sidebar-collapsed-width) max-lg:min-w-(--db-sidebar-collapsed-width) max-md:w-auto max-md:min-w-auto`}
         >
-          <div className="flex items-center justify-center">
+          <Link to="/home" title="Home" className="flex items-center justify-center no-underline">
             <img src="/images/okdp-notext.svg" alt="okdp" className="h-auto w-6" />
             <div
               className={`flex flex-row items-baseline gap-1 overflow-hidden leading-none whitespace-nowrap transition-[max-width,margin] duration-400 ease-smooth ${
-                collapsed
-                  ? 'ml-0 max-w-0'
-                  : 'ml-2 max-w-[150px] max-lg:ml-0 max-lg:max-w-0'
+                collapsed ? 'ml-0 max-w-0' : 'ml-2 max-w-[150px] max-lg:ml-0 max-lg:max-w-0'
               } max-md:ml-2 max-md:max-w-[150px]`}
             >
               <span className="text-[1.075rem] font-bold tracking-[-0.02em] text-fg">okdp</span>
               <span className="text-[1.075rem] font-normal text-fg-secondary">console</span>
             </div>
-          </div>
+          </Link>
           <button
             className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-sm border-none bg-transparent p-0 text-fg-muted transition-[color,background-color] duration-150 ease-smooth hover:bg-surface-tertiary hover:text-fg"
             onClick={onToggleCollapsed}
             title={collapsed ? 'Expand' : 'Collapse'}
             aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
-            <i className={`${collapsed ? 'pi pi-angle-right' : 'pi pi-angle-left'} text-[1.1rem]`}></i>
+            <i
+              className={`${collapsed ? 'pi pi-angle-right' : 'pi pi-angle-left'} text-[1.1rem]`}
+            ></i>
           </button>
         </div>
 

@@ -79,8 +79,10 @@ export default function ProjectKpis({ summary }: { summary: ProjectServicesSumma
         label="CPU used"
         value={loaded ? (cpuSeen ? formatCpuCores(cpu) : '—') : pending}
       />
+      {/* th-large (cell grid) stands in for RAM — the database/disk icon
+          reads as storage, and primeicons has no dedicated memory glyph. */}
       <KpiTile
-        icon="pi pi-database"
+        icon="pi pi-th-large"
         tone="blue"
         label="Memory used"
         value={loaded ? (memSeen ? formatMemoryBytes(mem) : '—') : pending}

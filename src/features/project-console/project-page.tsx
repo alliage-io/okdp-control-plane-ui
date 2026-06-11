@@ -103,6 +103,7 @@ export default function ProjectPage() {
   };
 
   const projectName = context.currentProject?.name;
+  const envColor = projectName ? getProjectColor(projectName) : undefined;
   const futureTitle = 'Direction future, non engagé';
 
   const headerLeft = context.availableProjects.length > 0 && (
@@ -118,6 +119,14 @@ export default function ProjectPage() {
         className="project-dropdown"
         panelClassName="project-dropdown-panel"
         appendTo={document.body}
+        style={
+          envColor
+            ? {
+                background: `color-mix(in srgb, ${envColor} 14%, transparent)`,
+                border: `1px solid color-mix(in srgb, ${envColor} 50%, transparent)`,
+              }
+            : undefined
+        }
         onChange={(e) => context.selectProject((e.value as Project).name)}
         valueTemplate={(project: Project | null) => (
           <span className="flex items-center gap-2 font-semibold">
@@ -165,6 +174,7 @@ export default function ProjectPage() {
       collapsed={sidebarCollapsed}
       onToggleCollapsed={toggleSidebar}
       headerLeft={headerLeft}
+      accentColor={envColor}
       navBottomAriaLabel="Project tools"
       nav={
         <>

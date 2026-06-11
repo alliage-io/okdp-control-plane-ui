@@ -45,6 +45,8 @@ interface ConsoleShellProps {
   onToggleCollapsed: () => void;
   /** Header widgets rendered right after the brand block (e.g. project switcher). */
   headerLeft?: ReactNode;
+  /** Environment color painted as a strip across the top of the header. */
+  accentColor?: string;
   nav: ReactNode;
   navBottom?: ReactNode;
   navBottomAriaLabel?: string;
@@ -57,6 +59,7 @@ export function ConsoleShell({
   collapsed,
   onToggleCollapsed,
   headerLeft,
+  accentColor,
   nav,
   navBottom,
   navBottomAriaLabel,
@@ -116,7 +119,14 @@ export function ConsoleShell({
       } grid-rows-[var(--db-header-height)_1fr] bg-surface transition-[grid-template-columns] duration-400 ease-smooth max-lg:grid-cols-[var(--db-sidebar-collapsed-width)_1fr] max-md:grid-cols-[1fr]`}
     >
       {/* Unified header */}
-      <header className="z-20 col-span-2 row-start-1 flex h-(--db-header-height) items-center justify-between border-b border-border-light bg-surface px-3 transition-[background-color,border-color] duration-150 ease-smooth max-md:col-span-1">
+      <header className="relative z-20 col-span-2 row-start-1 flex h-(--db-header-height) items-center justify-between border-b border-border-light bg-surface px-3 transition-[background-color,border-color] duration-150 ease-smooth max-md:col-span-1">
+        {accentColor && (
+          <div
+            className="absolute inset-x-0 top-0 h-[3px]"
+            style={{ background: accentColor }}
+            aria-hidden="true"
+          ></div>
+        )}
         <div
           className={`flex items-center gap-2 ${
             collapsed

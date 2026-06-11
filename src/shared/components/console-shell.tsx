@@ -5,7 +5,6 @@ import { Avatar } from 'primereact/avatar';
 import { Menu } from 'primereact/menu';
 import type { MenuItem } from 'primereact/menuitem';
 import { useAuth } from '../../core/auth/auth-context';
-import { useTheme, type ThemeMode } from '../../core/theme/theme-context';
 import { useEnvBar } from '../../core/preferences/env-bar-context';
 import { environment } from '../../config/environment';
 import { sideNavIconClass, sideNavLabelClass, sideNavLinkClass } from './console-nav-classes';
@@ -72,42 +71,13 @@ export function ConsoleShell({
   children,
 }: ConsoleShellProps) {
   const auth = useAuth();
-  const { theme, setTheme } = useTheme();
   const { envBarEnabled } = useEnvBar();
   const menuRef = useRef<Menu>(null);
-  const themeMenuRef = useRef<Menu>(null);
 
   const displayName = auth.profile?.firstName ?? auth.profile?.username ?? 'User';
   const first = (auth.profile?.firstName ?? auth.profile?.username ?? '?').charAt(0).toUpperCase();
   const last = (auth.profile?.lastName ?? '').charAt(0).toUpperCase();
   const initials = `${first}${last || ''}`;
-
-  const themeOption = (mode: ThemeMode, icon: string, label: string): MenuItem => ({
-    label,
-    icon,
-    command: () => setTheme(mode),
-    // Custom template to append the active-mode check mark. Templates replace
-    // the .p-menuitem-content wrapper too, so it must be reproduced for the
-    // theme's padding/hover rules to keep applying.
-    template: (item, options) => (
-      <div className="p-menuitem-content">
-        <a className={options.className} onClick={options.onClick}>
-          <span className={options.iconClassName}></span>
-          <span className={options.labelClassName}>{item.label}</span>
-          {theme === mode && <i className="pi pi-check ml-auto text-[0.7rem] text-primary"></i>}
-        </a>
-      </div>
-    ),
-  });
-
-  const themeMenu: MenuItem[] = [
-    themeOption('system', 'pi pi-desktop', 'System'),
-    themeOption('light', 'pi pi-sun', 'Light'),
-    themeOption('dark', 'pi pi-moon', 'Dark'),
-  ];
-
-  const themeIcon =
-    theme === 'dark' ? 'pi pi-moon' : theme === 'light' ? 'pi pi-sun' : 'pi pi-desktop';
 
   const profileMenu: MenuItem[] = [
     {
@@ -166,17 +136,6 @@ export function ConsoleShell({
           >
             <i className="pi pi-github text-[1rem]"></i>
           </a>
-
-          <button
-            className={TOPBAR_BTN_CLASS}
-            onClick={(e) => themeMenuRef.current?.toggle(e)}
-            title="Theme"
-            aria-label="Theme menu"
-            aria-haspopup="menu"
-          >
-            <i className={`${themeIcon} text-[1rem]`}></i>
-          </button>
-          <Menu ref={themeMenuRef} model={themeMenu} popup />
 
           <div
             className="flex items-center gap-2 rounded-md border-none bg-transparent py-1 pr-2 pl-1 transition-[background-color] duration-150 ease-smooth hover:bg-surface-tertiary"

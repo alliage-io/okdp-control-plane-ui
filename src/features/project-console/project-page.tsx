@@ -12,8 +12,13 @@ import {
   sideNavLabelClass,
   sideNavLinkClass,
 } from '../../shared/components/console-nav-classes';
-import { NAV_CATEGORIES, navItemIcon, type NavCategory, type NavItem } from './nav-config';
-import { CUSTOM_VIEWS, customViewIcon, uiServiceLaunchers } from '../custom-views/views-config';
+import { NAV_CATEGORIES, navItemIcon, type NavCategory } from './nav-config';
+import {
+  CUSTOM_VIEWS,
+  customViewIcon,
+  uiServiceLaunchers,
+  uiServiceViewIcon,
+} from '../custom-views/views-config';
 import { useViewServices } from '../custom-views/use-view-services';
 
 /** Per-category unfold overrides persisted across reloads; categories absent
@@ -129,16 +134,6 @@ function ExternalNavLink({ href, icon, label, collapsed, title }: ExternalNavLin
       )}
     </a>
   );
-}
-
-/** Lateral-menu item for a console segment — the views sidebar borrows its
- *  brand logo so both menus show a service the same way. */
-function navItemBySegment(segment: string): NavItem | undefined {
-  for (const category of NAV_CATEGORIES) {
-    const item = category.items.find((i) => i.segment === segment);
-    if (item) return item;
-  }
-  return undefined;
 }
 
 export default function ProjectPage() {
@@ -352,8 +347,7 @@ export default function ProjectPage() {
                   />
                 ))}
                 {launchers.map(({ svc, view }) => {
-                  const navItem = navItemBySegment(view.navSegment);
-                  const icon = navItem ? navItemIcon(navItem) : view.icon;
+                  const icon = uiServiceViewIcon(view);
                   const label = (launcherCounts.get(view.service) ?? 0) > 1 ? svc.name : view.label;
                   return svc.status === 'Ready' ? (
                     <ExternalNavLink

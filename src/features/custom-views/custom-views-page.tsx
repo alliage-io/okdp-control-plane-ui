@@ -2,7 +2,12 @@ import { Link, useOutletContext } from 'react-router-dom';
 import { useProjectContext } from '../../core/context/project-context';
 import { ActionCard, QuickActions } from '../../shared/components/action-card';
 import SectionHeading from '../../shared/components/section-heading';
-import { CUSTOM_VIEWS, customViewIcon, uiServiceLaunchers } from './views-config';
+import {
+  CUSTOM_VIEWS,
+  customViewIcon,
+  uiServiceLaunchers,
+  uiServiceViewIcon,
+} from './views-config';
 import type { ViewServicesState } from './use-view-services';
 
 /** /views — service UI launchers plus rich technology-specific views that
@@ -71,7 +76,7 @@ export default function CustomViewsPage() {
                       to={svc.url!}
                       external
                       disabled={!ready}
-                      icon={view.icon}
+                      icon={uiServiceViewIcon(view)}
                       tone={view.tone}
                       title={view.label}
                       description={

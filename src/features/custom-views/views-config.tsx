@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { siApachespark } from 'simple-icons';
 import type { ServiceInstance } from '../../core/models/service.model';
 import { BrandIcon, type BrandGlyph } from '../../shared/components/brand-icon';
+import { navItemBySegment, navItemIcon } from '../project-console/nav-config';
 
 export type ViewTone = 'primary' | 'blue' | 'purple';
 
@@ -92,6 +93,13 @@ export function customViewIcon(view: CustomView): ReactNode {
       ></i>
     </span>
   );
+}
+
+/** Brand logo borrowed from the service's lateral-menu entry, primeicons
+ *  fallback otherwise — tiles and sidebar items show a service the same way. */
+export function uiServiceViewIcon(view: UiServiceView): ReactNode {
+  const navItem = navItemBySegment(view.navSegment);
+  return navItem ? navItemIcon(navItem) : view.icon;
 }
 
 export interface UiServiceLauncher {

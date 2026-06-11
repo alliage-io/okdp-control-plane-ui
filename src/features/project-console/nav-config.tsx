@@ -210,3 +210,13 @@ export const NAV_CATEGORIES: NavCategory[] = [
 export function navItemIcon(item: NavItem): React.ReactNode {
   return item.brand ? <BrandIcon icon={item.brand} mono={item.brandMono} /> : item.icon;
 }
+
+/** Lateral-menu item for a console segment — lets other surfaces (the views
+ *  page and its sidebar) show a service with the same brand logo. */
+export function navItemBySegment(segment: string): NavItem | undefined {
+  for (const category of NAV_CATEGORIES) {
+    const item = category.items.find((i) => i.segment === segment);
+    if (item) return item;
+  }
+  return undefined;
+}

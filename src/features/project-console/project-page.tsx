@@ -5,6 +5,7 @@ import { useAuth } from '../../core/auth/auth-context';
 import { useProjectContext } from '../../core/context/project-context';
 import { SIDEBAR_COLLAPSED_KEY } from '../../core/storage-keys';
 import type { Project } from '../../core/api/project-api';
+import { getProjectColor } from '../../core/services/project-colors';
 import { ConsoleShell, SideNavLink } from '../../shared/components/console-shell';
 import {
   sideNavIconClass,
@@ -120,15 +121,27 @@ export default function ProjectPage() {
         onChange={(e) => context.selectProject((e.value as Project).name)}
         valueTemplate={(project: Project | null) => (
           <span className="flex items-center gap-2 font-semibold">
+            {project && (
+              <span
+                className="h-2.5 w-2.5 shrink-0 rounded-full"
+                style={{ background: getProjectColor(project.name) }}
+              ></span>
+            )}
             {project ? project.name : 'Select Project'}
           </span>
         )}
         itemTemplate={(project: Project) => (
-          <div className="flex flex-col gap-px">
-            <span className="font-medium">{project.name}</span>
-            {project.description && (
-              <small className="text-xs text-fg-muted">{project.description}</small>
-            )}
+          <div className="flex items-center gap-2">
+            <span
+              className="h-2.5 w-2.5 shrink-0 rounded-full"
+              style={{ background: getProjectColor(project.name) }}
+            ></span>
+            <div className="flex flex-col gap-px">
+              <span className="font-medium">{project.name}</span>
+              {project.description && (
+                <small className="text-xs text-fg-muted">{project.description}</small>
+              )}
+            </div>
           </div>
         )}
         panelFooterTemplate={() => (

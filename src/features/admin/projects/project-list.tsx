@@ -16,6 +16,12 @@ import { projectApi, type Project, type ProjectEvent } from '../../../core/api/p
 import { applyListEvent } from '../../../core/api/sse';
 import { logger } from '../../../core/services/logger';
 import { useAuth } from '../../../core/auth/auth-context';
+import {
+  PROJECT_COLOR_PALETTE,
+  clearProjectColor,
+  getProjectColor,
+  setProjectColor,
+} from '../../../core/services/project-colors';
 import EmptyState from '../../../shared/components/empty-state';
 
 export default function ProjectList() {
@@ -36,6 +42,7 @@ export default function ProjectList() {
   const [globalFilter, setGlobalFilter] = useState('');
   const [visible, setVisible] = useState(false);
   const [newProject, setNewProject] = useState<Project>({ name: '', description: '' });
+  const [newColor, setNewColor] = useState<string>(PROJECT_COLOR_PALETTE[0]);
 
   const showSuccess = (detail: string) =>
     toast.current?.show({ severity: 'success', summary: 'Success', detail, life: 3000 });
@@ -60,6 +67,7 @@ export default function ProjectList() {
         showSuccess(`Project ${project.name} created`);
       } else if (event.type === 'DELETED' && exists) {
         showSuccess(`Project ${project.name} deleted`);
+        clearProjectColor(project.name);
         setDeletingNames((names) => {
           if (!names.has(project.name)) return names;
           const next = new Set(names);
@@ -108,13 +116,17 @@ export default function ProjectList() {
 
   const showDialog = () => {
     setNewProject({ name: '', description: '' });
+    setNewColor(PROJECT_COLOR_PALETTE[0]);
     setVisible(true);
   };
 
   const createProject = () => {
     projectApi
       .createProject(newProject)
-      .then(() => setVisible(false))
+      .then(() => {
+        setProjectColor(newProject.name, newColor);
+        setVisible(false);
+      })
       .catch((err) => {
         showError('Failed to create project');
         logger.error('Failed to create project', err);
@@ -226,7 +238,15 @@ export default function ProjectList() {
               header="Name"
               field="name"
               style={{ width: '30%' }}
-              body={(project: Project) => <span className="project-name">{project.name}</span>}
+              body={(project: Project) => (
+                <span className="project-name flex items-center gap-2">
+                  <span
+                    className="h-2.5 w-2.5 shrink-0 rounded-full"
+                    style={{ background: getProjectColor(project.name) }}
+                  ></span>
+                  {project.name}
+                </span>
+              )}
             />
             <Column
               header="Description"
@@ -312,6 +332,34 @@ export default function ProjectList() {
               className="w-full dialog-input"
               placeholder="Briefly describe the purpose of this project..."
             />
+          </div>
+
+          <div className="field">
+            <label id="project-color-label">
+              Color <span className="optional">(only visible to you)</span>
+            </label>
+            <div
+              className="flex items-center gap-2"
+              role="radiogroup"
+              aria-labelledby="project-color-label"
+            >
+              {PROJECT_COLOR_PALETTE.map((color) => (
+                <button
+                  key={color}
+                  type="button"
+                  role="radio"
+                  aria-checked={newColor === color}
+                  aria-label={`Project color ${color}`}
+                  className={`h-7 w-7 cursor-pointer rounded-full border-2 transition-transform duration-150 ease-smooth hover:scale-110 ${
+                    newColor === color
+                      ? 'border-fg ring-2 ring-(--db-primary-200)'
+                      : 'border-transparent'
+                  }`}
+                  style={{ background: color }}
+                  onClick={() => setNewColor(color)}
+                ></button>
+              ))}
+            </div>
           </div>
         </div>
       </Dialog>

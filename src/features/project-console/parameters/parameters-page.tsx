@@ -6,6 +6,7 @@ import { projectApi } from '../../../core/api/project-api';
 import { useProjectContext } from '../../../core/context/project-context';
 import SectionHeading from '../../../shared/components/section-heading';
 import DeleteConfirmDialog from '../../../shared/components/delete-confirm-dialog';
+import CustomViewsSection from './custom-views-section';
 
 /** /projects/:projectId/parameters — per-project settings: description
  *  update and project deletion (moved here from the former /admin/projects
@@ -109,6 +110,8 @@ export default function ParametersPage() {
           />
         </div>
       </div>
+
+      <CustomViewsSection projectName={projectName} />
 
       <SectionHeading>Danger zone</SectionHeading>
       <div className="flex max-w-[560px] items-center justify-between gap-4 rounded-lg border border-border-light bg-surface px-4 py-3">

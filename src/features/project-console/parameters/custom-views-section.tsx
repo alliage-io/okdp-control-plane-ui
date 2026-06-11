@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
 import { Button } from 'primereact/button';
 import { Checkbox } from 'primereact/checkbox';
 import { Dialog } from 'primereact/dialog';
@@ -7,7 +6,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { useCustomViews, type CustomView } from '../../../core/preferences/custom-views-context';
-import EmptyState from '../../../shared/components/empty-state';
+import SectionHeading from '../../../shared/components/section-heading';
 import { NAV_CATEGORIES } from '../nav-config';
 
 /** Curated primeicons palette for the tile icon picker. */
@@ -41,14 +40,13 @@ function isValidUrl(url: string): boolean {
   return /^https?:\/\/.+/.test(url.trim());
 }
 
-/** Project configuration page for user-created views: launcher tiles
+/** Project Parameters section for user-created views: launcher tiles
  *  (URL, description, icon) shown on the views page and, when flagged, in
- *  the views sidebar. Stored in this browser only — the API is not involved
- *  and other users never see them. */
-export default function CustomViewsSettingsPage() {
-  const { projectId } = useParams<{ projectId: string }>();
+ *  the views sidebar under their category. Stored in this browser only —
+ *  the API is not involved and other users never see them. */
+export default function CustomViewsSection({ projectName }: { projectName: string }) {
   const { viewsFor, addView, updateView, removeView } = useCustomViews();
-  const views = projectId ? viewsFor(projectId) : [];
+  const views = projectName ? viewsFor(projectName) : [];
 
   const [draft, setDraft] = useState<Draft | null>(null);
   const valid =
@@ -68,7 +66,7 @@ export default function CustomViewsSettingsPage() {
   const openEdit = (view: CustomView) => setDraft({ ...view });
 
   const save = () => {
-    if (!projectId || !draft || !valid) return;
+    if (!projectName || !draft || !valid) return;
     const view = {
       ...draft,
       label: draft.label.trim(),
@@ -77,9 +75,9 @@ export default function CustomViewsSettingsPage() {
       category: draft.category.trim(),
     };
     if (view.id) {
-      updateView(projectId, view as CustomView);
+      updateView(projectName, view as CustomView);
     } else {
-      addView(projectId, view);
+      addView(projectName, view);
     }
     setDraft(null);
   };
@@ -91,7 +89,7 @@ export default function CustomViewsSettingsPage() {
       icon: 'pi pi-exclamation-triangle',
       acceptClassName: 'p-button-danger',
       acceptLabel: 'Remove',
-      accept: () => projectId && removeView(projectId, view.id),
+      accept: () => removeView(projectName, view.id),
     });
 
   const dialogFooter = (
@@ -102,105 +100,101 @@ export default function CustomViewsSettingsPage() {
   );
 
   return (
-    <div className="workspace-container">
-      <ConfirmDialog />
+    <>
+      <SectionHeading>Custom views</SectionHeading>
+      <div className="flex max-w-[860px] flex-col gap-3 rounded-lg border border-border-light bg-surface px-4 py-3">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-col">
+            <span className="text-sm font-semibold text-fg">Personal launcher tiles</span>
+            <span className="text-xs text-fg-muted">
+              Shown on the views page and, with a category, in the views menu. Stored in this
+              browser only — other users don&apos;t see them.
+            </span>
+          </div>
+          <Button
+            label="New view"
+            icon="pi pi-plus"
+            size="small"
+            className="shrink-0"
+            onClick={openCreate}
+          />
+        </div>
 
-      <div className="top-bar">
-        <h1>Custom views</h1>
-        {views.length > 0 && (
-          <button className="create-btn" onClick={openCreate}>
-            <i className="pi pi-plus"></i>
-            <span>New view</span>
-          </button>
+        {views.length === 0 ? (
+          <p className="m-0 text-sm text-fg-muted">
+            No custom views yet — a Grafana dashboard, a wiki page, any URL.
+          </p>
+        ) : (
+          <div className="okdp-table-wrapper">
+            <table className="okdp-table">
+              <thead>
+                <tr>
+                  <th style={{ width: '20%' }}>Name</th>
+                  <th style={{ width: '28%' }}>URL</th>
+                  <th style={{ width: '14%' }}>Category</th>
+                  <th style={{ width: '20%' }}>Description</th>
+                  <th style={{ width: '8%' }}>In menu</th>
+                  <th style={{ width: '10%' }}></th>
+                </tr>
+              </thead>
+              <tbody>
+                {views.map((view) => (
+                  <tr key={view.id}>
+                    <td>
+                      <span className="flex items-center gap-2 font-medium text-fg">
+                        <i className={`${view.icon} text-[0.95rem] text-fg-secondary`}></i>
+                        {view.label}
+                      </span>
+                    </td>
+                    <td>
+                      <a
+                        href={view.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mono text-sm break-all text-primary no-underline hover:underline"
+                      >
+                        {view.url}
+                      </a>
+                    </td>
+                    <td>
+                      <span className="text-sm text-fg-secondary">{view.category}</span>
+                    </td>
+                    <td>
+                      <span className="muted-text">{view.description || '—'}</span>
+                    </td>
+                    <td>
+                      {view.inMenu ? (
+                        <i
+                          className="pi pi-check text-sm text-(--db-success)"
+                          title="Shown in the views menu"
+                        ></i>
+                      ) : (
+                        <span className="muted-text">—</span>
+                      )}
+                    </td>
+                    <td>
+                      <div className="okdp-actions">
+                        <button className="icon-btn" title="Edit" onClick={() => openEdit(view)}>
+                          <i className="pi pi-pencil"></i>
+                        </button>
+                        <button
+                          className="icon-btn danger"
+                          title="Remove"
+                          onClick={() => confirmRemove(view)}
+                        >
+                          <i className="pi pi-trash"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 
-      <p className="mt-0 mb-5 text-base text-fg-secondary">
-        Personal launcher tiles for the <strong>{projectId}</strong> views space. Stored in this
-        browser only — other users don&apos;t see them.
-      </p>
-
-      {views.length === 0 ? (
-        <EmptyState
-          icon="pi pi-bookmark"
-          title="No custom views yet"
-          description="Add your own launcher tiles — a Grafana dashboard, a wiki page, any URL — and optionally pin them to the views menu."
-          action={
-            <button className="create-btn mt-3" onClick={openCreate}>
-              <i className="pi pi-plus"></i>
-              <span>New view</span>
-            </button>
-          }
-        />
-      ) : (
-        <div className="okdp-table-wrapper">
-          <table className="okdp-table">
-            <thead>
-              <tr>
-                <th style={{ width: '20%' }}>Name</th>
-                <th style={{ width: '28%' }}>URL</th>
-                <th style={{ width: '14%' }}>Category</th>
-                <th style={{ width: '20%' }}>Description</th>
-                <th style={{ width: '8%' }}>In menu</th>
-                <th style={{ width: '10%' }}></th>
-              </tr>
-            </thead>
-            <tbody>
-              {views.map((view) => (
-                <tr key={view.id}>
-                  <td>
-                    <span className="flex items-center gap-2 font-medium text-fg">
-                      <i className={`${view.icon} text-[0.95rem] text-fg-secondary`}></i>
-                      {view.label}
-                    </span>
-                  </td>
-                  <td>
-                    <a
-                      href={view.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="mono text-sm break-all text-primary no-underline hover:underline"
-                    >
-                      {view.url}
-                    </a>
-                  </td>
-                  <td>
-                    <span className="text-sm text-fg-secondary">{view.category}</span>
-                  </td>
-                  <td>
-                    <span className="muted-text">{view.description || '—'}</span>
-                  </td>
-                  <td>
-                    {view.inMenu ? (
-                      <i
-                        className="pi pi-check text-sm text-(--db-success)"
-                        title="Shown in the views menu"
-                      ></i>
-                    ) : (
-                      <span className="muted-text">—</span>
-                    )}
-                  </td>
-                  <td>
-                    <div className="okdp-actions">
-                      <button className="icon-btn" title="Edit" onClick={() => openEdit(view)}>
-                        <i className="pi pi-pencil"></i>
-                      </button>
-                      <button
-                        className="icon-btn danger"
-                        title="Remove"
-                        onClick={() => confirmRemove(view)}
-                      >
-                        <i className="pi pi-trash"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
+      <ConfirmDialog />
       <Dialog
         header={draft?.id ? 'Edit custom view' : 'New custom view'}
         visible={draft !== null}
@@ -308,6 +302,6 @@ export default function CustomViewsSettingsPage() {
           </div>
         )}
       </Dialog>
-    </div>
+    </>
   );
 }

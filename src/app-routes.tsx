@@ -2,7 +2,7 @@ import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { RequireAuth } from './core/auth/require-auth';
 import { RequireAdmin } from './core/auth/require-admin';
-import { ProjectIndexRedirect, ProjectRouteSync } from './core/guards/project-route';
+import { ProjectRouteSync } from './core/guards/project-route';
 
 const HomePage = lazy(() => import('./features/landing/home-page'));
 const StartPage = lazy(() => import('./features/start/start-page'));
@@ -73,7 +73,6 @@ export function AppRoutes() {
             </RequireAuth>
           }
         >
-          <Route path="/projects" element={<ProjectList />} />
           <Route
             path="/identity"
             element={
@@ -83,8 +82,9 @@ export function AppRoutes() {
             }
           />
 
-          <Route path="/project">
-            <Route index element={<ProjectIndexRedirect />} />
+          {/* REST-style: /projects is the collection, /projects/:projectId a member. */}
+          <Route path="/projects">
+            <Route index element={<ProjectList />} />
             <Route path=":projectId" element={<ProjectRouteSync />}>
               <Route index element={<ProjectHome />} />
               <Route path="secret-stores" element={<SecretsPage />} />

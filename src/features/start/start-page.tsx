@@ -16,7 +16,7 @@ export default function StartPage() {
   if (availableProjects.length > 0) {
     const lastId = getLastSelectedProjectId();
     const target = availableProjects.find((p) => p.name === lastId) ?? availableProjects[0];
-    return <Navigate to={`/project/${target.name}`} replace />;
+    return <Navigate to={`/projects/${target.name}`} replace />;
   }
 
   return <Navigate to="/projects" replace />;

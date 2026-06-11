@@ -22,21 +22,21 @@ export default function ProjectHome() {
           <SectionHeading>Quick Actions</SectionHeading>
           <QuickActions>
             <ActionCard
-              to={`/project/${project.name}/services/deploy`}
+              to={`/projects/${project.name}/services/deploy`}
               icon="pi pi-play"
               tone="primary"
               title="Deploy Notebook"
               description="Launch a new Jupyter instance"
             />
             <ActionCard
-              to={`/project/${project.name}/services`}
+              to={`/projects/${project.name}/services`}
               icon="pi pi-server"
               tone="blue"
               title="View Instances"
               description="Monitor running notebooks"
             />
             <ActionCard
-              to={`/project/${project.name}/secret-stores`}
+              to={`/projects/${project.name}/secret-stores`}
               icon="pi pi-lock"
               tone="purple"
               title="Manage Secrets"

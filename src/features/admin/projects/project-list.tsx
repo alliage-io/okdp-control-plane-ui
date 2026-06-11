@@ -213,7 +213,7 @@ export default function ProjectList() {
               body={(project: Project) => (
                 <div className="actions">
                   <Link
-                    to={`/project/${project.name}`}
+                    to={`/projects/${project.name}`}
                     className="action-link primary visible-btn"
                     style={{ textDecoration: 'none' }}
                   >

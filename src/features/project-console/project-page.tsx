@@ -173,7 +173,7 @@ export default function ProjectPage() {
                 </div>
               )}
               <SideNavLink
-                to={`/project/${projectName}`}
+                to={`/projects/${projectName}`}
                 end
                 icon="pi pi-home"
                 label="Home"
@@ -189,14 +189,14 @@ export default function ProjectPage() {
                 onToggle={() => setLakehouseExpanded((v) => !v)}
               >
                 <SideNavLink
-                  to={`/project/${projectName}/lakehouse/polaris`}
+                  to={`/projects/${projectName}/lakehouse/polaris`}
                   icon="pi pi-table"
                   label="Polaris"
                   collapsed={sidebarCollapsed}
                   sub
                 />
                 <SideNavLink
-                  to={`/project/${projectName}/lakehouse/trino`}
+                  to={`/projects/${projectName}/lakehouse/trino`}
                   icon="pi pi-bolt"
                   label="Trino"
                   collapsed={sidebarCollapsed}
@@ -213,21 +213,21 @@ export default function ProjectPage() {
                 onToggle={() => setDataEngExpanded((v) => !v)}
               >
                 <SideNavLink
-                  to={`/project/${projectName}/data-engineering/airflow`}
+                  to={`/projects/${projectName}/data-engineering/airflow`}
                   icon="pi pi-sitemap"
                   label="Airflow"
                   collapsed={sidebarCollapsed}
                   sub
                 />
                 <SideNavLink
-                  to={`/project/${projectName}/spark/applications`}
+                  to={`/projects/${projectName}/spark/applications`}
                   icon="pi pi-play"
                   label="Spark Applications"
                   collapsed={sidebarCollapsed}
                   sub
                 />
                 <SideNavLink
-                  to={`/project/${projectName}/spark/history-server`}
+                  to={`/projects/${projectName}/spark/history-server`}
                   icon="pi pi-history"
                   label="Spark History"
                   collapsed={sidebarCollapsed}
@@ -251,7 +251,7 @@ export default function ProjectPage() {
                 onToggle={() => setNotebookExpanded((v) => !v)}
               >
                 <SideNavLink
-                  to={`/project/${projectName}/services`}
+                  to={`/projects/${projectName}/services`}
                   icon="pi pi-desktop"
                   label="JupyterHub"
                   collapsed={sidebarCollapsed}
@@ -268,7 +268,7 @@ export default function ProjectPage() {
                 onToggle={() => setSqlBiExpanded((v) => !v)}
               >
                 <SideNavLink
-                  to={`/project/${projectName}/bi/superset`}
+                  to={`/projects/${projectName}/bi/superset`}
                   icon="pi pi-chart-line"
                   label="Superset"
                   collapsed={sidebarCollapsed}
@@ -322,7 +322,7 @@ export default function ProjectPage() {
           <>
             {projectName && (
               <SideNavLink
-                to={`/project/${projectName}/secret-stores`}
+                to={`/projects/${projectName}/secret-stores`}
                 icon="pi pi-lock"
                 label="Secrets"
                 collapsed={sidebarCollapsed}

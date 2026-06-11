@@ -85,9 +85,9 @@ export function ProjectContextProvider({ children }: { children: ReactNode }) {
 
       // Navigate — preserve the current sub-route (e.g. secret-stores)
       const currentUrl = window.location.pathname;
-      const projectPathMatch = currentUrl.match(/^\/project\/[^/]+(\/.*)?$/);
+      const projectPathMatch = currentUrl.match(/^\/projects\/[^/]+(\/.*)?$/);
       const subPath = projectPathMatch?.[1] ?? '';
-      navigate(`/project/${projectId}${subPath}`);
+      navigate(`/projects/${projectId}${subPath}`);
     },
     [navigate],
   );

@@ -56,11 +56,11 @@ describe('AuthRedirector', () => {
   });
 
   describe('Deep links', () => {
-    it('should keep a /project deep link (regression: redirect loop after React migration)', async () => {
-      renderAt('/project/test');
+    it('should keep a /projects deep link (regression: redirect loop after React migration)', async () => {
+      renderAt('/projects/test');
       await flushEffects();
 
-      expect(currentPath).toBe('/project/test');
+      expect(currentPath).toBe('/projects/test');
     });
 
     it('should keep an /identity deep link', async () => {
@@ -79,11 +79,11 @@ describe('AuthRedirector', () => {
     });
 
     it('should restore and consume the saved return URL', async () => {
-      sessionStorage.setItem(AUTH_RETURN_URL_KEY, '/project/test/services');
+      sessionStorage.setItem(AUTH_RETURN_URL_KEY, '/projects/test/services');
 
       renderAt('/login');
 
-      await waitFor(() => expect(currentPath).toBe('/project/test/services'));
+      await waitFor(() => expect(currentPath).toBe('/projects/test/services'));
       expect(sessionStorage.getItem(AUTH_RETURN_URL_KEY)).toBeNull();
     });
   });

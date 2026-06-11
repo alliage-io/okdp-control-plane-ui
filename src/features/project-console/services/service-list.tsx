@@ -14,7 +14,7 @@ export interface ServiceListProps {
   emptyMessage?: string;
   emptyTitle?: string;
   /**
-   * URL segments under /project/:projectId for the parent "area" (e.g.
+   * URL segments under /projects/:projectId for the parent "area" (e.g.
    * ['services'] for Jupyter, ['spark', 'history-server'] for Spark
    * History Server). Used for detail/edit navigation so the sidebar
    * highlights the correct entry.
@@ -123,7 +123,7 @@ export function ServiceList({
   const viewDetail = (svc: ServiceInstance) => {
     if (projectName) {
       navigate(
-        `/project/${projectName}/${basePath.join('/')}/${svc.name}?returnTo=${encodeURIComponent(currentUrl)}`,
+        `/projects/${projectName}/${basePath.join('/')}/${svc.name}?returnTo=${encodeURIComponent(currentUrl)}`,
       );
     }
   };
@@ -131,7 +131,7 @@ export function ServiceList({
   const editService = (svc: ServiceInstance) => {
     if (projectName) {
       navigate(
-        `/project/${projectName}/${basePath.join('/')}/${svc.name}/edit?returnTo=${encodeURIComponent(currentUrl)}`,
+        `/projects/${projectName}/${basePath.join('/')}/${svc.name}/edit?returnTo=${encodeURIComponent(currentUrl)}`,
       );
     }
   };

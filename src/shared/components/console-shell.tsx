@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { Avatar } from 'primereact/avatar';
@@ -6,6 +6,7 @@ import { Menu } from 'primereact/menu';
 import type { MenuItem } from 'primereact/menuitem';
 import { useAuth } from '../../core/auth/auth-context';
 import { useTheme, type ThemeMode } from '../../core/theme/theme-context';
+import { ENV_BAR_STORAGE_KEY } from '../../core/storage-keys';
 import { environment } from '../../config/environment';
 import { sideNavIconClass, sideNavLabelClass, sideNavLinkClass } from './console-nav-classes';
 
@@ -69,6 +70,16 @@ export function ConsoleShell({
   const { theme, setTheme } = useTheme();
   const menuRef = useRef<Menu>(null);
   const themeMenuRef = useRef<Menu>(null);
+  const [envBarEnabled, setEnvBarEnabled] = useState(
+    () => localStorage.getItem(ENV_BAR_STORAGE_KEY) !== 'false',
+  );
+
+  const toggleEnvBar = () => {
+    setEnvBarEnabled((enabled) => {
+      localStorage.setItem(ENV_BAR_STORAGE_KEY, String(!enabled));
+      return !enabled;
+    });
+  };
 
   const displayName = auth.profile?.firstName ?? auth.profile?.username ?? 'User';
   const first = (auth.profile?.firstName ?? auth.profile?.username ?? '?').charAt(0).toUpperCase();
@@ -104,6 +115,30 @@ export function ConsoleShell({
 
   const profileMenu: MenuItem[] = [
     {
+      label: 'Preferences',
+      items: [
+        {
+          label: 'Environment color bar',
+          icon: 'pi pi-palette',
+          command: toggleEnvBar,
+          // Same template trick as the theme options: reproduce the
+          // .p-menuitem-content wrapper and append the check mark.
+          template: (item, options) => (
+            <div className="p-menuitem-content">
+              <a className={options.className} onClick={options.onClick}>
+                <span className={options.iconClassName}></span>
+                <span className={options.labelClassName}>{item.label}</span>
+                {envBarEnabled && (
+                  <i className="pi pi-check ml-auto text-[0.7rem] text-primary"></i>
+                )}
+              </a>
+            </div>
+          ),
+        },
+      ],
+    },
+    { separator: true },
+    {
       label: 'Sign out',
       icon: 'pi pi-sign-out',
       command: () => auth.logout(),
@@ -120,7 +155,7 @@ export function ConsoleShell({
     >
       {/* Unified header */}
       <header className="relative z-20 col-span-2 row-start-1 flex h-(--db-header-height) items-center justify-between border-b border-border-light bg-surface px-3 transition-[background-color,border-color] duration-150 ease-smooth max-md:col-span-1">
-        {accentColor && (
+        {accentColor && envBarEnabled && (
           <div
             className="absolute inset-x-0 top-0 h-[3px]"
             style={{ background: accentColor }}

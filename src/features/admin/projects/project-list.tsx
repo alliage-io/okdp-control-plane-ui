@@ -15,8 +15,12 @@ import type { MenuItem } from 'primereact/menuitem';
 import { projectApi, type Project, type ProjectEvent } from '../../../core/api/project-api';
 import { applyListEvent } from '../../../core/api/sse';
 import { logger } from '../../../core/services/logger';
+import { useAuth } from '../../../core/auth/auth-context';
+import EmptyState from '../../../shared/components/empty-state';
 
 export default function ProjectList() {
+  const auth = useAuth();
+  const isAdmin = auth.hasRole('admins');
   const toast = useRef<Toast>(null);
   const menuRef = useRef<Menu>(null);
   const selectedProjectRef = useRef<Project | null>(null);
@@ -25,6 +29,7 @@ export default function ProjectList() {
   // Mirror of `projects` so the SSE handler can decide on toasts without
   // side effects inside the state updater (updaters must stay pure).
   const projectsRef = useRef<Project[]>([]);
+  const [loaded, setLoaded] = useState(false);
   const [globalFilter, setGlobalFilter] = useState('');
   const [visible, setVisible] = useState(false);
   const [newProject, setNewProject] = useState<Project>({ name: '', description: '' });
@@ -62,12 +67,16 @@ export default function ProjectList() {
       .then((data) => {
         if (cancelled) return;
         applyProjects(data);
+        setLoaded(true);
         unsubscribe = projectApi.subscribeProjects({
           next: handleProjectEvent,
           error: (err) => logger.error('Stream error', err),
         });
       })
-      .catch(() => showError('Failed to load projects'));
+      .catch(() => {
+        if (!cancelled) setLoaded(true);
+        showError('Failed to load projects');
+      });
 
     return () => {
       cancelled = true;
@@ -128,76 +137,107 @@ export default function ProjectList() {
     </div>
   );
 
+  const empty = loaded && projects.length === 0;
+
   return (
     <div className="workspace-container">
       {/* Top Bar: Title + Search (Left) | Create Button (Right) */}
       <div className="top-bar">
         <div className="left-group">
           <h1>Projects</h1>
-          <IconField>
-            <InputIcon className="pi pi-search" />
-            <InputText
-              type="text"
-              placeholder="Filter projects..."
-              value={globalFilter}
-              onChange={(e) => setGlobalFilter(e.target.value)}
-            />
-          </IconField>
+          {!empty && (
+            <IconField>
+              <InputIcon className="pi pi-search" />
+              <InputText
+                type="text"
+                placeholder="Filter projects..."
+                value={globalFilter}
+                onChange={(e) => setGlobalFilter(e.target.value)}
+              />
+            </IconField>
+          )}
         </div>
 
-        <Button label="Create project" onClick={showDialog} className="create-btn" />
+        {isAdmin && !empty && (
+          <Button label="Create project" onClick={showDialog} className="create-btn" />
+        )}
       </div>
 
-      {/* Data Table */}
-      <div className="table-wrapper">
-        <DataTable
-          value={projects}
-          globalFilter={globalFilter}
-          globalFilterFields={['name', 'description']}
-          className="minimal-table"
-          emptyMessage="No projects found."
-          rowClassName={() => 'workspace-row'}
-        >
-          <Column
-            header="Name"
-            field="name"
-            style={{ width: '30%' }}
-            body={(project: Project) => <span className="project-name">{project.name}</span>}
-          />
-          <Column
-            header="Description"
-            field="description"
-            style={{ width: '60%' }}
-            className="description-cell"
-            body={(project: Project) => project.description || '-'}
-          />
-          <Column
-            style={{ width: '10%', textAlign: 'right' }}
-            body={(project: Project) => (
-              <div className="actions">
-                <Link
-                  to={`/project/${project.name}`}
-                  className="action-link primary visible-btn"
-                  style={{ textDecoration: 'none' }}
-                >
-                  Open <i className="pi pi-external-link"></i>
-                </Link>
+      {empty ? (
+        /* Getting started: the platform has no project yet. */
+        <EmptyState
+          icon="pi pi-sparkles"
+          title="Welcome to OKDP"
+          description={
+            isAdmin
+              ? 'There is no project on this platform yet. Create your first project to get started.'
+              : 'There is no project you can access yet. Ask your platform administrator to create one and grant you access.'
+          }
+          action={
+            isAdmin && (
+              <Button
+                label="Create your first project"
+                icon="pi pi-plus"
+                onClick={showDialog}
+                className="create-btn mt-3"
+              />
+            )
+          }
+        />
+      ) : (
+        /* Data Table */
+        <div className="table-wrapper">
+          <DataTable
+            value={projects}
+            globalFilter={globalFilter}
+            globalFilterFields={['name', 'description']}
+            className="minimal-table"
+            emptyMessage="No projects found."
+            rowClassName={() => 'workspace-row'}
+          >
+            <Column
+              header="Name"
+              field="name"
+              style={{ width: '30%' }}
+              body={(project: Project) => <span className="project-name">{project.name}</span>}
+            />
+            <Column
+              header="Description"
+              field="description"
+              style={{ width: '60%' }}
+              className="description-cell"
+              body={(project: Project) => project.description || '-'}
+            />
+            <Column
+              style={{ width: '10%', textAlign: 'right' }}
+              body={(project: Project) => (
+                <div className="actions">
+                  <Link
+                    to={`/project/${project.name}`}
+                    className="action-link primary visible-btn"
+                    style={{ textDecoration: 'none' }}
+                  >
+                    Open <i className="pi pi-external-link"></i>
+                  </Link>
 
-                <Button
-                  icon="pi pi-ellipsis-v"
-                  text
-                  rounded
-                  onClick={(e) => {
-                    selectedProjectRef.current = project;
-                    menuRef.current?.toggle(e);
-                  }}
-                />
-              </div>
-            )}
-          />
-        </DataTable>
-        <Menu ref={menuRef} model={menuItems} popup appendTo={document.body} />
-      </div>
+                  {isAdmin && (
+                    <Button
+                      icon="pi pi-ellipsis-v"
+                      text
+                      rounded
+                      onClick={(e) => {
+                        selectedProjectRef.current = project;
+                        menuRef.current?.toggle(e);
+                      }}
+                    />
+                  )}
+                </div>
+              )}
+            />
+          </DataTable>
+          <Menu ref={menuRef} model={menuItems} popup appendTo={document.body} />
+        </div>
+      )}
 
       {/* Create Dialog */}
       <Dialog

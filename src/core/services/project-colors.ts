@@ -1,3 +1,4 @@
+import { useSyncExternalStore } from 'react';
 import { PROJECT_COLORS_KEY } from '../storage-keys';
 
 /** Palette offered when creating a project; accents from the design system. */
@@ -49,6 +50,7 @@ export function getProjectColor(name: string): string {
 
 export function setProjectColor(name: string, color: string): void {
   writeMap({ ...readMap(), [name]: color });
+  notifyColorChange();
 }
 
 export function clearProjectColor(name: string): void {
@@ -56,5 +58,29 @@ export function clearProjectColor(name: string): void {
   if (name in map) {
     delete map[name];
     writeMap(map);
+    notifyColorChange();
   }
+}
+
+// Change notification: colors are read at render time all over the shell
+// (header accent, project switcher, list dots), so editing one — e.g. from
+// Project Parameters — must re-render those readers.
+const colorListeners = new Set<() => void>();
+let colorsVersion = 0;
+
+function notifyColorChange(): void {
+  colorsVersion++;
+  colorListeners.forEach((listener) => listener());
+}
+
+/** Subscribes the calling component to project-color changes: it re-renders
+ *  on every edit, so plain getProjectColor reads stay fresh. */
+export function useProjectColorsVersion(): number {
+  return useSyncExternalStore(
+    (listener) => {
+      colorListeners.add(listener);
+      return () => colorListeners.delete(listener);
+    },
+    () => colorsVersion,
+  );
 }

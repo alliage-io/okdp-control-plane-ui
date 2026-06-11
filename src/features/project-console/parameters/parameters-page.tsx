@@ -4,6 +4,12 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { Toast } from 'primereact/toast';
 import { projectApi } from '../../../core/api/project-api';
 import { useProjectContext } from '../../../core/context/project-context';
+import {
+  PROJECT_COLOR_PALETTE,
+  getProjectColor,
+  setProjectColor,
+  useProjectColorsVersion,
+} from '../../../core/services/project-colors';
 import SectionHeading from '../../../shared/components/section-heading';
 import DeleteConfirmDialog from '../../../shared/components/delete-confirm-dialog';
 import CustomViewsSection from './custom-views-section';
@@ -22,6 +28,10 @@ export default function ParametersPage() {
   const [saving, setSaving] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
+
+  // Re-render when the color changes so the selected swatch follows.
+  useProjectColorsVersion();
+  const currentColor = projectName ? getProjectColor(projectName) : undefined;
 
   // Re-seed the editor when the selected project changes (the project
   // switcher preserves the /parameters sub-route) or when an SSE MODIFIED
@@ -108,6 +118,34 @@ export default function ParametersPage() {
             loading={saving}
             onClick={saveDescription}
           />
+        </div>
+      </div>
+
+      <SectionHeading>Color</SectionHeading>
+      <div className="flex max-w-[560px] flex-col gap-3 rounded-lg border border-border-light bg-surface px-4 py-3">
+        <div className="flex flex-col">
+          <span className="text-sm font-semibold text-fg">Project color</span>
+          <span className="text-xs text-fg-muted">
+            Shown in the header bar and project lists. Only visible to you; applied immediately.
+          </span>
+        </div>
+        <div className="flex items-center gap-2" role="radiogroup" aria-label="Project color">
+          {PROJECT_COLOR_PALETTE.map((color) => (
+            <button
+              key={color}
+              type="button"
+              role="radio"
+              aria-checked={currentColor === color}
+              aria-label={`Project color ${color}`}
+              className={`h-7 w-7 cursor-pointer rounded-full border-2 transition-transform duration-150 ease-smooth hover:scale-110 ${
+                currentColor === color
+                  ? 'border-fg ring-2 ring-(--db-primary-200)'
+                  : 'border-transparent'
+              }`}
+              style={{ background: color }}
+              onClick={() => setProjectColor(projectName, color)}
+            ></button>
+          ))}
         </div>
       </div>
 

@@ -6,7 +6,7 @@ import { useNavPrefs } from '../../core/preferences/nav-prefs-context';
 import { useCustomViews, type CustomView } from '../../core/preferences/custom-views-context';
 import { NAV_EXPANDED_KEY, SIDEBAR_COLLAPSED_KEY } from '../../core/storage-keys';
 import type { Project } from '../../core/api/project-api';
-import { getProjectColor } from '../../core/services/project-colors';
+import { getProjectColor, useProjectColorsVersion } from '../../core/services/project-colors';
 import { ConsoleShell, SideNavLink } from '../../shared/components/console-shell';
 import {
   sideNavIconClass,
@@ -192,6 +192,8 @@ export default function ProjectPage() {
   // Deployed instances backing the views sidebar and, via outlet context,
   // the views pages themselves — one fetch + SSE stream for both.
   const viewServices = useViewServices(onViewsWorld ? projectName : undefined);
+  // Header accent and switcher follow color edits made in Project Parameters.
+  useProjectColorsVersion();
   const envColor = projectName ? getProjectColor(projectName) : undefined;
   const futureTitle = 'Direction future, non engagé';
 

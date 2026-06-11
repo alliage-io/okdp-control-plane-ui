@@ -160,8 +160,8 @@ export default function ProjectPage() {
               <SideNavLink
                 to={`/projects/${projectName}`}
                 end
-                icon="pi pi-home"
-                label="Home"
+                icon="pi pi-objects-column"
+                label="Overview"
                 collapsed={sidebarCollapsed}
               />
 

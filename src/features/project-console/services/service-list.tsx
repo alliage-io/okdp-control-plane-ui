@@ -197,8 +197,8 @@ export function ServiceList({
         message={
           deleteTarget && (
             <>
-              This will remove <strong>{deleteTarget.name}</strong> and all its pods. This cannot
-              be undone.
+              This will remove <strong>{deleteTarget.name}</strong> and all its pods. This cannot be
+              undone.
             </>
           )
         }

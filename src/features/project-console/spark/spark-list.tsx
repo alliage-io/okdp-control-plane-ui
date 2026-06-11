@@ -183,7 +183,10 @@ export function SparkList() {
             header="Image"
             style={{ width: '15%' }}
             body={(app: SparkAppInstance) => (
-              <span className="text-[12px] text-fg-secondary [font-family:monospace]" title={app.image}>
+              <span
+                className="text-[12px] text-fg-secondary [font-family:monospace]"
+                title={app.image}
+              >
                 {shortenImage(app.image)}
               </span>
             )}
@@ -200,7 +203,9 @@ export function SparkList() {
             header="Created"
             style={{ width: '15%' }}
             body={(app: SparkAppInstance) => (
-              <span className="text-[13px] text-fg-secondary">{formatMediumDate(app.createdAt)}</span>
+              <span className="text-[13px] text-fg-secondary">
+                {formatMediumDate(app.createdAt)}
+              </span>
             )}
           />
           <Column

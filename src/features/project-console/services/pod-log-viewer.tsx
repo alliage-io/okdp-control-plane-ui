@@ -215,7 +215,10 @@ export function PodLogViewer({
         ) : (
           <div className="py-3">
             {lines.map((line, i) => (
-              <div key={i} className="flex gap-4 px-4 break-all whitespace-pre-wrap hover:bg-white/3">
+              <div
+                key={i}
+                className="flex gap-4 px-4 break-all whitespace-pre-wrap hover:bg-white/3"
+              >
                 <span className="min-w-8 shrink-0 text-right text-[#6b7280] select-none">
                   {formatLineNo(i + 1)}
                 </span>

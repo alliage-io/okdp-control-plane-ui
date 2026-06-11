@@ -1,22 +1,9 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useOutletContext } from 'react-router-dom';
 import { useProjectContext } from '../../core/context/project-context';
-import { serviceApi } from '../../core/api/service-api';
-import { applyListEvent } from '../../core/api/sse';
-import type { ServiceInstance } from '../../core/models/service.model';
-import { logger } from '../../core/services/logger';
 import { ActionCard, QuickActions } from '../../shared/components/action-card';
 import SectionHeading from '../../shared/components/section-heading';
-
-/** Services whose deployed instances expose a web UI worth a launcher tile. */
-const UI_SERVICES: Record<
-  string,
-  { label: string; icon: string; tone: 'primary' | 'blue' | 'purple' }
-> = {
-  airflow: { label: 'Airflow', icon: 'pi pi-sitemap', tone: 'blue' },
-  'spark-history-server': { label: 'Spark History Server', icon: 'pi pi-history', tone: 'purple' },
-  superset: { label: 'Superset', icon: 'pi pi-chart-line', tone: 'primary' },
-};
+import { CUSTOM_VIEWS, uiServiceLaunchers } from './views-config';
+import type { ViewServicesState } from './use-view-services';
 
 /** /views — service UI launchers plus rich technology-specific views that
  *  don't fit the "one service, one instance list" shape of the lateral menu
@@ -26,42 +13,14 @@ export default function CustomViewsPage() {
   const { currentProject } = useProjectContext();
   const projectName = currentProject?.name;
 
-  const [instances, setInstances] = useState<ServiceInstance[]>([]);
-  const [loaded, setLoaded] = useState(false);
+  // Fetched once by the project shell, which feeds the views sidebar from
+  // the same subscription.
+  const { instances, loaded } = useOutletContext<ViewServicesState>() ?? {
+    instances: [],
+    loaded: false,
+  };
 
-  // Initial REST fetch + SSE merge, like every live list in the app.
-  useEffect(() => {
-    if (!projectName) return;
-    let cancelled = false;
-    setLoaded(false);
-    setInstances([]);
-
-    serviceApi
-      .getServices(projectName)
-      .then((data) => {
-        if (cancelled) return;
-        setInstances(data);
-        setLoaded(true);
-      })
-      .catch((err) => {
-        if (cancelled) return;
-        logger.error('Failed to load services for views', err);
-        setLoaded(true);
-      });
-
-    const unsubscribe = serviceApi.subscribeServices(projectName, {
-      next: (event) => setInstances((current) => applyListEvent(current, event, (s) => s.name)),
-    });
-
-    return () => {
-      cancelled = true;
-      unsubscribe();
-    };
-  }, [projectName]);
-
-  // The same gate as the instance list's "Open" action: a tile needs a URL,
-  // and stays inert until the instance is Ready.
-  const uiInstances = instances.filter((svc) => UI_SERVICES[svc.service] && svc.url);
+  const launchers = uiServiceLaunchers(instances);
 
   return (
     <section className="flex animate-[fadeInUp_0.4s_ease-out] flex-col gap-7">
@@ -86,10 +45,9 @@ export default function CustomViewsPage() {
               <p className="m-0 flex items-center gap-2 text-base text-fg-muted">
                 <i className="pi pi-spin pi-spinner"></i> Loading deployed services…
               </p>
-            ) : uiInstances.length > 0 ? (
+            ) : launchers.length > 0 ? (
               <QuickActions>
-                {uiInstances.map((svc) => {
-                  const ui = UI_SERVICES[svc.service];
+                {launchers.map(({ svc, view }) => {
                   const ready = svc.status === 'Ready';
                   return (
                     <ActionCard
@@ -97,9 +55,9 @@ export default function CustomViewsPage() {
                       to={svc.url!}
                       external
                       disabled={!ready}
-                      icon={ui.icon}
-                      tone={ui.tone}
-                      title={ui.label}
+                      icon={view.icon}
+                      tone={view.tone}
+                      title={view.label}
                       description={
                         ready ? `Open ${svc.name} in a new tab` : `${svc.name} — ${svc.status}`
                       }
@@ -117,13 +75,16 @@ export default function CustomViewsPage() {
           <div className="flex flex-col gap-3">
             <SectionHeading>Custom views</SectionHeading>
             <QuickActions>
-              <ActionCard
-                to={`/projects/${projectName}/spark/applications`}
-                icon="pi pi-bolt"
-                tone="blue"
-                title="Spark Applications"
-                description="Submitted Spark jobs and their live status"
-              />
+              {CUSTOM_VIEWS.map((view) => (
+                <ActionCard
+                  key={view.label}
+                  to={view.path(projectName)}
+                  icon={view.icon}
+                  tone={view.tone}
+                  title={view.label}
+                  description={view.description}
+                />
+              ))}
             </QuickActions>
           </div>
         </>

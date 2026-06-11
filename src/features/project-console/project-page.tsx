@@ -12,7 +12,9 @@ import {
   sideNavLabelClass,
   sideNavLinkClass,
 } from '../../shared/components/console-nav-classes';
-import { NAV_CATEGORIES, navItemIcon, type NavCategory } from './nav-config';
+import { NAV_CATEGORIES, navItemIcon, type NavCategory, type NavItem } from './nav-config';
+import { CUSTOM_VIEWS, uiServiceLaunchers } from '../custom-views/views-config';
+import { useViewServices } from '../custom-views/use-view-services';
 
 /** Per-category unfold overrides persisted across reloads; categories absent
  *  from the record keep their default. */
@@ -101,6 +103,44 @@ function DisabledNavLink({ icon, label, collapsed, title, collapsedTitle }: Disa
   );
 }
 
+interface ExternalNavLinkProps {
+  href: string;
+  icon: React.ReactNode;
+  label: string;
+  collapsed: boolean;
+  title: string;
+}
+
+/** Views-sidebar launcher: opens a deployed service UI in a new tab — the
+ *  sidebar twin of the page's "Open" tiles. */
+function ExternalNavLink({ href, icon, label, collapsed, title }: ExternalNavLinkProps) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      className={sideNavLinkClass({ collapsed, sub: true })}
+      title={collapsed ? label : title}
+    >
+      {typeof icon === 'string' ? <i className={`${icon} ${sideNavIconClass(false)}`}></i> : icon}
+      <span className={sideNavLabelClass(collapsed)}>{label}</span>
+      {!collapsed && (
+        <i className="pi pi-external-link ml-auto text-[0.6rem] text-fg-muted max-lg:hidden"></i>
+      )}
+    </a>
+  );
+}
+
+/** Lateral-menu item for a console segment — the views sidebar borrows its
+ *  brand logo so both menus show a service the same way. */
+function navItemBySegment(segment: string): NavItem | undefined {
+  for (const category of NAV_CATEGORIES) {
+    const item = category.items.find((i) => i.segment === segment);
+    if (item) return item;
+  }
+  return undefined;
+}
+
 export default function ProjectPage() {
   const context = useProjectContext();
   const { isNavItemHidden } = useNavPrefs();
@@ -142,13 +182,34 @@ export default function ProjectPage() {
   };
 
   // The project tree only belongs to project pages (/projects/:projectId/…);
-  // every other page under the shell (/projects, /identity, …) gets an empty
-  // sidebar even while a project is still selected in the context.
+  // /views gets its own tree of view launchers; every other page under the
+  // shell (/projects, /identity, …) gets an empty sidebar even while a
+  // project is still selected in the context.
   const onProjectPage = useMatch('/projects/:projectId/*') !== null;
+  const onViewsPage = useMatch('/views') !== null;
 
   const projectName = context.currentProject?.name;
+
+  // Deployed instances backing the views sidebar and, via outlet context,
+  // the /views page itself — one fetch + SSE stream for both.
+  const viewServices = useViewServices(onViewsPage ? projectName : undefined);
   const envColor = projectName ? getProjectColor(projectName) : undefined;
   const futureTitle = 'Direction future, non engagé';
+
+  // Views sidebar content: the lateral menu's categories, but holding the
+  // /views tiles — external launchers for deployed UI services plus the
+  // custom views. Categories with nothing to show disappear.
+  const allLaunchers = uiServiceLaunchers(viewServices.instances);
+  // With several instances of one service, the instance name disambiguates.
+  const launcherCounts = new Map<string, number>();
+  for (const { view } of allLaunchers) {
+    launcherCounts.set(view.service, (launcherCounts.get(view.service) ?? 0) + 1);
+  }
+  const viewCategories = NAV_CATEGORIES.map((category) => ({
+    category,
+    launchers: allLaunchers.filter(({ view }) => view.categoryKey === category.key),
+    customViews: CUSTOM_VIEWS.filter((view) => view.categoryKey === category.key),
+  })).filter((entry) => entry.launchers.length + entry.customViews.length > 0);
 
   const headerLeft = context.availableProjects.length > 0 && (
     /* project-switcher scopes the Dropdown overrides in the PrimeReact overrides section of styles.css */
@@ -261,10 +322,66 @@ export default function ProjectPage() {
               </NavSection>
             ))}
           </>
+        ) : projectName && onViewsPage ? (
+          <>
+            <SideNavLink
+              to="/views"
+              end
+              icon="pi pi-th-large"
+              label="All views"
+              collapsed={sidebarCollapsed}
+            />
+
+            {viewCategories.map(({ category, launchers, customViews }) => (
+              <NavSection
+                key={category.key}
+                icon={category.icon}
+                label={category.label}
+                expanded={isExpanded(category)}
+                collapsed={sidebarCollapsed}
+                onToggle={() => toggleCategory(category)}
+              >
+                {launchers.map(({ svc, view }) => {
+                  const navItem = navItemBySegment(view.navSegment);
+                  const icon = navItem ? navItemIcon(navItem) : view.icon;
+                  const label = (launcherCounts.get(view.service) ?? 0) > 1 ? svc.name : view.label;
+                  return svc.status === 'Ready' ? (
+                    <ExternalNavLink
+                      key={svc.name}
+                      href={svc.url!}
+                      icon={icon}
+                      label={label}
+                      collapsed={sidebarCollapsed}
+                      title={`Open ${svc.name} in a new tab`}
+                    />
+                  ) : (
+                    <DisabledNavLink
+                      key={svc.name}
+                      icon={icon}
+                      label={label}
+                      collapsed={sidebarCollapsed}
+                      title={`${svc.name} — ${svc.status}`}
+                      collapsedTitle={`${label} — ${svc.status}`}
+                    />
+                  );
+                })}
+                {customViews.map((view) => (
+                  <SideNavLink
+                    key={view.label}
+                    to={view.path(projectName)}
+                    icon={view.icon}
+                    label={view.label}
+                    collapsed={sidebarCollapsed}
+                    sub
+                  />
+                ))}
+              </NavSection>
+            ))}
+          </>
         ) : null
       }
     >
-      <Outlet />
+      <Outlet context={viewServices} />
     </ConsoleShell>
   );
 }

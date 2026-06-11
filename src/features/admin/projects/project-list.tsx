@@ -178,27 +178,27 @@ export default function ProjectList() {
 
   return (
     <div className="workspace-container">
-      {/* Top Bar: Title + Search (Left) | Create Button (Right) */}
+      {/* Top Bar: Title (Left) | Create Button (Right), vertically aligned */}
       <div className="top-bar">
-        <div className="left-group">
-          <h1>Projects</h1>
-          {!empty && (
-            <IconField>
-              <InputIcon className="pi pi-search" />
-              <InputText
-                type="text"
-                placeholder="Filter projects..."
-                value={globalFilter}
-                onChange={(e) => setGlobalFilter(e.target.value)}
-              />
-            </IconField>
-          )}
-        </div>
-
+        <h1>Projects</h1>
         {isAdmin && !empty && (
           <Button label="Create project" onClick={showDialog} className="create-btn" />
         )}
       </div>
+
+      {!empty && (
+        <div className="mb-5">
+          <IconField>
+            <InputIcon className="pi pi-search" />
+            <InputText
+              type="text"
+              placeholder="Filter projects..."
+              value={globalFilter}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+            />
+          </IconField>
+        </div>
+      )}
 
       {empty ? (
         /* Getting started: the platform has no project yet. */

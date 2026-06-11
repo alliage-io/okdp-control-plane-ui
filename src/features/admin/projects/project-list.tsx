@@ -7,11 +7,8 @@ import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Toast } from 'primereact/toast';
-import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
-import { Menu } from 'primereact/menu';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
-import type { MenuItem } from 'primereact/menuitem';
 import { projectApi, type Project, type ProjectEvent } from '../../../core/api/project-api';
 import { applyListEvent } from '../../../core/api/sse';
 import { logger } from '../../../core/services/logger';
@@ -26,7 +23,7 @@ import EmptyState from '../../../shared/components/empty-state';
 import { formatCpuCores, formatMemoryBytes } from '../../project-console/services/service-utils';
 import { useProjectStats, type ProjectStats } from './use-project-stats';
 
-type ProjectRow = Project & { deleting: boolean; stats?: ProjectStats };
+type ProjectRow = Project & { stats?: ProjectStats };
 
 /** KPI cell: pulse while loading, em dash when the metric is unreported. */
 function StatCell({
@@ -51,16 +48,11 @@ export default function ProjectList() {
   const auth = useAuth();
   const isAdmin = auth.hasRole('admins');
   const toast = useRef<Toast>(null);
-  const menuRef = useRef<Menu>(null);
-  const selectedProjectRef = useRef<Project | null>(null);
 
   const [projects, setProjects] = useState<Project[]>([]);
   // Mirror of `projects` so the SSE handler can decide on toasts without
   // side effects inside the state updater (updaters must stay pure).
   const projectsRef = useRef<Project[]>([]);
-  // Deletion runs until the backend's DELETED event removes the row; these
-  // names render as "Deleting…" in the meantime.
-  const [deletingNames, setDeletingNames] = useState<Set<string>>(new Set());
   const [loaded, setLoaded] = useState(false);
   const [globalFilter, setGlobalFilter] = useState('');
   const [visible, setVisible] = useState(false);
@@ -91,12 +83,6 @@ export default function ProjectList() {
       } else if (event.type === 'DELETED' && exists) {
         showSuccess(`Project ${project.name} deleted`);
         clearProjectColor(project.name);
-        setDeletingNames((names) => {
-          if (!names.has(project.name)) return names;
-          const next = new Set(names);
-          next.delete(project.name);
-          return next;
-        });
       }
 
       applyProjects(applyListEvent(projectsRef.current, event, (p) => p.name));
@@ -124,19 +110,6 @@ export default function ProjectList() {
     };
   }, []);
 
-  const menuItems: MenuItem[] = [
-    {
-      label: 'Delete',
-      icon: 'pi pi-trash',
-      command: () => {
-        const project = selectedProjectRef.current;
-        if (project) {
-          confirmDelete(project);
-        }
-      },
-    },
-  ];
-
   const showDialog = () => {
     setNewProject({ name: '', description: '' });
     setNewColor(PROJECT_COLOR_PALETTE[0]);
@@ -157,32 +130,6 @@ export default function ProjectList() {
       });
   };
 
-  const confirmDelete = (project: Project) => {
-    confirmDialog({
-      message: (
-        <span>
-          Are you sure you want to delete <strong>{project.name}</strong>? This action cannot be
-          undone.
-        </span>
-      ),
-      header: 'Delete project?',
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Delete',
-      rejectLabel: 'Cancel',
-      accept: () => {
-        setDeletingNames((names) => new Set(names).add(project.name));
-        projectApi.deleteProject(project.name).catch(() => {
-          setDeletingNames((names) => {
-            const next = new Set(names);
-            next.delete(project.name);
-            return next;
-          });
-          showError('Failed to delete project');
-        });
-      },
-    });
-  };
-
   const dialogFooter = (
     <div className="dialog-actions">
       <Button severity="secondary" outlined label="Cancel" onClick={() => setVisible(false)} />
@@ -194,17 +141,11 @@ export default function ProjectList() {
 
   const projectStats = useProjectStats(projects.map((p) => p.name));
 
-  // DataTable memoizes its rows against `value`: the deleting flag and the
-  // KPI aggregates must be part of the row objects for the cells to repaint
-  // when they change.
+  // DataTable memoizes its rows against `value`: the KPI aggregates must be
+  // part of the row objects for the cells to repaint when they change.
   const rows = useMemo<ProjectRow[]>(
-    () =>
-      projects.map((p) => ({
-        ...p,
-        deleting: deletingNames.has(p.name),
-        stats: projectStats[p.name],
-      })),
-    [projects, deletingNames, projectStats],
+    () => projects.map((p) => ({ ...p, stats: projectStats[p.name] })),
+    [projects, projectStats],
   );
 
   return (
@@ -262,36 +203,24 @@ export default function ProjectList() {
             globalFilterFields={['name', 'description']}
             className="minimal-table"
             emptyMessage="No projects found."
-            rowClassName={(row: Project & { deleting: boolean }) =>
-              row.deleting ? 'workspace-row opacity-50' : 'workspace-row'
-            }
+            rowClassName={() => 'workspace-row'}
           >
             <Column
               header="Name"
               field="name"
               style={{ width: '30%' }}
-              body={(project: Project & { deleting: boolean }) =>
-                project.deleting ? (
-                  <span className="flex items-center gap-2 text-lg font-semibold text-fg">
-                    <span
-                      className="h-2.5 w-2.5 shrink-0 rounded-full"
-                      style={{ background: getProjectColor(project.name) }}
-                    ></span>
-                    {project.name}
-                  </span>
-                ) : (
-                  <Link
-                    to={`/projects/${project.name}`}
-                    className="flex items-center gap-2 text-lg font-semibold text-fg no-underline transition-colors duration-150 ease-smooth hover:text-primary hover:underline"
-                  >
-                    <span
-                      className="h-2.5 w-2.5 shrink-0 rounded-full"
-                      style={{ background: getProjectColor(project.name) }}
-                    ></span>
-                    {project.name}
-                  </Link>
-                )
-              }
+              body={(project: ProjectRow) => (
+                <Link
+                  to={`/projects/${project.name}`}
+                  className="flex items-center gap-2 text-lg font-semibold text-fg no-underline transition-colors duration-150 ease-smooth hover:text-primary hover:underline"
+                >
+                  <span
+                    className="h-2.5 w-2.5 shrink-0 rounded-full"
+                    style={{ background: getProjectColor(project.name) }}
+                  ></span>
+                  {project.name}
+                </Link>
+              )}
             />
             <Column
               header="Description"
@@ -327,35 +256,7 @@ export default function ProjectList() {
                 />
               )}
             />
-            <Column
-              style={{ width: '9%', textAlign: 'right' }}
-              body={(project: Project & { deleting: boolean }) =>
-                project.deleting ? (
-                  <div className="actions">
-                    <span className="flex items-center gap-1.5 px-2 py-1 text-sm font-medium text-fg-secondary">
-                      <i className="pi pi-spin pi-spinner text-[0.85rem]"></i>
-                      Deleting…
-                    </span>
-                  </div>
-                ) : (
-                  <div className="actions">
-                    {isAdmin && (
-                      <Button
-                        icon="pi pi-ellipsis-v"
-                        text
-                        rounded
-                        onClick={(e) => {
-                          selectedProjectRef.current = project;
-                          menuRef.current?.toggle(e);
-                        }}
-                      />
-                    )}
-                  </div>
-                )
-              }
-            />
           </DataTable>
-          <Menu ref={menuRef} model={menuItems} popup appendTo={document.body} />
         </div>
       )}
 
@@ -427,13 +328,6 @@ export default function ProjectList() {
           </div>
         </div>
       </Dialog>
-
-      <ConfirmDialog
-        className="db-confirm-dialog"
-        style={{ width: '400px' }}
-        acceptClassName="p-button-danger"
-        rejectClassName="p-button-text"
-      />
 
       <Toast ref={toast} position="bottom-right" />
     </div>

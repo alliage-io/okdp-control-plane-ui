@@ -20,6 +20,13 @@ export default function AdminPage() {
           title="Identity"
           description="Manage users and groups"
         />
+        <ActionCard
+          to="/admin/projects"
+          icon="pi pi-folder"
+          tone="purple"
+          title="Projects"
+          description="Delete projects from the platform"
+        />
       </QuickActions>
     </section>
   );

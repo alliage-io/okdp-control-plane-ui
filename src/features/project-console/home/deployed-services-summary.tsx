@@ -123,9 +123,7 @@ export default function DeployedServicesSummary({ projectId }: { projectId: stri
 
   if (instances.length === 0) {
     return (
-      <p className="m-0 text-base text-fg-muted">
-        No services deployed in this project yet — use the quick actions below to get started.
-      </p>
+      <p className="m-0 text-base text-fg-muted">No services deployed in this project yet.</p>
     );
   }
 

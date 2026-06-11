@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Link, Outlet } from 'react-router-dom';
+import { Link, Outlet, useMatch } from 'react-router-dom';
 import { Dropdown } from 'primereact/dropdown';
 import {
   siApacheairflow,
@@ -276,6 +276,11 @@ export default function ProjectPage() {
     });
   };
 
+  // The project tree only belongs to project pages (/projects/:projectId/…);
+  // every other page under the shell (/projects, /identity, …) gets an empty
+  // sidebar even while a project is still selected in the context.
+  const onProjectPage = useMatch('/projects/:projectId/*') !== null;
+
   const projectName = context.currentProject?.name;
   const envColor = projectName ? getProjectColor(projectName) : undefined;
   const futureTitle = 'Direction future, non engagé';
@@ -349,7 +354,7 @@ export default function ProjectPage() {
       accentColor={envColor}
       nav={
         <>
-          {projectName && (
+          {projectName && onProjectPage && (
             <>
               <SideNavLink
                 to={`/projects/${projectName}`}

@@ -36,7 +36,7 @@ Is at right of Logo - OKDP Console
 
 /settings : User settings page
 
-- [ ] Light/dark theme with preview like in GitHub
+- [x] Light/dark theme with preview like in GitHub
 - [ ] Control env bar (already exists before roadmap, but in user dropdown)
 
 ## Projects page

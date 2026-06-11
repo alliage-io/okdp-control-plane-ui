@@ -7,6 +7,7 @@ import { ProjectRouteSync } from './core/guards/project-route';
 const HomePage = lazy(() => import('./features/landing/home-page'));
 const StartPage = lazy(() => import('./features/start/start-page'));
 const ProjectList = lazy(() => import('./features/admin/projects/project-list'));
+const SettingsPage = lazy(() => import('./features/settings/settings-page'));
 const IdentityPage = lazy(() => import('./features/admin/identity/identity-page'));
 const ProjectPage = lazy(() => import('./features/project-console/project-page'));
 const ProjectHome = lazy(() => import('./features/project-console/home/project-home'));
@@ -81,6 +82,8 @@ export function AppRoutes() {
               </RequireAdmin>
             }
           />
+
+          <Route path="/settings" element={<SettingsPage />} />
 
           {/* REST-style: /projects is the collection, /projects/:projectId a member. */}
           <Route path="/projects">

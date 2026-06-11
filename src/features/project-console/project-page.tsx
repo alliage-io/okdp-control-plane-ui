@@ -13,7 +13,7 @@ import {
   sideNavLinkClass,
 } from '../../shared/components/console-nav-classes';
 import { NAV_CATEGORIES, navItemIcon, type NavCategory, type NavItem } from './nav-config';
-import { CUSTOM_VIEWS, uiServiceLaunchers } from '../custom-views/views-config';
+import { CUSTOM_VIEWS, customViewIcon, uiServiceLaunchers } from '../custom-views/views-config';
 import { useViewServices } from '../custom-views/use-view-services';
 
 /** Per-category unfold overrides persisted across reloads; categories absent
@@ -341,6 +341,16 @@ export default function ProjectPage() {
                 collapsed={sidebarCollapsed}
                 onToggle={() => toggleCategory(category)}
               >
+                {customViews.map((view) => (
+                  <SideNavLink
+                    key={view.label}
+                    to={view.path(projectName)}
+                    icon={customViewIcon(view)}
+                    label={view.label}
+                    collapsed={sidebarCollapsed}
+                    sub
+                  />
+                ))}
                 {launchers.map(({ svc, view }) => {
                   const navItem = navItemBySegment(view.navSegment);
                   const icon = navItem ? navItemIcon(navItem) : view.icon;
@@ -365,16 +375,6 @@ export default function ProjectPage() {
                     />
                   );
                 })}
-                {customViews.map((view) => (
-                  <SideNavLink
-                    key={view.label}
-                    to={view.path(projectName)}
-                    icon={view.icon}
-                    label={view.label}
-                    collapsed={sidebarCollapsed}
-                    sub
-                  />
-                ))}
               </NavSection>
             ))}
           </>

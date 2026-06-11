@@ -2,7 +2,7 @@ import { Link, useOutletContext } from 'react-router-dom';
 import { useProjectContext } from '../../core/context/project-context';
 import { ActionCard, QuickActions } from '../../shared/components/action-card';
 import SectionHeading from '../../shared/components/section-heading';
-import { CUSTOM_VIEWS, uiServiceLaunchers } from './views-config';
+import { CUSTOM_VIEWS, customViewIcon, uiServiceLaunchers } from './views-config';
 import type { ViewServicesState } from './use-view-services';
 
 /** /views — service UI launchers plus rich technology-specific views that
@@ -40,7 +40,23 @@ export default function CustomViewsPage() {
       {projectName ? (
         <>
           <div className="flex flex-col gap-3">
-            <SectionHeading>Services</SectionHeading>
+            <SectionHeading>Custom views</SectionHeading>
+            <QuickActions>
+              {CUSTOM_VIEWS.map((view) => (
+                <ActionCard
+                  key={view.label}
+                  to={view.path(projectName)}
+                  icon={customViewIcon(view)}
+                  tone={view.tone}
+                  title={view.label}
+                  description={view.description}
+                />
+              ))}
+            </QuickActions>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <SectionHeading>Services views</SectionHeading>
             {!loaded ? (
               <p className="m-0 flex items-center gap-2 text-base text-fg-muted">
                 <i className="pi pi-spin pi-spinner"></i> Loading deployed services…
@@ -70,22 +86,6 @@ export default function CustomViewsPage() {
                 No deployed service exposes a web UI in this project yet.
               </p>
             )}
-          </div>
-
-          <div className="flex flex-col gap-3">
-            <SectionHeading>Custom views</SectionHeading>
-            <QuickActions>
-              {CUSTOM_VIEWS.map((view) => (
-                <ActionCard
-                  key={view.label}
-                  to={view.path(projectName)}
-                  icon={view.icon}
-                  tone={view.tone}
-                  title={view.label}
-                  description={view.description}
-                />
-              ))}
-            </QuickActions>
           </div>
         </>
       ) : (

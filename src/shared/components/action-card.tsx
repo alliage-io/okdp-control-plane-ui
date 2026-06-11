@@ -21,7 +21,8 @@ const CARD_CLASS =
 
 interface ActionCardProps {
   to: string;
-  icon: string;
+  /** Either a primeicons class string or a ready-made icon node (brand logo). */
+  icon: ReactNode;
   tone: keyof typeof ICON_TONES;
   title: ReactNode;
   description: ReactNode;
@@ -46,7 +47,7 @@ export function ActionCard({
       <div
         className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md ${ICON_TONES[tone]}`}
       >
-        <i className={`${icon} text-[1rem]`}></i>
+        {typeof icon === 'string' ? <i className={`${icon} text-[1rem]`}></i> : icon}
       </div>
       <div className="flex min-w-0 flex-1 flex-col gap-px">
         <span className="text-md font-medium text-fg">{title}</span>

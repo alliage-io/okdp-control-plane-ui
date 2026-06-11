@@ -1,4 +1,7 @@
+import type { ReactNode } from 'react';
+import { siApachespark } from 'simple-icons';
 import type { ServiceInstance } from '../../core/models/service.model';
+import { BrandIcon, type BrandGlyph } from '../../shared/components/brand-icon';
 
 export type ViewTone = 'primary' | 'blue' | 'purple';
 
@@ -46,7 +49,13 @@ export const UI_SERVICE_VIEWS: UiServiceView[] = [
 export interface CustomView {
   label: string;
   description: string;
+  /** primeicons fallback when the view has no brand logo. */
   icon: string;
+  /** Brand logo of the underlying technology. */
+  brand?: BrandGlyph;
+  /** Small primeicons glyph overlaid on the brand logo, telling sibling
+   *  views of the same technology apart. */
+  badge?: string;
   tone: ViewTone;
   /** NAV_CATEGORIES key the view is grouped under in the views sidebar. */
   categoryKey: string;
@@ -60,11 +69,30 @@ export const CUSTOM_VIEWS: CustomView[] = [
     label: 'Spark Applications',
     description: 'Submitted Spark jobs and their live status',
     icon: 'pi pi-bolt',
+    brand: siApachespark,
+    badge: 'pi pi-bolt',
     tone: 'blue',
     categoryKey: 'data-engineering',
     path: (projectName) => `/projects/${projectName}/spark/applications`,
   },
 ];
+
+/** Brand logo (with its badge) when the view has one, primeicons fallback
+ *  otherwise — the views' counterpart of nav-config's navItemIcon. The badge
+ *  inherits the surrounding text color, so it adapts to tiles and sidebar
+ *  items alike. */
+export function customViewIcon(view: CustomView): ReactNode {
+  if (!view.brand) return view.icon;
+  if (!view.badge) return <BrandIcon icon={view.brand} />;
+  return (
+    <span className="relative inline-flex shrink-0">
+      <BrandIcon icon={view.brand} />
+      <i
+        className={`${view.badge} absolute -right-1 -bottom-0.5 rounded-full bg-surface p-px text-[0.5rem] leading-none`}
+      ></i>
+    </span>
+  );
+}
 
 export interface UiServiceLauncher {
   svc: ServiceInstance;

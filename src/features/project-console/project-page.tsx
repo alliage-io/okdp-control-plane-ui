@@ -155,23 +155,8 @@ export default function ProjectPage() {
       navBottomAriaLabel="Project tools"
       nav={
         <>
-          <SideNavLink
-            to="/projects"
-            end
-            icon="pi pi-th-large"
-            label="Projects"
-            collapsed={sidebarCollapsed}
-          />
-
           {projectName && (
             <>
-              {sidebarCollapsed ? (
-                <div className="mx-1 my-2 border-t border-border-light"></div>
-              ) : (
-                <div className="mt-3 mb-1 px-2.5 text-[0.65rem] font-bold tracking-[0.08em] text-fg-muted uppercase">
-                  {projectName}
-                </div>
-              )}
               <SideNavLink
                 to={`/projects/${projectName}`}
                 end

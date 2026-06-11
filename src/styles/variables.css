@@ -45,12 +45,13 @@
   --db-danger: #dc2626;
 
   /* ========== Design Tokens ========== */
-  --db-radius-xs: 6px;
-  --db-radius-sm: 8px;
-  --db-radius-md: 12px;
-  --db-radius-lg: 16px;
-  --db-radius-xl: 24px;
-  --db-radius-2xl: 32px;
+  /* Radius scale: previous 6/8/12/16/24/32 reduced by ~0.75, same ratios. */
+  --db-radius-xs: 4px;
+  --db-radius-sm: 6px;
+  --db-radius-md: 9px;
+  --db-radius-lg: 12px;
+  --db-radius-xl: 18px;
+  --db-radius-2xl: 24px;
   --db-radius-full: 9999px;
 
   --db-space-xs: 4px;

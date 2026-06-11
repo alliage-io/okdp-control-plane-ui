@@ -38,6 +38,14 @@ export const UI_SERVICE_VIEWS: UiServiceView[] = [
     navSegment: 'spark/history-server',
   },
   {
+    service: 'jupyterhub',
+    label: 'JupyterHub',
+    icon: 'pi pi-desktop',
+    tone: 'primary',
+    categoryKey: 'notebooks',
+    navSegment: 'services',
+  },
+  {
     service: 'superset',
     label: 'Superset',
     icon: 'pi pi-chart-line',

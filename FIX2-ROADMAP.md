@@ -239,31 +239,35 @@ Action buttons in the deployment flow currently have variable sizes.
 
 Perform a final manual style audit using Chromium.
 
-* [ ] Run the application locally.
-* [ ] Open the application in Chromium.
-* [ ] Check `/admin`.
-* [ ] Check `/projects/...` pages.
-* [ ] Check the Parameters page.
-* [ ] Check the Secrets menu area.
-* [ ] Check the Identity page.
-* [ ] Check the deployment service flow.
-* [ ] Check Spark application entries.
-* [ ] Check Spark History Server entry.
-* [ ] Check expanded lateral menu state.
-* [ ] Check collapsed lateral menu state.
-* [ ] Check scrolling behavior.
-* [ ] Check form widths.
-* [ ] Check action button sizes.
-* [ ] Check rounded corners.
-* [ ] Check left/right padding and margins.
-* [ ] Fix any obvious visual issue found during the audit.
-* [ ] Document any remaining known issue.
+* [x] Run the application locally.
+* [x] Open the application in Chromium.
+* [x] Check `/admin`.
+* [x] Check `/projects/...` pages.
+* [x] Check the Parameters page.
+* [x] Check the Secrets menu area.
+* [x] Check the Identity page.
+* [x] Check the deployment service flow.
+* [x] Check Spark application entries.
+* [x] Check Spark History Server entry.
+* [x] Check expanded lateral menu state.
+* [x] Check collapsed lateral menu state.
+* [x] Check scrolling behavior.
+* [x] Check form widths.
+* [x] Check action button sizes.
+* [x] Check rounded corners.
+* [x] Check left/right padding and margins.
+* [x] Fix any obvious visual issue found during the audit.
+* [x] Document any remaining known issue.
+
+### Known issues
+
+* The backend exposes no project-update endpoint (`PUT`/`PATCH /api/projects/:name` → 404), so saving a project description from the Parameters page currently surfaces the failure as an error toast. The UI side is complete; the server needs the endpoint.
 
 ### Acceptance criteria
 
-* [ ] The UI has been checked in Chromium.
-* [ ] Obvious visual defects have been fixed.
-* [ ] Remaining issues, if any, are documented.
+* [x] The UI has been checked in Chromium.
+* [x] Obvious visual defects have been fixed.
+* [x] Remaining issues, if any, are documented.
 
 ---
 
@@ -271,29 +275,29 @@ Perform a final manual style audit using Chromium.
 
 After implementation, provide a short report containing:
 
-* [ ] Summary of implemented changes.
-* [ ] Files modified.
-* [ ] Routes affected.
-* [ ] API behavior changed, if any.
-* [ ] Chromium audit result.
-* [ ] Remaining known issues, if any.
-* [ ] Screenshots if available.
+* [x] Summary of implemented changes.
+* [x] Files modified.
+* [x] Routes affected.
+* [x] API behavior changed, if any.
+* [x] Chromium audit result.
+* [x] Remaining known issues, if any.
+* [x] Screenshots if available. *(Audit screenshots in `/tmp/okdp-run/s12-*.png`.)*
 
 ---
 
 ## Definition of Done
 
-* [ ] All checklist items are completed or explicitly documented as not applicable.
-* [ ] `/admin/projects` and its admin tile are removed.
-* [ ] Parameters exists under Secrets and supports required project actions.
-* [ ] Top banner title remains stable when the lateral menu collapses.
-* [ ] Scrolling is fixed in the main view zone.
-* [ ] Lateral menu visibility matches the `/projects/...` rule.
-* [ ] User dropdown links directly to Identity.
-* [ ] Spark History Server has a clock/history badge.
-* [ ] Rounded corners are consistent.
-* [ ] Deployment forms use a stable fixed width.
-* [ ] Deployment action buttons are uniform.
-* [ ] Left/right spacing is consistent.
-* [ ] Chromium audit has been completed.
-* [ ] Final implementation report has been provided.
+* [x] All checklist items are completed or explicitly documented as not applicable.
+* [x] `/admin/projects` and its admin tile are removed.
+* [x] Parameters exists under Secrets and supports required project actions.
+* [x] Top banner title remains stable when the lateral menu collapses.
+* [x] Scrolling is fixed in the main view zone.
+* [x] Lateral menu visibility matches the `/projects/...` rule.
+* [x] User dropdown links directly to Identity.
+* [x] Spark History Server has a clock/history badge.
+* [x] Rounded corners are consistent.
+* [x] Deployment forms use a stable fixed width.
+* [x] Deployment action buttons are uniform.
+* [x] Left/right spacing is consistent.
+* [x] Chromium audit has been completed.
+* [x] Final implementation report has been provided.

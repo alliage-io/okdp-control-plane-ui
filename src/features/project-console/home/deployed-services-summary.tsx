@@ -11,12 +11,37 @@ import type {
 } from '../../../core/models/service.model';
 import { areaBasePath, parentLabel, tagClass } from '../services/service-utils';
 
-function metricCell(metric: MetricValue | undefined): string {
-  if (!metric || !metric.available) {
-    return '—';
+/** Compact version of the detail page's metric card: used / limit over a
+ *  tone-colored usage bar. `metric` undefined = request still in flight. */
+function MetricCell({ metric }: { metric: MetricValue | undefined }) {
+  if (!metric) {
+    return <div className="metric-bar h-[5px] w-[110px] animate-pulse"></div>;
   }
-  // limitRaw 0 = no limit configured; showing "/ 0" would read as exhausted.
-  return metric.limitRaw > 0 ? `${metric.used} / ${metric.limit}` : metric.used;
+  if (!metric.available) {
+    return <span className="text-sm text-fg-muted">—</span>;
+  }
+  // limitRaw 0 = no limit configured; a bar against 0 would read as exhausted.
+  if (metric.limitRaw <= 0) {
+    return (
+      <span className="text-sm text-fg-secondary">
+        {metric.used} <span className="text-xs text-fg-muted">· no limit</span>
+      </span>
+    );
+  }
+  const tone = metric.pct > 0.8 ? 'tone-danger' : metric.pct > 0.6 ? 'tone-warn' : '';
+  return (
+    <div className="flex w-[110px] flex-col gap-1">
+      <span className="text-sm text-fg-secondary">
+        {metric.used} <span className="text-fg-muted">/ {metric.limit}</span>
+      </span>
+      <div className="metric-bar h-[5px]!">
+        <div
+          className={`metric-fill ${tone}`}
+          style={{ width: `${Math.min(metric.pct, 1) * 100}%` }}
+        ></div>
+      </div>
+    </div>
+  );
 }
 
 type SummaryRow = ServiceInstance & { metrics?: ServiceMetrics };
@@ -88,7 +113,12 @@ export default function DeployedServicesSummary({ projectId }: { projectId: stri
   );
 
   if (!loaded) {
-    return null;
+    return (
+      <div className="flex items-center gap-2.5 py-2 text-fg-secondary">
+        <i className="pi pi-spin pi-spinner text-primary"></i>
+        <span>Loading services…</span>
+      </div>
+    );
   }
 
   if (instances.length === 0) {
@@ -125,17 +155,10 @@ export default function DeployedServicesSummary({ projectId }: { projectId: stri
             </span>
           )}
         />
-        <Column
-          header="CPU"
-          body={(svc: SummaryRow) => (
-            <span className="text-sm text-fg-secondary">{metricCell(svc.metrics?.cpu)}</span>
-          )}
-        />
+        <Column header="CPU" body={(svc: SummaryRow) => <MetricCell metric={svc.metrics?.cpu} />} />
         <Column
           header="Memory"
-          body={(svc: SummaryRow) => (
-            <span className="text-sm text-fg-secondary">{metricCell(svc.metrics?.memory)}</span>
-          )}
+          body={(svc: SummaryRow) => <MetricCell metric={svc.metrics?.memory} />}
         />
         <Column
           style={{ textAlign: 'right' }}

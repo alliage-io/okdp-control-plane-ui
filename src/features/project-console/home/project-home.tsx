@@ -1,5 +1,7 @@
 import { useProjectContext } from '../../../core/context/project-context';
 import DeployedServicesSummary from './deployed-services-summary';
+import { useProjectServicesSummary } from './use-project-services-summary';
+import ProjectKpis from './project-kpis';
 import SectionHeading from '../../../shared/components/section-heading';
 import { ActionCard, QuickActions } from '../../../shared/components/action-card';
 import EmptyState from '../../../shared/components/empty-state';
@@ -8,6 +10,7 @@ import CtaButton from '../../../shared/components/cta-button';
 export default function ProjectHome() {
   const context = useProjectContext();
   const project = context.currentProject;
+  const summary = useProjectServicesSummary(project?.name);
 
   return (
     <section className="flex animate-[fadeInUp_0.4s_ease-out] flex-col gap-7">
@@ -20,8 +23,10 @@ export default function ProjectHome() {
             )}
           </div>
 
+          <ProjectKpis summary={summary} />
+
           <SectionHeading>Deployed services</SectionHeading>
-          <DeployedServicesSummary projectId={project.name} />
+          <DeployedServicesSummary projectId={project.name} summary={summary} />
 
           <SectionHeading>Quick Actions</SectionHeading>
           <QuickActions>

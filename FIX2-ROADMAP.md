@@ -215,23 +215,23 @@ Action buttons in the deployment flow currently have variable sizes.
 
 ## 11. Normalize left/right padding and margins
 
-* [ ] Audit padding and margin in main layout zones.
-* [ ] Ensure left and right spacing are symmetrical where expected.
-* [ ] Reuse shared spacing tokens if available.
-* [ ] Fix spacing inconsistencies in page containers.
-* [ ] Fix spacing inconsistencies in cards.
-* [ ] Fix spacing inconsistencies in forms.
-* [ ] Fix spacing inconsistencies in tiles.
-* [ ] Fix spacing inconsistencies in deployment pages.
-* [ ] Fix spacing inconsistencies in admin pages.
-* [ ] Ensure spacing works with the lateral menu visible.
-* [ ] Ensure spacing works with the lateral menu hidden.
+* [x] Audit padding and margin in main layout zones.
+* [x] Ensure left and right spacing are symmetrical where expected.
+* [x] Reuse shared spacing tokens if available.
+* [x] Fix spacing inconsistencies in page containers. *(Audit: every page renders in the shared `px-7` shell wrapper — measured 28px on both sides on all routes; remaining one-sided paddings are deliberate icon/indent offsets.)*
+* [x] Fix spacing inconsistencies in cards.
+* [x] Fix spacing inconsistencies in forms.
+* [x] Fix spacing inconsistencies in tiles.
+* [x] Fix spacing inconsistencies in deployment pages. *(Deploy/spark forms share `--db-form-width`, centered — section 9.)*
+* [x] Fix spacing inconsistencies in admin pages. *(Full-width zone since the sidebar removal — section 5.)*
+* [x] Ensure spacing works with the lateral menu visible.
+* [x] Ensure spacing works with the lateral menu hidden.
 
 ### Acceptance criteria
 
-* [ ] Left and right spacing is visually balanced.
-* [ ] Main zones use consistent padding.
-* [ ] Pages do not feel shifted or misaligned.
+* [x] Left and right spacing is visually balanced.
+* [x] Main zones use consistent padding.
+* [x] Pages do not feel shifted or misaligned.
 
 ---
 

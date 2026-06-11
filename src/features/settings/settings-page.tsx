@@ -1,6 +1,8 @@
 import { InputSwitch } from 'primereact/inputswitch';
 import { useTheme, type ThemeMode } from '../../core/theme/theme-context';
 import { useEnvBar } from '../../core/preferences/env-bar-context';
+import { useNavPrefs } from '../../core/preferences/nav-prefs-context';
+import { NAV_CATEGORIES } from '../project-console/nav-config';
 import SectionHeading from '../../shared/components/section-heading';
 
 interface PreviewPalette {
@@ -113,6 +115,42 @@ function ThemeCard({ mode, label, description, icon }: ThemeCardProps) {
   );
 }
 
+/** Per-category cards of lateral-menu entries with show/hide switches.
+ *  Core entries (Overview, Project configuration) are not listed: they
+ *  always stay in the menu. */
+function NavMenuPrefs() {
+  const { hiddenNavItems, setNavItemHidden } = useNavPrefs();
+
+  return (
+    <div className="flex max-w-[560px] flex-col gap-3">
+      {NAV_CATEGORIES.filter((category) => !category.fixed).map((category) => (
+        <div
+          key={category.key}
+          className="flex flex-col gap-3 rounded-lg border border-border-light bg-surface px-4 py-3"
+        >
+          <span className="flex items-center gap-2 text-sm font-semibold text-fg">
+            <i className={`pi ${category.icon} text-[0.85rem] text-fg-muted`}></i>
+            {category.label}
+          </span>
+          {category.items.map((item) => (
+            <div key={item.label} className="flex items-center justify-between gap-4">
+              <label htmlFor={`nav-item-${item.label}`} className="text-sm text-fg-secondary">
+                {item.label}
+                {item.disabled && <span className="ml-1.5 text-xs text-fg-muted">(preview)</span>}
+              </label>
+              <InputSwitch
+                inputId={`nav-item-${item.label}`}
+                checked={!hiddenNavItems.has(item.label)}
+                onChange={(e) => setNavItemHidden(item.label, !(e.value ?? false))}
+              />
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 /** /settings — personal preferences for the console. */
 export default function SettingsPage() {
   const { envBarEnabled, setEnvBarEnabled } = useEnvBar();
@@ -153,6 +191,12 @@ export default function SettingsPage() {
           onChange={(e) => setEnvBarEnabled(e.value ?? false)}
         />
       </div>
+
+      <SectionHeading>Lateral menu</SectionHeading>
+      <p className="-mt-5 text-sm text-fg-muted">
+        Choose which services appear in the project lateral menu.
+      </p>
+      <NavMenuPrefs />
     </section>
   );
 }

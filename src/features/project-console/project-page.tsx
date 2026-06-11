@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { Link, Outlet, useMatch } from 'react-router-dom';
 import { Dropdown } from 'primereact/dropdown';
 import { useProjectContext } from '../../core/context/project-context';
+import { useNavPrefs } from '../../core/preferences/nav-prefs-context';
 import { NAV_EXPANDED_KEY, SIDEBAR_COLLAPSED_KEY } from '../../core/storage-keys';
 import type { Project } from '../../core/api/project-api';
 import { getProjectColor } from '../../core/services/project-colors';
@@ -102,7 +103,16 @@ function DisabledNavLink({ icon, label, collapsed, title, collapsedTitle }: Disa
 
 export default function ProjectPage() {
   const context = useProjectContext();
+  const { hiddenNavItems } = useNavPrefs();
   const switcherRef = useRef<Dropdown>(null);
+
+  // Entries hidden from the user's settings drop out of the menu (fixed
+  // categories are exempt); a category left empty disappears entirely.
+  const visibleCategories = NAV_CATEGORIES.map((category) =>
+    category.fixed
+      ? category
+      : { ...category, items: category.items.filter((i) => !hiddenNavItems.has(i.label)) },
+  ).filter((category) => category.items.length > 0);
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(
     () => localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === 'true',
@@ -214,7 +224,7 @@ export default function ProjectPage() {
               collapsed={sidebarCollapsed}
             />
 
-            {NAV_CATEGORIES.map((category) => (
+            {visibleCategories.map((category) => (
               <NavSection
                 key={category.key}
                 icon={category.icon}

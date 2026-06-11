@@ -9,3 +9,4 @@ export const NAV_EXPANDED_KEY = 'okdp-nav-expanded';
 export const THEME_STORAGE_KEY = 'okdp-theme';
 export const PROJECT_COLORS_KEY = 'okdp-project-colors';
 export const ENV_BAR_STORAGE_KEY = 'okdp-env-bar';
+export const NAV_HIDDEN_KEY = 'okdp-nav-hidden';

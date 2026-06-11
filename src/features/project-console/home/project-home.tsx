@@ -1,4 +1,5 @@
 import { useProjectContext } from '../../../core/context/project-context';
+import DeployedServicesSummary from './deployed-services-summary';
 import SectionHeading from '../../../shared/components/section-heading';
 import { ActionCard, QuickActions } from '../../../shared/components/action-card';
 import EmptyState from '../../../shared/components/empty-state';
@@ -18,6 +19,9 @@ export default function ProjectHome() {
               <p className="mt-1 text-base text-fg-secondary">{project.description}</p>
             )}
           </div>
+
+          <SectionHeading>Deployed services</SectionHeading>
+          <DeployedServicesSummary projectId={project.name} />
 
           <SectionHeading>Quick Actions</SectionHeading>
           <QuickActions>

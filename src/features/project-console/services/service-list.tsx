@@ -4,6 +4,7 @@ import { Toast } from 'primereact/toast';
 import DeleteConfirmDialog from '../../../shared/components/delete-confirm-dialog';
 import { serviceApi } from '../../../core/api/service-api';
 import { applyListEvent } from '../../../core/api/sse';
+import { readUiCache, writeUiCache } from '../../../core/api/ui-cache';
 import type { ServiceInstance } from '../../../core/models/service.model';
 import { apiErrorMessage, formatMediumDate, tagClass } from './service-utils';
 
@@ -51,11 +52,15 @@ export function ServiceList({
       !serviceFilter || instance.service === serviceFilter;
 
     let cancelled = false;
-    setLoading(true);
+    // Recent snapshot: skip the loading panel; the fetch below still runs.
+    const cached = readUiCache<ServiceInstance[]>(`services:${projectName}`);
+    setServices(cached ? cached.filter(matchesFilter) : []);
+    setLoading(!cached);
     serviceApi
       .getServices(projectName)
       .then((data) => {
         if (cancelled) return;
+        writeUiCache(`services:${projectName}`, data);
         setServices(data.filter(matchesFilter));
         setLoading(false);
       })

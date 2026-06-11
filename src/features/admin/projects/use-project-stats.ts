@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { serviceApi } from '../../../core/api/service-api';
+import { readUiCache, writeUiCache } from '../../../core/api/ui-cache';
 
 export interface ProjectStats {
   /** Total deployed service instances in the project. */
@@ -27,6 +28,10 @@ export function useProjectStats(projectNames: string[]): Record<string, ProjectS
   // array with the same content.
   const namesKey = projectNames.join('|');
   const [stats, setStats] = useState<Record<string, ProjectStats>>({});
+  // Names already fanned out for (the list grows via SSE events; existing
+  // rows must not refetch). Cache-seeded entries are NOT in this set — the
+  // snapshot paints instantly, the live aggregation still runs.
+  const fetchedRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     const names = namesKey ? namesKey.split('|') : [];
@@ -38,10 +43,22 @@ export function useProjectStats(projectNames: string[]): Record<string, ProjectS
       }
     };
 
+    // A partial result must not blank out a painted snapshot (no pulse
+    // regression); the final aggregate below always overwrites.
+    const mergeIfAbsent = (name: string, value: ProjectStats) => {
+      if (!cancelled) {
+        setStats((prev) => (prev[name] ? prev : { ...prev, [name]: value }));
+      }
+    };
+
     for (const name of names) {
-      // Skip projects already aggregated (the list grows via SSE events;
-      // existing rows keep their numbers).
-      if (stats[name]) continue;
+      if (fetchedRef.current.has(name)) continue;
+      fetchedRef.current.add(name);
+
+      // Recent snapshot: paint immediately; the aggregation still runs.
+      const cached = readUiCache<ProjectStats>(`project-stats:${name}`);
+      if (cached) mergeIfAbsent(name, cached);
+
       (async () => {
         let base: ProjectStats;
         try {
@@ -55,9 +72,13 @@ export function useProjectStats(projectNames: string[]): Record<string, ProjectS
             cpuLimit: null,
             memLimit: null,
           };
-          mergeStats(name, base);
+          if (instances.length === 0) {
+            writeUiCache(`project-stats:${name}`, base);
+            mergeStats(name, base);
+            return;
+          }
+          mergeIfAbsent(name, base);
 
-          if (instances.length === 0) return;
           const metrics = await Promise.all(
             instances.map((i) => serviceApi.getServiceMetrics(name, i.name).catch(() => null)),
           );
@@ -86,16 +107,19 @@ export function useProjectStats(projectNames: string[]): Record<string, ProjectS
               else memBounded = false;
             }
           }
-          mergeStats(name, {
+          const aggregated: ProjectStats = {
             ...base,
             metricsLoaded: true,
             cpuUsed: cpuSeen ? cpu : null,
             memUsed: memSeen ? mem : null,
             cpuLimit: cpuSeen && cpuBounded ? cpuLimit : null,
             memLimit: memSeen && memBounded ? memLimit : null,
-          });
+          };
+          writeUiCache(`project-stats:${name}`, aggregated);
+          mergeStats(name, aggregated);
         } catch {
-          mergeStats(name, {
+          // Failures are not cached, and must not replace a painted snapshot.
+          mergeIfAbsent(name, {
             instances: 0,
             services: 0,
             metricsLoaded: true,
@@ -111,9 +135,6 @@ export function useProjectStats(projectNames: string[]): Record<string, ProjectS
     return () => {
       cancelled = true;
     };
-    // `stats` is intentionally read without re-triggering: the effect only
-    // fans out for names it has not aggregated yet.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [namesKey]);
 
   return stats;

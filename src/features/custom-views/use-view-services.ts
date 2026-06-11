@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { serviceApi } from '../../core/api/service-api';
 import { applyListEvent } from '../../core/api/sse';
+import { readUiCache, writeUiCache } from '../../core/api/ui-cache';
 import type { ServiceInstance } from '../../core/models/service.model';
 import { logger } from '../../core/services/logger';
 
@@ -20,13 +21,17 @@ export function useViewServices(projectName: string | undefined): ViewServicesSt
   useEffect(() => {
     if (!projectName) return;
     let cancelled = false;
-    setLoaded(false);
-    setInstances([]);
+
+    // Recent snapshot: paint immediately; the fetch below still runs.
+    const cached = readUiCache<ServiceInstance[]>(`services:${projectName}`);
+    setInstances(cached ?? []);
+    setLoaded(!!cached);
 
     serviceApi
       .getServices(projectName)
       .then((data) => {
         if (cancelled) return;
+        writeUiCache(`services:${projectName}`, data);
         setInstances(data);
         setLoaded(true);
       })

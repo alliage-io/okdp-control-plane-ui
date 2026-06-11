@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { serviceApi } from '../../../core/api/service-api';
 import { applyListEvent } from '../../../core/api/sse';
+import { readUiCache, writeUiCache } from '../../../core/api/ui-cache';
 import type { ServiceInstance, ServiceMetrics } from '../../../core/models/service.model';
 
 export interface ProjectServicesSummary {
@@ -23,15 +24,20 @@ export function useProjectServicesSummary(projectId: string | undefined): Projec
   useEffect(() => {
     if (!projectId) return;
     let cancelled = false;
-    setInstances([]);
     setMetrics({});
-    setLoaded(false);
     fetchedMetricsRef.current = new Set();
+
+    // Recent snapshot: paint immediately; the fetch below still runs (and
+    // the metrics effect re-fetches every instance regardless).
+    const cached = readUiCache<ServiceInstance[]>(`services:${projectId}`);
+    setInstances(cached ?? []);
+    setLoaded(!!cached);
 
     serviceApi
       .getServices(projectId)
       .then((data) => {
         if (cancelled) return;
+        writeUiCache(`services:${projectId}`, data);
         setInstances(data);
         setLoaded(true);
       })
@@ -60,9 +66,15 @@ export function useProjectServicesSummary(projectId: string | undefined): Projec
     for (const svc of instances) {
       if (fetched.has(svc.name)) continue;
       fetched.add(svc.name);
+      // Recent snapshot fills the cell while the fresh request runs.
+      const cached = readUiCache<ServiceMetrics>(`metrics:${projectId}/${svc.name}`);
+      if (cached) {
+        setMetrics((prev) => (prev[svc.name] ? prev : { ...prev, [svc.name]: cached }));
+      }
       serviceApi
         .getServiceMetrics(projectId, svc.name)
         .then((m) => {
+          writeUiCache(`metrics:${projectId}/${svc.name}`, m);
           if (fetchedMetricsRef.current === fetched) {
             setMetrics((prev) => ({ ...prev, [svc.name]: m }));
           }

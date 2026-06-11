@@ -87,7 +87,7 @@ export default function ParametersPage() {
   };
 
   return (
-    <section className="flex animate-[fadeInUp_0.4s_ease-out] flex-col gap-7">
+    <section className="form-page flex animate-[fadeInUp_0.4s_ease-out] flex-col gap-7">
       <div>
         <h1>Project Parameters</h1>
         <p className="mt-1 text-base text-fg-secondary">
@@ -95,86 +95,98 @@ export default function ParametersPage() {
         </p>
       </div>
 
-      <SectionHeading>Description</SectionHeading>
-      <div className="flex max-w-[560px] flex-col gap-3 rounded-lg border border-border-light bg-surface px-4 py-3">
-        <label htmlFor="project-description" className="text-sm font-semibold text-fg">
-          Project description
-        </label>
-        <InputTextarea
-          id="project-description"
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          rows={3}
-          autoResize
-          placeholder="Describe the purpose of this project"
-          className="w-full"
-        />
-        <div className="flex justify-end">
-          <Button
-            label="Save"
-            icon="pi pi-check"
-            size="small"
-            disabled={!dirty}
-            loading={saving}
-            onClick={saveDescription}
-          />
+      <div className="flex flex-col gap-3">
+        <SectionHeading>Description</SectionHeading>
+        <div className="form-card">
+          <div className="form-field">
+            <label htmlFor="project-description">Project description</label>
+            <InputTextarea
+              id="project-description"
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              rows={3}
+              autoResize
+              placeholder="Describe the purpose of this project"
+              className="w-full"
+            />
+            <div className="flex justify-end">
+              <Button
+                label="Save"
+                icon="pi pi-check"
+                size="small"
+                disabled={!dirty}
+                loading={saving}
+                onClick={saveDescription}
+              />
+            </div>
+          </div>
         </div>
       </div>
 
-      <SectionHeading>Color</SectionHeading>
-      <div className="flex max-w-[560px] flex-col gap-3 rounded-lg border border-border-light bg-surface px-4 py-3">
-        <div className="flex flex-col">
-          <span className="text-sm font-semibold text-fg">Project color</span>
-          <span className="text-xs text-fg-muted">
-            Shown in the header bar and project lists. Only visible to you; applied immediately.
-          </span>
-        </div>
-        <div className="flex items-center gap-2" role="radiogroup" aria-label="Project color">
-          {PROJECT_COLOR_PALETTE.map((color) => (
-            <button
-              key={color}
-              type="button"
-              role="radio"
-              aria-checked={currentColor === color}
-              aria-label={`Project color ${color}`}
-              className={`h-7 w-7 cursor-pointer rounded-full border-2 transition-transform duration-150 ease-smooth hover:scale-110 ${
-                currentColor === color
-                  ? 'border-fg ring-2 ring-(--db-primary-200)'
-                  : 'border-transparent'
-              }`}
-              style={{ background: color }}
-              onClick={() => setProjectColor(projectName, color)}
-            ></button>
-          ))}
+      <div className="flex flex-col gap-3">
+        <SectionHeading>Color</SectionHeading>
+        <div className="form-card">
+          <div className="form-field">
+            <label id="project-color-label">Project color</label>
+            <small className="field-hint">
+              Shown in the header bar and project lists. Only visible to you; applied immediately.
+            </small>
+            <div
+              className="mt-1 flex items-center gap-2"
+              role="radiogroup"
+              aria-labelledby="project-color-label"
+            >
+              {PROJECT_COLOR_PALETTE.map((color) => (
+                <button
+                  key={color}
+                  type="button"
+                  role="radio"
+                  aria-checked={currentColor === color}
+                  aria-label={`Project color ${color}`}
+                  className={`h-7 w-7 cursor-pointer rounded-full border-2 transition-transform duration-150 ease-smooth hover:scale-110 ${
+                    currentColor === color
+                      ? 'border-fg ring-2 ring-(--db-primary-200)'
+                      : 'border-transparent'
+                  }`}
+                  style={{ background: color }}
+                  onClick={() => setProjectColor(projectName, color)}
+                ></button>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
       <CustomViewsSection projectName={projectName} />
 
-      <SectionHeading>Danger zone</SectionHeading>
-      <div className="flex max-w-[560px] items-center justify-between gap-4 rounded-lg border border-border-light bg-surface px-4 py-3">
-        <div className="flex flex-col">
-          <span className="text-sm font-semibold text-fg">Delete this project</span>
-          <span className="text-xs text-fg-muted">
-            Removes the project and all its deployed services. This cannot be undone.
-          </span>
+      <div className="flex flex-col gap-3">
+        <SectionHeading>Danger zone</SectionHeading>
+        <div className="form-card">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col gap-1">
+              <span className="text-[12.5px] font-semibold text-fg">Delete this project</span>
+              <small className="field-hint">
+                Removes the project and all its deployed services. This cannot be undone.
+              </small>
+            </div>
+            {deleting ? (
+              <span className="flex shrink-0 items-center gap-1.5 px-2 py-1 text-sm font-medium text-fg-secondary">
+                <i className="pi pi-spin pi-spinner text-[0.85rem]"></i>
+                Deleting…
+              </span>
+            ) : (
+              <Button
+                label="Delete"
+                icon="pi pi-trash"
+                severity="danger"
+                outlined
+                size="small"
+                className="shrink-0"
+                onClick={() => setConfirmDelete(true)}
+              />
+            )}
+          </div>
         </div>
-        {deleting ? (
-          <span className="flex shrink-0 items-center gap-1.5 px-2 py-1 text-sm font-medium text-fg-secondary">
-            <i className="pi pi-spin pi-spinner text-[0.85rem]"></i>
-            Deleting…
-          </span>
-        ) : (
-          <Button
-            label="Delete"
-            icon="pi pi-trash"
-            severity="danger"
-            outlined
-            size="small"
-            className="shrink-0"
-            onClick={() => setConfirmDelete(true)}
-          />
-        )}
       </div>
 
       <DeleteConfirmDialog

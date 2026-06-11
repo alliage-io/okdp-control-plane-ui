@@ -100,16 +100,16 @@ export default function CustomViewsSection({ projectName }: { projectName: strin
   );
 
   return (
-    <>
+    <div className="flex flex-col gap-3">
       <SectionHeading>Custom views</SectionHeading>
-      <div className="flex max-w-[860px] flex-col gap-3 rounded-lg border border-border-light bg-surface px-4 py-3">
+      <div className="form-card flex flex-col gap-3">
         <div className="flex items-center justify-between gap-4">
-          <div className="flex flex-col">
-            <span className="text-sm font-semibold text-fg">Personal launcher tiles</span>
-            <span className="text-xs text-fg-muted">
+          <div className="flex flex-col gap-1">
+            <span className="text-[12.5px] font-semibold text-fg">Personal launcher tiles</span>
+            <small className="field-hint">
               Shown on the views page and, with a category, in the views menu. Stored in this
               browser only — other users don&apos;t see them.
-            </span>
+            </small>
           </div>
           <Button
             label="New view"
@@ -302,6 +302,6 @@ export default function CustomViewsSection({ projectName }: { projectName: strin
           </div>
         )}
       </Dialog>
-    </>
+    </div>
   );
 }

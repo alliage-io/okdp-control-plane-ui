@@ -1452,6 +1452,14 @@ h1 {
   word-break: break-all;
 }
 
+/* Settings / parameters pages share the deploy form's footprint: a centered
+   column at the shared form width, one form-card per section. */
+@utility form-page {
+  width: 100%;
+  max-width: var(--db-form-width);
+  margin: 0 auto;
+}
+
 /* ========== Deploy wizard ========== */
 @utility deploy-page {
   padding-top: 4px;

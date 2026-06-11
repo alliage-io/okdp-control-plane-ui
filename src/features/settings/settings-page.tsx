@@ -115,20 +115,20 @@ function ThemeCard({ mode, label, description, icon }: ThemeCardProps) {
   );
 }
 
-/** Per-category cards of lateral-menu entries with show/hide switches.
+/** Per-category groups of lateral-menu entries with show/hide switches.
  *  Core entries (Overview, Project configuration) are not listed: they
  *  always stay in the menu. */
 function NavMenuPrefs() {
   const { isNavItemHidden, setNavItemHidden } = useNavPrefs();
 
   return (
-    <div className="flex max-w-[560px] flex-col gap-3">
+    <div className="flex flex-col gap-5">
       {NAV_CATEGORIES.filter((category) => !category.fixed).map((category) => (
         <div
           key={category.key}
-          className="flex flex-col gap-3 rounded-lg border border-border-light bg-surface px-4 py-3"
+          className="flex flex-col gap-3 border-t border-border-light pt-5 first:border-t-0 first:pt-0"
         >
-          <span className="flex items-center gap-2 text-sm font-semibold text-fg">
+          <span className="flex items-center gap-2 text-[12.5px] font-semibold text-fg">
             <i className={`pi ${category.icon} text-[0.85rem] text-fg-muted`}></i>
             {category.label}
           </span>
@@ -155,7 +155,7 @@ function NavMenuPrefs() {
 export default function SettingsPage() {
   const { envBarEnabled, setEnvBarEnabled } = useEnvBar();
   return (
-    <section className="flex animate-[fadeInUp_0.4s_ease-out] flex-col gap-7">
+    <section className="form-page flex animate-[fadeInUp_0.4s_ease-out] flex-col gap-7">
       <div>
         <h1>User settings</h1>
         <p className="mt-1 text-base text-fg-secondary">
@@ -163,40 +163,52 @@ export default function SettingsPage() {
         </p>
       </div>
 
-      <SectionHeading>Theme</SectionHeading>
-      <div role="radiogroup" aria-label="Theme" className="flex flex-wrap gap-4">
-        <ThemeCard
-          mode="system"
-          label="Sync with system"
-          description="Follows your OS appearance"
-          icon="pi pi-desktop"
-        />
-        <ThemeCard mode="light" label="Light" description="Always light" icon="pi pi-sun" />
-        <ThemeCard mode="dark" label="Dark" description="Always dark" icon="pi pi-moon" />
-      </div>
-
-      <SectionHeading>Environment</SectionHeading>
-      <div className="flex max-w-[560px] items-center justify-between gap-4 rounded-lg border border-border-light bg-surface px-4 py-3">
-        <div className="flex flex-col">
-          <label htmlFor="env-bar-switch" className="text-sm font-semibold text-fg">
-            Environment color bar
-          </label>
-          <span className="text-xs text-fg-muted">
-            Paint the selected project&apos;s color as a strip across the top banner.
-          </span>
+      <div className="flex flex-col gap-3">
+        <SectionHeading>Theme</SectionHeading>
+        <div className="form-card">
+          <div role="radiogroup" aria-label="Theme" className="flex flex-wrap gap-4">
+            <ThemeCard
+              mode="system"
+              label="Sync with system"
+              description="Follows your OS appearance"
+              icon="pi pi-desktop"
+            />
+            <ThemeCard mode="light" label="Light" description="Always light" icon="pi pi-sun" />
+            <ThemeCard mode="dark" label="Dark" description="Always dark" icon="pi pi-moon" />
+          </div>
         </div>
-        <InputSwitch
-          inputId="env-bar-switch"
-          checked={envBarEnabled}
-          onChange={(e) => setEnvBarEnabled(e.value ?? false)}
-        />
       </div>
 
-      <SectionHeading>Lateral menu</SectionHeading>
-      <p className="-mt-5 text-sm text-fg-muted">
-        Choose which services appear in the project lateral menu.
-      </p>
-      <NavMenuPrefs />
+      <div className="flex flex-col gap-3">
+        <SectionHeading>Environment</SectionHeading>
+        <div className="form-card">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col gap-1">
+              <label htmlFor="env-bar-switch" className="text-[12.5px] font-semibold text-fg">
+                Environment color bar
+              </label>
+              <small className="field-hint">
+                Paint the selected project&apos;s color as a strip across the top banner.
+              </small>
+            </div>
+            <InputSwitch
+              inputId="env-bar-switch"
+              checked={envBarEnabled}
+              onChange={(e) => setEnvBarEnabled(e.value ?? false)}
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <SectionHeading>Lateral menu</SectionHeading>
+        <div className="form-card flex flex-col gap-5">
+          <small className="field-hint">
+            Choose which services appear in the project lateral menu.
+          </small>
+          <NavMenuPrefs />
+        </div>
+      </div>
     </section>
   );
 }

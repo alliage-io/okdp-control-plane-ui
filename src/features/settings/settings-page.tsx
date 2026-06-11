@@ -119,7 +119,7 @@ function ThemeCard({ mode, label, description, icon }: ThemeCardProps) {
  *  Core entries (Overview, Project configuration) are not listed: they
  *  always stay in the menu. */
 function NavMenuPrefs() {
-  const { hiddenNavItems, setNavItemHidden } = useNavPrefs();
+  const { isNavItemHidden, setNavItemHidden } = useNavPrefs();
 
   return (
     <div className="flex max-w-[560px] flex-col gap-3">
@@ -140,7 +140,7 @@ function NavMenuPrefs() {
               </label>
               <InputSwitch
                 inputId={`nav-item-${item.label}`}
-                checked={!hiddenNavItems.has(item.label)}
+                checked={!isNavItemHidden(item.label, item.defaultHidden)}
                 onChange={(e) => setNavItemHidden(item.label, !(e.value ?? false))}
               />
             </div>

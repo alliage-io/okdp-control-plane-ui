@@ -103,15 +103,19 @@ function DisabledNavLink({ icon, label, collapsed, title, collapsedTitle }: Disa
 
 export default function ProjectPage() {
   const context = useProjectContext();
-  const { hiddenNavItems } = useNavPrefs();
+  const { isNavItemHidden } = useNavPrefs();
   const switcherRef = useRef<Dropdown>(null);
 
-  // Entries hidden from the user's settings drop out of the menu (fixed
-  // categories are exempt); a category left empty disappears entirely.
+  // Entries hidden by default or from the user's settings drop out of the
+  // menu (fixed categories are exempt); a category left empty disappears
+  // entirely — no header, no collapsed-rail separator.
   const visibleCategories = NAV_CATEGORIES.map((category) =>
     category.fixed
       ? category
-      : { ...category, items: category.items.filter((i) => !hiddenNavItems.has(i.label)) },
+      : {
+          ...category,
+          items: category.items.filter((i) => !isNavItemHidden(i.label, i.defaultHidden)),
+        },
   ).filter((category) => category.items.length > 0);
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(

@@ -72,6 +72,8 @@ export interface NavItem {
   brandMono?: boolean;
   label: string;
   disabled?: boolean;
+  /** Hidden from the menu unless the user enables it in their settings. */
+  defaultHidden?: boolean;
   collapsedTitle?: string;
 }
 
@@ -128,6 +130,7 @@ export const NAV_CATEGORIES: NavCategory[] = [
         brandMono: true,
         label: 'Kafka',
         disabled: true,
+        defaultHidden: true,
         collapsedTitle: 'Kafka — exploration',
       },
     ],
@@ -155,6 +158,7 @@ export const NAV_CATEGORIES: NavCategory[] = [
         icon: 'pi pi-pencil',
         label: 'SQL Editor',
         disabled: true,
+        defaultHidden: true,
         collapsedTitle: 'SQL Editor — exploration',
       },
     ],
@@ -169,6 +173,7 @@ export const NAV_CATEGORIES: NavCategory[] = [
         icon: 'pi pi-sitemap',
         label: 'Kubeflow',
         disabled: true,
+        defaultHidden: true,
         collapsedTitle: 'Kubeflow — exploration',
       },
       {
@@ -176,12 +181,14 @@ export const NAV_CATEGORIES: NavCategory[] = [
         brand: siMlflow,
         label: 'MLflow',
         disabled: true,
+        defaultHidden: true,
         collapsedTitle: 'MLflow — exploration',
       },
       {
         icon: 'pi pi-send',
         label: 'KServe',
         disabled: true,
+        defaultHidden: true,
         collapsedTitle: 'KServe — exploration',
       },
     ],

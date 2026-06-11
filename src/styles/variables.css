@@ -45,6 +45,7 @@
   --db-danger: #dc2626;
 
   /* ========== Design Tokens ========== */
+  --db-radius-xs: 6px;
   --db-radius-sm: 8px;
   --db-radius-md: 12px;
   --db-radius-lg: 16px;

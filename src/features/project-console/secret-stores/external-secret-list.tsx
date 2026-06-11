@@ -462,7 +462,7 @@ export function ExternalSecretList() {
             field="secretStoreRef"
             style={{ width: '16%' }}
             body={(es: ExternalSecret) => (
-              <span className="inline-flex items-center gap-1.5 rounded-[4px] border border-border-light bg-surface-secondary px-2 py-[3px] text-[12px] font-medium text-fg-secondary">
+              <span className="inline-flex items-center gap-1.5 rounded-xs border border-border-light bg-surface-secondary px-2 py-[3px] text-[12px] font-medium text-fg-secondary">
                 <i className="pi pi-database text-[11px]"></i>
                 {es.secretStoreRef}
               </span>
@@ -561,7 +561,7 @@ export function ExternalSecretList() {
           <div className="field">
             <label htmlFor="storeRef">Secret Store</label>
             {readyStores.length === 0 ? (
-              <div className="flex items-center gap-2 rounded-[6px] border border-[#ffe0b2] bg-[#fff3e0] px-3 py-2.5 text-[13px] text-[#e65100]">
+              <div className="flex items-center gap-2 rounded-md border border-[#ffe0b2] bg-[#fff3e0] px-3 py-2.5 text-[13px] text-[#e65100]">
                 <i className="pi pi-info-circle shrink-0 text-[14px]"></i>
                 <span>
                   No ready secret stores available. Create and connect a secret store first.
@@ -615,7 +615,7 @@ export function ExternalSecretList() {
             {dataMappings.map((mapping, index) => (
               <div
                 key={index}
-                className="rounded-[6px] border border-border-light bg-surface-secondary px-3 py-2.5"
+                className="rounded-md border border-border-light bg-surface-secondary px-3 py-2.5"
               >
                 <div className="flex items-end gap-2">
                   <div className="flex flex-1 flex-col gap-1">

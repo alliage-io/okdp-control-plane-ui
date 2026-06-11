@@ -113,7 +113,7 @@ export function StatusDetailContent({
                           </span>
                           {cond.reason && (
                             <span
-                              className={`rounded-[4px] px-2 py-0.5 text-[11px] font-medium ${
+                              className={`rounded-xs px-2 py-0.5 text-[11px] font-medium ${
                                 ok
                                   ? 'bg-[rgba(30,142,62,0.1)] text-[#1e8e3e]'
                                   : 'bg-[rgba(211,47,47,0.1)] text-[#c62828]'
@@ -125,7 +125,7 @@ export function StatusDetailContent({
                         </div>
                         {cond.message && (
                           <pre
-                            className={`m-0 max-h-[120px] overflow-y-auto rounded-[4px] border border-border-light bg-surface px-2.5 py-2 text-[12px] leading-normal whitespace-pre-wrap text-fg-secondary [word-break:break-word] ${MONO_FONT_CLASS}`}
+                            className={`m-0 max-h-[120px] overflow-y-auto rounded-xs border border-border-light bg-surface px-2.5 py-2 text-[12px] leading-normal whitespace-pre-wrap text-fg-secondary [word-break:break-word] ${MONO_FONT_CLASS}`}
                           >
                             {cond.message}
                           </pre>

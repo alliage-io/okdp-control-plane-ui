@@ -154,23 +154,23 @@ Spark and Spark History Server currently use the same icon.
 
 Rounded corners are inconsistent across form inputs, buttons, tiles, and view elements.
 
-* [ ] Audit existing `border-radius` values.
-* [ ] Define shared radius values or reuse existing design tokens.
-* [ ] Apply consistent radius values to text inputs.
-* [ ] Apply consistent radius values to selects.
-* [ ] Apply consistent radius values to textareas.
-* [ ] Apply consistent radius values to buttons.
-* [ ] Apply consistent radius values to tiles.
-* [ ] Apply consistent radius values to cards.
-* [ ] Apply consistent radius values to panels and main containers.
-* [ ] Avoid one-off radius values unless clearly justified.
+* [x] Audit existing `border-radius` values.
+* [x] Define shared radius values or reuse existing design tokens.
+* [x] Apply consistent radius values to text inputs.
+* [x] Apply consistent radius values to selects.
+* [x] Apply consistent radius values to textareas.
+* [x] Apply consistent radius values to buttons.
+* [x] Apply consistent radius values to tiles.
+* [x] Apply consistent radius values to cards.
+* [x] Apply consistent radius values to panels and main containers.
+* [x] Avoid one-off radius values unless clearly justified. *(Remaining: 3px scrollbar thumb, 1px decorative separator line — both intentional.)*
 
 ### Acceptance criteria
 
-* [ ] Similar UI elements use the same border radius.
-* [ ] Form controls look consistent.
-* [ ] Tiles and cards look consistent.
-* [ ] No obvious rounded-corner mismatch remains.
+* [x] Similar UI elements use the same border radius.
+* [x] Form controls look consistent.
+* [x] Tiles and cards look consistent.
+* [x] No obvious rounded-corner mismatch remains.
 
 ---
 

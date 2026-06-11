@@ -28,9 +28,9 @@ import { StatusDetailContent } from './status-detail';
 const SECTION_TITLE_CLASS = 'm-0 mb-3 text-[14px] font-semibold text-fg';
 const DIVIDER_CLASS = 'my-4 border-0 border-t border-t-border';
 const MODE_SWITCH_CLASS =
-  'mb-4 flex rounded-[6px] border border-border-light bg-surface-secondary p-1';
+  'mb-4 flex rounded-sm border border-border-light bg-surface-secondary p-1';
 const MODE_BTN_CLASS =
-  'flex-1 cursor-pointer rounded-[4px] border-none p-2 transition-all duration-200';
+  'flex-1 cursor-pointer rounded-xs border-none p-2 transition-all duration-200';
 const MODE_BTN_ACTIVE_CLASS = 'bg-surface font-semibold text-fg shadow-[0_1px_3px_rgba(0,0,0,0.1)]';
 const MODE_BTN_IDLE_CLASS = 'bg-transparent font-medium text-fg-secondary';
 
@@ -469,7 +469,7 @@ export function SecretStoreList() {
               <>
                 <span className="font-medium">{store.name}</span>
                 {store.isDefault && (
-                  <span className="ml-2 rounded-[4px] bg-[#e6f4ea] px-2 py-[3px] text-[11px] font-medium text-[#1e8e3e] os-dark:bg-[rgba(21,101,192,0.3)] os-dark:text-[#90caf9]">
+                  <span className="ml-2 rounded-xs bg-[#e6f4ea] px-2 py-[3px] text-[11px] font-medium text-[#1e8e3e] os-dark:bg-[rgba(21,101,192,0.3)] os-dark:text-[#90caf9]">
                     default
                   </span>
                 )}
@@ -481,7 +481,7 @@ export function SecretStoreList() {
             field="provider"
             style={{ width: '12%' }}
             body={(store: SecretStore) => (
-              <span className="inline-flex items-center gap-1.5 rounded-[4px] border border-border-light bg-surface-secondary px-2 py-[3px] text-[12px] font-medium text-fg-secondary capitalize">
+              <span className="inline-flex items-center gap-1.5 rounded-xs border border-border-light bg-surface-secondary px-2 py-[3px] text-[12px] font-medium text-fg-secondary capitalize">
                 <i className="pi pi-shield text-[11px]"></i>
                 {store.provider}
               </span>

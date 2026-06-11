@@ -89,6 +89,7 @@
   --color-danger: var(--db-danger);
 
   /* ===== Radii ===== */
+  --radius-xs: var(--db-radius-xs);
   --radius-sm: var(--db-radius-sm);
   --radius-md: var(--db-radius-md);
   --radius-lg: var(--db-radius-lg);
@@ -279,10 +280,6 @@
 @utility animate-in {
   animation: fadeInUp 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
-
-
-
-
 
 /* ========== Cursor ========== */
 button,
@@ -486,18 +483,36 @@ button.create-btn:hover,
    plain (unlayered) CSS so they keep overriding the unlayered PrimeReact
    theme stylesheet. */
 
+/* The lara theme renders dialogs at 6px (the --p-dialog-border-radius token
+   is inert with PrimeReact 10); align the frame on the same 2xl radius as
+   the glass tables. Header and footer corners must match the frame because
+   the dialog root does not clip its children. */
+.db-dialog.p-dialog {
+  border-radius: var(--db-radius-2xl);
+}
+
 .db-dialog .p-dialog-header {
   padding: var(--db-space-lg) var(--db-space-xl) var(--db-space-sm) var(--db-space-xl);
   border-bottom: none;
+  border-top-left-radius: var(--db-radius-2xl);
+  border-top-right-radius: var(--db-radius-2xl);
 }
 
 .db-dialog .p-dialog-content {
   padding: var(--db-space-sm) var(--db-space-xl) var(--db-space-lg) var(--db-space-xl);
 }
 
+/* Footer-less dialogs: the content pane carries the bottom corners. */
+.db-dialog .p-dialog-content:last-of-type {
+  border-bottom-left-radius: var(--db-radius-2xl);
+  border-bottom-right-radius: var(--db-radius-2xl);
+}
+
 .db-dialog .p-dialog-footer {
   padding: var(--db-space-md) var(--db-space-xl);
   border-top: 1px solid var(--db-border-light);
+  border-bottom-left-radius: var(--db-radius-2xl);
+  border-bottom-right-radius: var(--db-radius-2xl);
 }
 
 /* Dialog content layout patterns */
@@ -516,6 +531,28 @@ button.create-btn:hover,
 /* Unified Form Styles
    PrimeNG input theming is handled via CSS vars in variables.css:
    --p-inputtext-border-radius, --p-inputtext-focus-border-color, etc. */
+
+/* Uniform control corners. PrimeReact 10's lara theme hardcodes 6px on
+   inputs and buttons (the --p-*-border-radius tokens in variables.css are
+   PrimeNG-era and inert here), so every regular control aligns on the md
+   token instead. Circular .p-button-rounded buttons and fused input-group
+   corners keep their theme values through higher-specificity theme rules. */
+.p-inputtext,
+.p-dropdown,
+.p-multiselect,
+.p-button:not(.p-button-rounded) {
+  border-radius: var(--db-radius-md);
+}
+
+/* Stacked InputNumber spinners: keep the fused inner edge flat and align
+   the outer corners on the same md radius as their input. */
+.p-inputnumber-buttons-stacked .p-inputnumber-button-up {
+  border-radius: 0 var(--db-radius-md) 0 0;
+}
+
+.p-inputnumber-buttons-stacked .p-inputnumber-button-down {
+  border-radius: 0 0 var(--db-radius-md) 0;
+}
 
 @utility field {
   display: flex;
@@ -749,7 +786,7 @@ button.create-btn:hover,
   background: var(--db-bg-primary);
   color: var(--db-text-secondary);
   border: 1px solid var(--db-border-light);
-  border-radius: 999px;
+  border-radius: var(--db-radius-full);
   font: inherit;
   font-size: 13px;
   font-weight: 500;
@@ -769,7 +806,7 @@ button.create-btn:hover,
     background: var(--db-bg-tertiary);
     color: var(--db-text-secondary);
     padding: 1px 8px;
-    border-radius: 999px;
+    border-radius: var(--db-radius-full);
     font-size: 11px;
     font-weight: 600;
     font-family: 'JetBrains Mono', ui-monospace, monospace;
@@ -916,7 +953,7 @@ button.create-btn:hover,
   color: var(--db-text-secondary);
   font-size: 11.5px;
   padding: 2px 8px;
-  border-radius: 6px;
+  border-radius: var(--db-radius-xs);
   border: 1px solid var(--db-border-light);
   font-weight: 500;
 }
@@ -969,7 +1006,7 @@ button.create-btn:hover,
   align-items: center;
   gap: 5px;
   padding: 2px 9px;
-  border-radius: 999px;
+  border-radius: var(--db-radius-full);
   font-size: 11.5px;
   font-weight: 600;
   background: var(--db-bg-tertiary);
@@ -1069,7 +1106,7 @@ button.create-btn:hover,
   text-decoration: none;
   font-weight: 500;
   padding: 4px 10px 4px 8px;
-  border-radius: 999px;
+  border-radius: var(--db-radius-full);
   transition: all var(--db-transition-base);
   &:hover {
     background: var(--db-bg-tertiary);
@@ -1183,7 +1220,7 @@ button.create-btn:hover,
   font-size: 10.5px;
   font-weight: 700;
   padding: 1px 7px;
-  border-radius: 999px;
+  border-radius: var(--db-radius-full);
   font-family: 'JetBrains Mono', ui-monospace, monospace;
 }
 
@@ -1260,7 +1297,7 @@ button.create-btn:hover,
 @utility section-icon-badge {
   width: 30px;
   height: 30px;
-  border-radius: 8px;
+  border-radius: var(--db-radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1364,7 +1401,7 @@ button.create-btn:hover,
 
 @utility metric-bar {
   height: 8px;
-  border-radius: 999px;
+  border-radius: var(--db-radius-full);
   background: var(--db-bg-tertiary);
   overflow: hidden;
   position: relative;
@@ -1372,7 +1409,7 @@ button.create-btn:hover,
 
 @utility metric-fill {
   height: 100%;
-  border-radius: 999px;
+  border-radius: var(--db-radius-full);
   transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
   background: var(--db-primary);
   &.tone-warn {
@@ -1702,7 +1739,7 @@ button.create-btn:hover,
   margin-bottom: 16px;
   background: color-mix(in oklab, var(--db-primary) 7%, transparent);
   border: 1px solid color-mix(in oklab, var(--db-primary) 22%, transparent);
-  border-radius: 10px;
+  border-radius: var(--db-radius-md);
   font-size: 13px;
   line-height: 1.55;
   color: var(--db-text-primary);
@@ -1870,10 +1907,7 @@ body.dark-mode .p-menu .p-menuitem > .p-menuitem-content .p-menuitem-link .p-men
 }
 
 body.dark-mode .p-menu .p-menuitem:not(.p-highlight):not(.p-disabled).p-focus > .p-menuitem-content,
-body.dark-mode
-  .p-menu
-  .p-menuitem:not(.p-highlight):not(.p-disabled)
-  > .p-menuitem-content:hover {
+body.dark-mode .p-menu .p-menuitem:not(.p-highlight):not(.p-disabled) > .p-menuitem-content:hover {
   background: var(--db-bg-tertiary);
   color: var(--db-text-primary);
 }
@@ -2047,10 +2081,19 @@ body.dark-mode .p-multiselect-panel .p-multiselect-items .p-multiselect-item {
   color: var(--db-text-primary);
 }
 
-body.dark-mode .p-dropdown-panel .p-dropdown-items .p-dropdown-item:not(.p-highlight):not(.p-disabled):hover,
+body.dark-mode
+  .p-dropdown-panel
+  .p-dropdown-items
+  .p-dropdown-item:not(.p-highlight):not(.p-disabled):hover,
 body.dark-mode .p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-focus:not(.p-highlight),
-body.dark-mode .p-multiselect-panel .p-multiselect-items .p-multiselect-item:not(.p-highlight):not(.p-disabled):hover,
-body.dark-mode .p-multiselect-panel .p-multiselect-items .p-multiselect-item.p-focus:not(.p-highlight) {
+body.dark-mode
+  .p-multiselect-panel
+  .p-multiselect-items
+  .p-multiselect-item:not(.p-highlight):not(.p-disabled):hover,
+body.dark-mode
+  .p-multiselect-panel
+  .p-multiselect-items
+  .p-multiselect-item.p-focus:not(.p-highlight) {
   background: var(--db-bg-tertiary);
   color: var(--db-text-primary);
 }
@@ -2163,7 +2206,8 @@ body.dark-mode .p-button.p-button-text:not(.p-button-danger):not(.p-button-secon
   color: var(--db-primary);
 }
 
-body.dark-mode .p-button.p-button-text:not(.p-button-danger):not(.p-button-secondary):enabled:hover {
+body.dark-mode
+  .p-button.p-button-text:not(.p-button-danger):not(.p-button-secondary):enabled:hover {
   background: var(--db-primary-50);
   color: var(--db-primary);
 }

@@ -1,5 +1,4 @@
 import { useProjectContext } from '../../../core/context/project-context';
-import WelcomeBanner from '../../../shared/components/welcome-banner';
 import SectionHeading from '../../../shared/components/section-heading';
 import { ActionCard, QuickActions } from '../../../shared/components/action-card';
 import EmptyState from '../../../shared/components/empty-state';
@@ -13,11 +12,12 @@ export default function ProjectHome() {
     <section className="flex animate-[fadeInUp_0.4s_ease-out] flex-col gap-7">
       {project ? (
         <>
-          <WelcomeBanner
-            icon="pi pi-th-large"
-            title={project.name}
-            subtitle={project.description || 'Project Dashboard'}
-          />
+          <div>
+            <h1>Overview</h1>
+            {project.description && (
+              <p className="mt-1 text-base text-fg-secondary">{project.description}</p>
+            )}
+          </div>
 
           <SectionHeading>Quick Actions</SectionHeading>
           <QuickActions>

@@ -19,7 +19,7 @@
    element's margin/padding/border), stripping PrimeReact components bare.
    Declaring the order up front slots `primereact` above preflight while
    keeping utilities strongest. */
-@layer theme, base, primereact, components, utilities;
+@layer theme, base, primereact, primereact-overrides, components, utilities;
 
 @import 'tailwindcss';
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
@@ -325,52 +325,6 @@ h1 {
   letter-spacing: -0.01em;
 }
 
-/* =========================================
-   Buttons — Consolidated
-   ========================================= */
-
-/* Primary action button (PrimeNG-compatible) */
-button.create-btn,
-.p-button.create-btn {
-  background-color: var(--db-primary);
-  color: white;
-  border: none;
-  border-radius: var(--db-radius-md);
-  padding: 7px 14px;
-  font-weight: 500;
-  font-size: var(--db-font-size-md);
-  cursor: pointer;
-  transition: background var(--db-transition-base);
-}
-
-button.create-btn:hover,
-.p-button.create-btn:hover {
-  background-color: var(--db-primary-hover);
-}
-
-/* Secondary button */
-.btn-secondary {
-  background: var(--db-bg-primary);
-  color: var(--db-text-primary);
-  border: 1px solid var(--db-border-color);
-  padding: 7px var(--db-space-md);
-  border-radius: var(--db-radius-md);
-  cursor: pointer;
-  font-weight: 500;
-  font-size: var(--db-font-size-md);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition:
-    background var(--db-transition-base),
-    border-color var(--db-transition-base);
-}
-
-.btn-secondary:hover {
-  background: var(--db-bg-tertiary);
-  border-color: var(--db-border-color);
-}
-
 /* Row-level actions */
 .actions {
   display: flex;
@@ -418,98 +372,102 @@ button.create-btn:hover,
   }
 }
 
-/* Unified Table Styles
-   These rules style PrimeReact DataTable internals through the
-   .minimal-table wrapper class. They stay unlayered so they override the
-   lara theme, which ships in @layer primereact (unlayered rules outrank
-   any cascade layer). They target the DataTable's internal DOM, so they
-   cannot be Tailwind @utility classes, and PrimeReact 10's styled theme
-   exposes no design tokens to retheme through. */
+/* ============================================================
+   PrimeReact overrides — @layer primereact-overrides
 
-.p-datatable.minimal-table {
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  border-radius: var(--db-radius-2xl);
-  overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.03);
+   The lara theme ships in @layer primereact and reads no design tokens, so
+   these rules re-theme PrimeReact's internal DOM. The layer is ordered
+   after primereact (so these win over the theme) but before utilities (so
+   Tailwind classes still win). They can't be Tailwind @utility classes —
+   they target descendant structure, not single elements. Collected here as
+   several merged `@layer primereact-overrides` blocks.
+   ============================================================ */
+
+/* DataTable internals via the .minimal-table wrapper. */
+@layer primereact-overrides {
+  .p-datatable.minimal-table {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-radius: var(--db-radius-2xl);
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.03);
+  }
+
+  .p-datatable.minimal-table .p-datatable-header {
+    display: none;
+  }
+
+  .p-datatable.minimal-table .p-datatable-thead > tr > th {
+    background: rgba(255, 255, 255, 0.6);
+    color: var(--db-text-secondary);
+    font-weight: 700;
+    font-size: var(--db-font-size-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 16px 20px;
+    text-align: left;
+    border: none;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.04);
+  }
+
+  .p-datatable.minimal-table .p-datatable-tbody > tr {
+    transition: background-color var(--db-transition-fast);
+  }
+
+  .p-datatable.minimal-table .p-datatable-tbody > tr > td {
+    padding: 18px 20px;
+    color: var(--db-text-primary);
+    font-size: var(--db-font-size-base);
+    font-weight: 500;
+    line-height: var(--db-line-height-base);
+    border: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+  }
+
+  .p-datatable.minimal-table .p-datatable-tbody > tr:last-child > td {
+    border-bottom: none;
+  }
+
+  .p-datatable.minimal-table .p-datatable-tbody > tr:hover {
+    background-color: rgba(255, 255, 255, 0.85) !important;
+  }
 }
 
-.p-datatable.minimal-table .p-datatable-header {
-  display: none;
-}
-
-.p-datatable.minimal-table .p-datatable-thead > tr > th {
-  background: rgba(255, 255, 255, 0.6);
-  color: var(--db-text-secondary);
-  font-weight: 700;
-  font-size: var(--db-font-size-sm);
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  padding: 16px 20px;
-  text-align: left;
-  border: none;
-  border-bottom: 2px solid rgba(0, 0, 0, 0.04);
-}
-
-.p-datatable.minimal-table .p-datatable-tbody > tr {
-  transition: background-color var(--db-transition-fast);
-}
-
-.p-datatable.minimal-table .p-datatable-tbody > tr > td {
-  padding: 18px 20px;
-  color: var(--db-text-primary);
-  font-size: var(--db-font-size-base);
-  font-weight: 500;
-  line-height: var(--db-line-height-base);
-  border: none;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
-}
-
-.p-datatable.minimal-table .p-datatable-tbody > tr:last-child > td {
-  border-bottom: none;
-}
-
-.p-datatable.minimal-table .p-datatable-tbody > tr:hover {
-  background-color: rgba(255, 255, 255, 0.85) !important;
-}
-
-/* Global Dialog Styles
-   The .db-dialog rules style PrimeReact Dialog internals; they stay
-   unlayered so they keep overriding the lara theme (which ships in
-   @layer primereact — unlayered rules outrank any cascade layer). */
-
-/* The lara theme hardcodes a 6px dialog radius and reads no design token;
+/* Global Dialog Styles — .db-dialog styles PrimeReact Dialog internals. */
+@layer primereact-overrides {
+  /* The lara theme hardcodes a 6px dialog radius and reads no design token;
    align the frame on the same 2xl radius as the glass tables. Header and
    footer corners must match the frame because the dialog root does not
    clip its children. */
-.db-dialog.p-dialog {
-  border-radius: var(--db-radius-2xl);
-}
+  .db-dialog.p-dialog {
+    border-radius: var(--db-radius-2xl);
+  }
 
-.db-dialog .p-dialog-header {
-  padding: var(--db-space-lg) var(--db-space-xl) var(--db-space-sm) var(--db-space-xl);
-  border-bottom: none;
-  border-top-left-radius: var(--db-radius-2xl);
-  border-top-right-radius: var(--db-radius-2xl);
-}
+  .db-dialog .p-dialog-header {
+    padding: var(--db-space-lg) var(--db-space-xl) var(--db-space-sm) var(--db-space-xl);
+    border-bottom: none;
+    border-top-left-radius: var(--db-radius-2xl);
+    border-top-right-radius: var(--db-radius-2xl);
+  }
 
-.db-dialog .p-dialog-content {
-  padding: var(--db-space-sm) var(--db-space-xl) var(--db-space-lg) var(--db-space-xl);
-}
+  .db-dialog .p-dialog-content {
+    padding: var(--db-space-sm) var(--db-space-xl) var(--db-space-lg) var(--db-space-xl);
+  }
 
-/* Footer-less dialogs: the content pane carries the bottom corners. */
-.db-dialog .p-dialog-content:last-of-type {
-  border-bottom-left-radius: var(--db-radius-2xl);
-  border-bottom-right-radius: var(--db-radius-2xl);
-}
+  /* Footer-less dialogs: the content pane carries the bottom corners. */
+  .db-dialog .p-dialog-content:last-of-type {
+    border-bottom-left-radius: var(--db-radius-2xl);
+    border-bottom-right-radius: var(--db-radius-2xl);
+  }
 
-.db-dialog .p-dialog-footer {
-  padding: var(--db-space-md) var(--db-space-xl);
-  border-top: 1px solid var(--db-border-light);
-  border-bottom-left-radius: var(--db-radius-2xl);
-  border-bottom-right-radius: var(--db-radius-2xl);
+  .db-dialog .p-dialog-footer {
+    padding: var(--db-space-md) var(--db-space-xl);
+    border-top: 1px solid var(--db-border-light);
+    border-bottom-left-radius: var(--db-radius-2xl);
+    border-bottom-right-radius: var(--db-radius-2xl);
+  }
 }
 
 /* Dialog content layout patterns */
@@ -525,30 +483,28 @@ button.create-btn:hover,
   gap: 8px;
 }
 
-/* Unified Form Styles
-   PrimeReact 10's lara theme hardcodes its input styling and reads no
-   design tokens, so form theming uses the unlayered overrides below
-   rather than CSS variables. */
+/* Unified Form Styles — control corners (the lara theme hardcodes them). */
+@layer primereact-overrides {
+  /* Uniform control corners. The lara theme hardcodes 6px on inputs and
+   buttons, so every regular control aligns on the md token instead.
+   Circular .p-button-rounded buttons and fused input-group corners keep
+   their theme values through higher-specificity theme rules. */
+  .p-inputtext,
+  .p-dropdown,
+  .p-multiselect,
+  .p-button:not(.p-button-rounded) {
+    border-radius: var(--db-radius-md);
+  }
 
-/* Uniform control corners. PrimeReact 10's lara theme hardcodes 6px on
-   inputs and buttons, so every regular control aligns on the md
-   token instead. Circular .p-button-rounded buttons and fused input-group
-   corners keep their theme values through higher-specificity theme rules. */
-.p-inputtext,
-.p-dropdown,
-.p-multiselect,
-.p-button:not(.p-button-rounded) {
-  border-radius: var(--db-radius-md);
-}
-
-/* Stacked InputNumber spinners: keep the fused inner edge flat and align
+  /* Stacked InputNumber spinners: keep the fused inner edge flat and align
    the outer corners on the same md radius as their input. */
-.p-inputnumber-buttons-stacked .p-inputnumber-button-up {
-  border-radius: 0 var(--db-radius-md) 0 0;
-}
+  .p-inputnumber-buttons-stacked .p-inputnumber-button-up {
+    border-radius: 0 var(--db-radius-md) 0 0;
+  }
 
-.p-inputnumber-buttons-stacked .p-inputnumber-button-down {
-  border-radius: 0 0 var(--db-radius-md) 0;
+  .p-inputnumber-buttons-stacked .p-inputnumber-button-down {
+    border-radius: 0 0 var(--db-radius-md) 0;
+  }
 }
 
 @utility field {
@@ -565,39 +521,40 @@ button.create-btn:hover,
   }
 }
 
-/* Common input class. Applied to PrimeReact InputText components, so it
-   stays unlayered to keep overriding the lara theme's .p-inputtext rules
-   (the theme ships in @layer primereact; unlayered rules outrank it). */
-.dialog-input {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 9px 12px;
-  font-size: var(--db-font-size-md);
-  font-family: inherit;
-  border-radius: var(--db-radius-md);
-  border: 1px solid var(--db-border-light);
-  background: var(--db-bg-primary);
-  color: var(--db-text-primary);
-  transition:
-    border-color var(--db-transition-base),
-    box-shadow var(--db-transition-base);
-}
+/* Common input class. Applied to PrimeReact InputText components; in
+   primereact-overrides so it beats the lara theme's .p-inputtext rules. */
+@layer primereact-overrides {
+  .dialog-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 9px 12px;
+    font-size: var(--db-font-size-md);
+    font-family: inherit;
+    border-radius: var(--db-radius-md);
+    border: 1px solid var(--db-border-light);
+    background: var(--db-bg-primary);
+    color: var(--db-text-primary);
+    transition:
+      border-color var(--db-transition-base),
+      box-shadow var(--db-transition-base);
+  }
 
-.dialog-input:hover {
-  border-color: var(--db-border-color);
-}
+  .dialog-input:hover {
+    border-color: var(--db-border-color);
+  }
 
-.dialog-input:focus {
-  border-color: var(--db-primary);
-  box-shadow: var(--db-shadow-focus);
-  outline: none;
-}
+  .dialog-input:focus {
+    border-color: var(--db-primary);
+    box-shadow: var(--db-shadow-focus);
+    outline: none;
+  }
 
-.dialog-input:disabled {
-  background: var(--db-bg-tertiary);
-  color: var(--db-text-muted);
-  cursor: not-allowed;
-  opacity: 0.7;
+  .dialog-input:disabled {
+    background: var(--db-bg-tertiary);
+    color: var(--db-text-muted);
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
 }
 
 @utility optional {
@@ -685,21 +642,23 @@ button.create-btn:hover,
 }
 
 /* ========== Buttons ========== */
-/* Legacy cascade: the page-layout section above defines button.create-btn /
-   .p-button.create-btn and .btn-secondary for the admin pages; these
-   stay unlayered to preserve today's specificity interplay until the
-   feature pages migrate. */
+/* The single definitions of the app's primary/secondary buttons, applied to
+   native <button> and to PrimeReact <Button className>. Kept unlayered so
+   they override the lara .p-button theme (which ships in @layer primereact —
+   unlayered rules outrank any cascade layer). */
 .create-btn {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 8px 14px;
+  /* 7px / font-size-md preserve the footprint the old duplicate definition
+     produced by specificity; only the duplication was removed. */
+  padding: 7px 14px;
   background: var(--db-primary);
   color: #fff;
   border: none;
   border-radius: var(--db-radius-md);
   font: inherit;
-  font-size: 14px;
+  font-size: var(--db-font-size-md);
   font-weight: 500;
   cursor: pointer;
   box-shadow: 0 1px 2px rgba(65, 146, 143, 0.25);
@@ -1768,138 +1727,137 @@ button.create-btn:hover,
   }
 }
 
-/* PrimeReact-internal overrides that cannot be expressed as Tailwind
-   utilities: they target PrimeReact's internal DOM (descendant selectors),
-   not single elements. The lara theme ships in @layer primereact and
-   exposes no design tokens, so these stay unlayered to override it.
-   Keep this file small. */
+/* PrimeReact-internal overrides (continued) — the remaining component
+   skins plus the dark-mode re-skin, all in @layer primereact-overrides.
+   The native (non-PrimeReact) dark status utilities live after this block,
+   unlayered, because they must out-rank Tailwind's utilities layer. */
+@layer primereact-overrides {
+  /* DynamicSchemaForm — invalid-field highlight on PrimeReact inputs */
+  .dsf-root .field-invalid,
+  .dsf-root .field-invalid.p-inputtext {
+    border-color: var(--db-danger, #dc2626) !important;
+    background-color: rgba(220, 38, 38, 0.04);
+  }
 
-/* DynamicSchemaForm — invalid-field highlight on PrimeReact inputs */
-.dsf-root .field-invalid,
-.dsf-root .field-invalid.p-inputtext {
-  border-color: var(--db-danger, #dc2626) !important;
-  background-color: rgba(220, 38, 38, 0.04);
-}
+  /* Project console header — borderless project-switcher Dropdown */
+  .project-switcher .p-dropdown {
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    transition: background var(--db-transition-fast);
+    border-radius: var(--db-radius-md);
+    padding: 2px 6px;
+  }
 
-/* Project console header — borderless project-switcher Dropdown */
-.project-switcher .p-dropdown {
-  border: none;
-  background: transparent;
-  box-shadow: none;
-  transition: background var(--db-transition-fast);
-  border-radius: var(--db-radius-md);
-  padding: 2px 6px;
-}
+  .project-switcher .p-dropdown .p-dropdown-label {
+    padding: 4px 6px;
+    font-weight: 600;
+    font-size: var(--db-font-size-md);
+    color: var(--db-text-primary);
+    letter-spacing: -0.01em;
+  }
 
-.project-switcher .p-dropdown .p-dropdown-label {
-  padding: 4px 6px;
-  font-weight: 600;
-  font-size: var(--db-font-size-md);
-  color: var(--db-text-primary);
-  letter-spacing: -0.01em;
-}
+  .project-switcher .p-dropdown .p-dropdown-trigger {
+    color: var(--db-text-muted);
+    width: 1.5rem;
+  }
 
-.project-switcher .p-dropdown .p-dropdown-trigger {
-  color: var(--db-text-muted);
-  width: 1.5rem;
-}
+  .project-switcher .p-dropdown:not(.p-disabled):hover {
+    background: var(--db-bg-tertiary);
+  }
 
-.project-switcher .p-dropdown:not(.p-disabled):hover {
-  background: var(--db-bg-tertiary);
-}
+  .project-switcher .p-dropdown:focus-within {
+    box-shadow: none;
+  }
 
-.project-switcher .p-dropdown:focus-within {
-  box-shadow: none;
-}
+  /* Project-switcher dropdown panel (appended to document.body) */
+  .project-dropdown-panel.p-dropdown-panel {
+    background: var(--db-bg-primary);
+    border: 1px solid var(--db-border-light);
+    border-radius: var(--db-radius-lg);
+    box-shadow: var(--db-shadow-lg);
+    margin-top: 4px;
+    padding: 4px;
+  }
 
-/* Project-switcher dropdown panel (appended to document.body) */
-.project-dropdown-panel.p-dropdown-panel {
-  background: var(--db-bg-primary);
-  border: 1px solid var(--db-border-light);
-  border-radius: var(--db-radius-lg);
-  box-shadow: var(--db-shadow-lg);
-  margin-top: 4px;
-  padding: 4px;
-}
+  .project-dropdown-panel .p-dropdown-items-wrapper {
+    padding: 0;
+  }
 
-.project-dropdown-panel .p-dropdown-items-wrapper {
-  padding: 0;
-}
+  .project-dropdown-panel .p-dropdown-item {
+    border-radius: var(--db-radius-sm);
+    margin-bottom: 1px;
+    padding: 6px 10px;
+    transition: background var(--db-transition-fast);
+    color: var(--db-text-secondary);
+    font-size: var(--db-font-size-base);
+  }
 
-.project-dropdown-panel .p-dropdown-item {
-  border-radius: var(--db-radius-sm);
-  margin-bottom: 1px;
-  padding: 6px 10px;
-  transition: background var(--db-transition-fast);
-  color: var(--db-text-secondary);
-  font-size: var(--db-font-size-base);
-}
+  .project-dropdown-panel .p-dropdown-item:hover,
+  .project-dropdown-panel .p-dropdown-item.p-focus {
+    background: var(--db-bg-secondary);
+    color: var(--db-text-primary);
+  }
 
-.project-dropdown-panel .p-dropdown-item:hover,
-.project-dropdown-panel .p-dropdown-item.p-focus {
-  background: var(--db-bg-secondary);
-  color: var(--db-text-primary);
-}
+  .project-dropdown-panel .p-dropdown-item.p-highlight {
+    background: var(--db-primary-50);
+    color: var(--db-primary);
+    font-weight: 500;
+  }
 
-.project-dropdown-panel .p-dropdown-item.p-highlight {
-  background: var(--db-primary-50);
-  color: var(--db-primary);
-  font-weight: 500;
-}
+  /* Identity & secrets pages — TabView spacing and tab panel animation */
+  .identity-page .p-tabview-nav,
+  .secrets-page .p-tabview-nav {
+    gap: 24px;
+    padding-left: 4px;
+  }
 
-/* Identity & secrets pages — TabView spacing and tab panel animation */
-.identity-page .p-tabview-nav,
-.secrets-page .p-tabview-nav {
-  gap: 24px;
-  padding-left: 4px;
-}
+  .identity-page .p-tabview-panel,
+  .secrets-page .p-tabview-panel {
+    animation: fadeIn 0.25s ease-out;
+  }
 
-.identity-page .p-tabview-panel,
-.secrets-page .p-tabview-panel {
-  animation: fadeIn 0.25s ease-out;
-}
+  /* Landing page — primary sign-in Button skin */
+  .login-btn {
+    width: 100%;
+    padding: 10px 1.5rem;
+    font-size: var(--db-font-size-md);
+    font-weight: 500;
+    justify-content: center;
+    background: var(--db-primary);
+    border-color: var(--db-primary);
+    border-radius: var(--db-radius-md);
+    transition: background var(--db-transition-base);
+  }
 
-/* Landing page — primary sign-in Button skin */
-.login-btn {
-  width: 100%;
-  padding: 10px 1.5rem;
-  font-size: var(--db-font-size-md);
-  font-weight: 500;
-  justify-content: center;
-  background: var(--db-primary);
-  border-color: var(--db-primary);
-  border-radius: var(--db-radius-md);
-  transition: background var(--db-transition-base);
-}
+  .login-btn:hover {
+    background: var(--db-primary-hover);
+    border-color: var(--db-primary-hover);
+  }
 
-.login-btn:hover {
-  background: var(--db-primary-hover);
-  border-color: var(--db-primary-hover);
-}
+  /* ProfileListEditor — borderless inline Panel for the Resources section */
+  .resource-panel .p-panel-header {
+    padding: 10px 0;
+    background: transparent;
+    border: none;
+    border-top: 1px solid var(--db-border-light);
+  }
 
-/* ProfileListEditor — borderless inline Panel for the Resources section */
-.resource-panel .p-panel-header {
-  padding: 10px 0;
-  background: transparent;
-  border: none;
-  border-top: 1px solid var(--db-border-light);
-}
+  .resource-panel .p-panel-content {
+    padding: 14px 0 0 0;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
 
-.resource-panel .p-panel-content {
-  padding: 14px 0 0 0;
-  border: none;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
+  .resource-panel .p-panel-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--db-text-secondary);
+  }
 
-.resource-panel .p-panel-title {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--db-text-secondary);
-}
-
-/* ============================================================
+  /* ============================================================
    9. Dark mode — PrimeReact component surfaces
    ============================================================
    variables.css flips the --db-* tokens under body.dark-mode, which
@@ -1908,364 +1866,424 @@ button.create-btn:hover,
    unlayered overrides below re-skin the components the app uses so
    they follow the flipped tokens. */
 
-/* ===== Popup menus ===== */
-body.dark-mode .p-menu {
-  background: var(--db-bg-elevated);
-  color: var(--db-text-primary);
-  border: 1px solid var(--db-border-color);
+  /* ===== Popup menus ===== */
+  body.dark-mode .p-menu {
+    background: var(--db-bg-elevated);
+    color: var(--db-text-primary);
+    border: 1px solid var(--db-border-color);
+  }
+
+  body.dark-mode .p-menu .p-menuitem > .p-menuitem-content {
+    color: var(--db-text-primary);
+  }
+
+  body.dark-mode .p-menu .p-menuitem > .p-menuitem-content .p-menuitem-link .p-menuitem-text,
+  body.dark-mode .p-menu .p-menuitem > .p-menuitem-content .p-menuitem-link .p-menuitem-icon {
+    color: var(--db-text-primary);
+  }
+
+  body.dark-mode
+    .p-menu
+    .p-menuitem:not(.p-highlight):not(.p-disabled).p-focus
+    > .p-menuitem-content,
+  body.dark-mode
+    .p-menu
+    .p-menuitem:not(.p-highlight):not(.p-disabled)
+    > .p-menuitem-content:hover {
+    background: var(--db-bg-tertiary);
+    color: var(--db-text-primary);
+  }
+
+  body.dark-mode
+    .p-menu
+    .p-menuitem:not(.p-highlight):not(.p-disabled).p-focus
+    > .p-menuitem-content
+    .p-menuitem-link
+    .p-menuitem-text,
+  body.dark-mode
+    .p-menu
+    .p-menuitem:not(.p-highlight):not(.p-disabled)
+    > .p-menuitem-content:hover
+    .p-menuitem-link
+    .p-menuitem-text {
+    color: var(--db-text-primary);
+  }
+
+  body.dark-mode .p-menu .p-submenu-header {
+    background: transparent;
+    color: var(--db-text-muted);
+  }
+
+  body.dark-mode .p-menu .p-menu-separator {
+    border-top-color: var(--db-border-color);
+  }
+
+  /* ===== Dialogs (incl. ConfirmDialog) ===== */
+  body.dark-mode .p-dialog .p-dialog-header,
+  body.dark-mode .p-dialog .p-dialog-content,
+  body.dark-mode .p-dialog .p-dialog-footer {
+    background: var(--db-bg-elevated);
+    color: var(--db-text-primary);
+  }
+
+  body.dark-mode .p-dialog .p-dialog-header .p-dialog-title {
+    color: var(--db-text-primary);
+  }
+
+  body.dark-mode .p-dialog .p-dialog-header .p-dialog-header-icon {
+    color: var(--db-text-secondary);
+  }
+
+  body.dark-mode .p-dialog .p-dialog-header .p-dialog-header-icon:enabled:hover {
+    background: var(--db-bg-tertiary);
+    color: var(--db-text-primary);
+  }
+
+  body.dark-mode .p-confirm-dialog .p-confirm-dialog-icon,
+  body.dark-mode .p-confirm-dialog .p-confirm-dialog-message {
+    color: var(--db-text-primary);
+  }
+
+  /* ===== Toasts ===== */
+  body.dark-mode .p-toast .p-toast-message {
+    background: var(--db-bg-elevated);
+    color: var(--db-text-primary);
+    border: 1px solid var(--db-border-color);
+    border-left-width: 4px;
+  }
+
+  body.dark-mode .p-toast .p-toast-message .p-toast-summary,
+  body.dark-mode .p-toast .p-toast-message .p-toast-detail,
+  body.dark-mode .p-toast .p-toast-message .p-toast-icon-close {
+    color: var(--db-text-primary);
+  }
+
+  body.dark-mode .p-toast .p-toast-message.p-toast-message-success {
+    border-left-color: var(--db-success);
+  }
+
+  body.dark-mode .p-toast .p-toast-message.p-toast-message-success .p-toast-message-icon {
+    color: var(--db-success);
+  }
+
+  body.dark-mode .p-toast .p-toast-message.p-toast-message-error {
+    border-left-color: var(--db-danger);
+  }
+
+  body.dark-mode .p-toast .p-toast-message.p-toast-message-error .p-toast-message-icon {
+    color: var(--db-danger);
+  }
+
+  body.dark-mode .p-toast .p-toast-message.p-toast-message-warn {
+    border-left-color: var(--db-warning);
+  }
+
+  body.dark-mode .p-toast .p-toast-message.p-toast-message-warn .p-toast-message-icon {
+    color: var(--db-warning);
+  }
+
+  body.dark-mode .p-toast .p-toast-message.p-toast-message-info {
+    border-left-color: var(--db-accent-blue);
+  }
+
+  body.dark-mode .p-toast .p-toast-message.p-toast-message-info .p-toast-message-icon {
+    color: var(--db-accent-blue);
+  }
+
+  /* ===== Text inputs (InputText, Textarea, Password, number/dropdown labels) ===== */
+  body.dark-mode .p-inputtext {
+    background: var(--db-bg-secondary);
+    color: var(--db-text-primary);
+    border-color: var(--db-border-color);
+  }
+
+  body.dark-mode .p-inputtext::placeholder {
+    color: var(--db-text-muted);
+  }
+
+  body.dark-mode .p-inputtext:enabled:hover {
+    border-color: var(--db-text-muted);
+  }
+
+  body.dark-mode .p-inputtext:enabled:focus {
+    border-color: var(--db-primary);
+  }
+
+  body.dark-mode .p-input-icon,
+  body.dark-mode .p-icon-field > .p-input-icon {
+    color: var(--db-text-muted);
+  }
+
+  body.dark-mode .p-password-panel {
+    background: var(--db-bg-elevated);
+    color: var(--db-text-primary);
+  }
+
+  /* ===== Dropdown / MultiSelect ===== */
+  body.dark-mode .p-dropdown,
+  body.dark-mode .p-multiselect {
+    background: var(--db-bg-secondary);
+    border-color: var(--db-border-color);
+  }
+
+  body.dark-mode .p-dropdown:not(.p-disabled):hover,
+  body.dark-mode .p-multiselect:not(.p-disabled):hover {
+    border-color: var(--db-text-muted);
+  }
+
+  body.dark-mode .p-dropdown:not(.p-disabled).p-focus,
+  body.dark-mode .p-multiselect:not(.p-disabled).p-focus {
+    border-color: var(--db-primary);
+  }
+
+  body.dark-mode .p-dropdown .p-dropdown-label,
+  body.dark-mode .p-multiselect .p-multiselect-label {
+    color: var(--db-text-primary);
+  }
+
+  body.dark-mode .p-dropdown .p-dropdown-label.p-placeholder,
+  body.dark-mode .p-multiselect .p-multiselect-label.p-placeholder {
+    color: var(--db-text-muted);
+  }
+
+  body.dark-mode .p-dropdown .p-dropdown-trigger,
+  body.dark-mode .p-multiselect .p-multiselect-trigger {
+    color: var(--db-text-secondary);
+  }
+
+  body.dark-mode .p-dropdown-panel,
+  body.dark-mode .p-multiselect-panel {
+    background: var(--db-bg-elevated);
+    color: var(--db-text-primary);
+    border: 1px solid var(--db-border-color);
+  }
+
+  body.dark-mode .p-dropdown-panel .p-dropdown-items .p-dropdown-item,
+  body.dark-mode .p-multiselect-panel .p-multiselect-items .p-multiselect-item {
+    color: var(--db-text-primary);
+  }
+
+  body.dark-mode
+    .p-dropdown-panel
+    .p-dropdown-items
+    .p-dropdown-item:not(.p-highlight):not(.p-disabled):hover,
+  body.dark-mode .p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-focus:not(.p-highlight),
+  body.dark-mode
+    .p-multiselect-panel
+    .p-multiselect-items
+    .p-multiselect-item:not(.p-highlight):not(.p-disabled):hover,
+  body.dark-mode
+    .p-multiselect-panel
+    .p-multiselect-items
+    .p-multiselect-item.p-focus:not(.p-highlight) {
+    background: var(--db-bg-tertiary);
+    color: var(--db-text-primary);
+  }
+
+  body.dark-mode .p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight,
+  body.dark-mode .p-multiselect-panel .p-multiselect-items .p-multiselect-item.p-highlight {
+    background: var(--db-primary-100);
+    color: var(--db-primary);
+  }
+
+  body.dark-mode .p-multiselect-panel .p-multiselect-header {
+    background: var(--db-bg-elevated);
+    color: var(--db-text-primary);
+    border-bottom-color: var(--db-border-color);
+  }
+
+  body.dark-mode .p-multiselect.p-multiselect-chip .p-multiselect-token {
+    background: var(--db-bg-tertiary);
+    color: var(--db-text-primary);
+  }
+
+  /* ===== Checkbox / InputSwitch ===== */
+  body.dark-mode .p-checkbox .p-checkbox-box {
+    background: var(--db-bg-secondary);
+    border-color: var(--db-border-color);
+  }
+
+  body.dark-mode .p-checkbox .p-checkbox-box.p-highlight {
+    background: var(--db-primary);
+    border-color: var(--db-primary);
+  }
+
+  body.dark-mode .p-inputswitch:not(.p-highlight) .p-inputswitch-slider {
+    background: var(--db-border-color);
+  }
+
+  /* ===== TabView ===== */
+  body.dark-mode .p-tabview .p-tabview-nav {
+    background: transparent;
+    border-color: var(--db-border-color);
+  }
+
+  body.dark-mode .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+    background: transparent;
+    color: var(--db-text-secondary);
+    border-color: var(--db-border-color);
+  }
+
+  body.dark-mode .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+    color: var(--db-primary);
+    border-color: var(--db-primary);
+  }
+
+  body.dark-mode .p-tabview .p-tabview-panels {
+    background: transparent;
+    color: var(--db-text-primary);
+  }
+
+  /* ===== Panel ===== */
+  body.dark-mode .p-panel .p-panel-header {
+    background: var(--db-bg-secondary);
+    color: var(--db-text-primary);
+    border-color: var(--db-border-color);
+  }
+
+  body.dark-mode .p-panel .p-panel-content {
+    background: transparent;
+    color: var(--db-text-primary);
+    border-color: var(--db-border-color);
+  }
+
+  /* The resource panel opts out of panel chrome; keep its transparent look. */
+  body.dark-mode .resource-panel .p-panel-header,
+  body.dark-mode .resource-panel .p-panel-content {
+    background: transparent;
+    border-color: var(--db-border-light);
+  }
+
+  /* ===== Tag ===== */
+  body.dark-mode .p-tag.p-tag-success {
+    background: rgba(5, 150, 105, 0.18);
+    color: #34d399;
+  }
+
+  body.dark-mode .p-tag.p-tag-warning {
+    background: rgba(217, 119, 6, 0.18);
+    color: #fbbf24;
+  }
+
+  body.dark-mode .p-tag.p-tag-danger {
+    background: rgba(220, 38, 38, 0.18);
+    color: #f87171;
+  }
+
+  /* ===== Secondary / text buttons ===== */
+  body.dark-mode .p-button.p-button-secondary.p-button-outlined,
+  body.dark-mode .p-button.p-button-secondary.p-button-text {
+    color: var(--db-text-secondary);
+    border-color: var(--db-border-color);
+  }
+
+  body.dark-mode .p-button.p-button-secondary.p-button-outlined:enabled:hover,
+  body.dark-mode .p-button.p-button-secondary.p-button-text:enabled:hover {
+    background: var(--db-bg-tertiary);
+    color: var(--db-text-primary);
+    border-color: var(--db-border-color);
+  }
+
+  body.dark-mode .p-button.p-button-text:not(.p-button-danger):not(.p-button-secondary) {
+    color: var(--db-primary);
+  }
+
+  body.dark-mode
+    .p-button.p-button-text:not(.p-button-danger):not(.p-button-secondary):enabled:hover {
+    background: var(--db-primary-50);
+    color: var(--db-primary);
+  }
+
+  /* ===== DataTable ===== */
+  body.dark-mode .p-datatable .p-datatable-thead > tr > th {
+    background: var(--db-bg-secondary);
+    color: var(--db-text-secondary);
+    border-color: var(--db-border-light);
+  }
+
+  body.dark-mode .p-datatable .p-datatable-tbody > tr {
+    background: transparent;
+    color: var(--db-text-primary);
+  }
+
+  body.dark-mode .p-datatable .p-datatable-tbody > tr > td {
+    border-color: var(--db-border-light);
+  }
+
+  /* The minimal table's glassmorphism is built on white tints; flip them. */
+  body.dark-mode .p-datatable.minimal-table {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  }
+
+  body.dark-mode .p-datatable.minimal-table .p-datatable-thead > tr > th {
+    background: rgba(255, 255, 255, 0.04);
+    border-bottom-color: rgba(255, 255, 255, 0.06);
+  }
+
+  body.dark-mode .p-datatable.minimal-table .p-datatable-tbody > tr > td {
+    border-bottom-color: rgba(255, 255, 255, 0.04);
+  }
+
+  body.dark-mode .p-datatable.minimal-table .p-datatable-tbody > tr:last-child > td {
+    border-bottom: none;
+  }
+
+  body.dark-mode .p-datatable.minimal-table .p-datatable-tbody > tr:hover {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+  }
 }
 
-body.dark-mode .p-menu .p-menuitem > .p-menuitem-content {
-  color: var(--db-text-primary);
-}
+/* ============================================================
+   Dark mode — native status utilities
 
-body.dark-mode .p-menu .p-menuitem > .p-menuitem-content .p-menuitem-link .p-menuitem-text,
-body.dark-mode .p-menu .p-menuitem > .p-menuitem-content .p-menuitem-link .p-menuitem-icon {
-  color: var(--db-text-primary);
-}
+   okdp-tag / alert / stat-chip are native (not PrimeReact) and hardcode
+   light status tints in their @utility definitions, so they need explicit
+   dark variants. Unlayered (not in primereact-overrides) because they must
+   out-rank the @utility classes, which live in Tailwind's utilities layer.
+   Palette mirrors the PrimeReact .p-tag dark treatment above. */
 
-body.dark-mode .p-menu .p-menuitem:not(.p-highlight):not(.p-disabled).p-focus > .p-menuitem-content,
-body.dark-mode .p-menu .p-menuitem:not(.p-highlight):not(.p-disabled) > .p-menuitem-content:hover {
-  background: var(--db-bg-tertiary);
-  color: var(--db-text-primary);
-}
-
-body.dark-mode
-  .p-menu
-  .p-menuitem:not(.p-highlight):not(.p-disabled).p-focus
-  > .p-menuitem-content
-  .p-menuitem-link
-  .p-menuitem-text,
-body.dark-mode
-  .p-menu
-  .p-menuitem:not(.p-highlight):not(.p-disabled)
-  > .p-menuitem-content:hover
-  .p-menuitem-link
-  .p-menuitem-text {
-  color: var(--db-text-primary);
-}
-
-body.dark-mode .p-menu .p-submenu-header {
-  background: transparent;
-  color: var(--db-text-muted);
-}
-
-body.dark-mode .p-menu .p-menu-separator {
-  border-top-color: var(--db-border-color);
-}
-
-/* ===== Dialogs (incl. ConfirmDialog) ===== */
-body.dark-mode .p-dialog .p-dialog-header,
-body.dark-mode .p-dialog .p-dialog-content,
-body.dark-mode .p-dialog .p-dialog-footer {
-  background: var(--db-bg-elevated);
-  color: var(--db-text-primary);
-}
-
-body.dark-mode .p-dialog .p-dialog-header .p-dialog-title {
-  color: var(--db-text-primary);
-}
-
-body.dark-mode .p-dialog .p-dialog-header .p-dialog-header-icon {
-  color: var(--db-text-secondary);
-}
-
-body.dark-mode .p-dialog .p-dialog-header .p-dialog-header-icon:enabled:hover {
-  background: var(--db-bg-tertiary);
-  color: var(--db-text-primary);
-}
-
-body.dark-mode .p-confirm-dialog .p-confirm-dialog-icon,
-body.dark-mode .p-confirm-dialog .p-confirm-dialog-message {
-  color: var(--db-text-primary);
-}
-
-/* ===== Toasts ===== */
-body.dark-mode .p-toast .p-toast-message {
-  background: var(--db-bg-elevated);
-  color: var(--db-text-primary);
-  border: 1px solid var(--db-border-color);
-  border-left-width: 4px;
-}
-
-body.dark-mode .p-toast .p-toast-message .p-toast-summary,
-body.dark-mode .p-toast .p-toast-message .p-toast-detail,
-body.dark-mode .p-toast .p-toast-message .p-toast-icon-close {
-  color: var(--db-text-primary);
-}
-
-body.dark-mode .p-toast .p-toast-message.p-toast-message-success {
-  border-left-color: var(--db-success);
-}
-
-body.dark-mode .p-toast .p-toast-message.p-toast-message-success .p-toast-message-icon {
-  color: var(--db-success);
-}
-
-body.dark-mode .p-toast .p-toast-message.p-toast-message-error {
-  border-left-color: var(--db-danger);
-}
-
-body.dark-mode .p-toast .p-toast-message.p-toast-message-error .p-toast-message-icon {
-  color: var(--db-danger);
-}
-
-body.dark-mode .p-toast .p-toast-message.p-toast-message-warn {
-  border-left-color: var(--db-warning);
-}
-
-body.dark-mode .p-toast .p-toast-message.p-toast-message-warn .p-toast-message-icon {
-  color: var(--db-warning);
-}
-
-body.dark-mode .p-toast .p-toast-message.p-toast-message-info {
-  border-left-color: var(--db-accent-blue);
-}
-
-body.dark-mode .p-toast .p-toast-message.p-toast-message-info .p-toast-message-icon {
-  color: var(--db-accent-blue);
-}
-
-/* ===== Text inputs (InputText, Textarea, Password, number/dropdown labels) ===== */
-body.dark-mode .p-inputtext {
-  background: var(--db-bg-secondary);
-  color: var(--db-text-primary);
-  border-color: var(--db-border-color);
-}
-
-body.dark-mode .p-inputtext::placeholder {
-  color: var(--db-text-muted);
-}
-
-body.dark-mode .p-inputtext:enabled:hover {
-  border-color: var(--db-text-muted);
-}
-
-body.dark-mode .p-inputtext:enabled:focus {
-  border-color: var(--db-primary);
-}
-
-body.dark-mode .p-input-icon,
-body.dark-mode .p-icon-field > .p-input-icon {
-  color: var(--db-text-muted);
-}
-
-body.dark-mode .p-password-panel {
-  background: var(--db-bg-elevated);
-  color: var(--db-text-primary);
-}
-
-/* ===== Dropdown / MultiSelect ===== */
-body.dark-mode .p-dropdown,
-body.dark-mode .p-multiselect {
-  background: var(--db-bg-secondary);
-  border-color: var(--db-border-color);
-}
-
-body.dark-mode .p-dropdown:not(.p-disabled):hover,
-body.dark-mode .p-multiselect:not(.p-disabled):hover {
-  border-color: var(--db-text-muted);
-}
-
-body.dark-mode .p-dropdown:not(.p-disabled).p-focus,
-body.dark-mode .p-multiselect:not(.p-disabled).p-focus {
-  border-color: var(--db-primary);
-}
-
-body.dark-mode .p-dropdown .p-dropdown-label,
-body.dark-mode .p-multiselect .p-multiselect-label {
-  color: var(--db-text-primary);
-}
-
-body.dark-mode .p-dropdown .p-dropdown-label.p-placeholder,
-body.dark-mode .p-multiselect .p-multiselect-label.p-placeholder {
-  color: var(--db-text-muted);
-}
-
-body.dark-mode .p-dropdown .p-dropdown-trigger,
-body.dark-mode .p-multiselect .p-multiselect-trigger {
-  color: var(--db-text-secondary);
-}
-
-body.dark-mode .p-dropdown-panel,
-body.dark-mode .p-multiselect-panel {
-  background: var(--db-bg-elevated);
-  color: var(--db-text-primary);
-  border: 1px solid var(--db-border-color);
-}
-
-body.dark-mode .p-dropdown-panel .p-dropdown-items .p-dropdown-item,
-body.dark-mode .p-multiselect-panel .p-multiselect-items .p-multiselect-item {
-  color: var(--db-text-primary);
-}
-
-body.dark-mode
-  .p-dropdown-panel
-  .p-dropdown-items
-  .p-dropdown-item:not(.p-highlight):not(.p-disabled):hover,
-body.dark-mode .p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-focus:not(.p-highlight),
-body.dark-mode
-  .p-multiselect-panel
-  .p-multiselect-items
-  .p-multiselect-item:not(.p-highlight):not(.p-disabled):hover,
-body.dark-mode
-  .p-multiselect-panel
-  .p-multiselect-items
-  .p-multiselect-item.p-focus:not(.p-highlight) {
-  background: var(--db-bg-tertiary);
-  color: var(--db-text-primary);
-}
-
-body.dark-mode .p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight,
-body.dark-mode .p-multiselect-panel .p-multiselect-items .p-multiselect-item.p-highlight {
-  background: var(--db-primary-100);
-  color: var(--db-primary);
-}
-
-body.dark-mode .p-multiselect-panel .p-multiselect-header {
-  background: var(--db-bg-elevated);
-  color: var(--db-text-primary);
-  border-bottom-color: var(--db-border-color);
-}
-
-body.dark-mode .p-multiselect.p-multiselect-chip .p-multiselect-token {
-  background: var(--db-bg-tertiary);
-  color: var(--db-text-primary);
-}
-
-/* ===== Checkbox / InputSwitch ===== */
-body.dark-mode .p-checkbox .p-checkbox-box {
-  background: var(--db-bg-secondary);
-  border-color: var(--db-border-color);
-}
-
-body.dark-mode .p-checkbox .p-checkbox-box.p-highlight {
-  background: var(--db-primary);
-  border-color: var(--db-primary);
-}
-
-body.dark-mode .p-inputswitch:not(.p-highlight) .p-inputswitch-slider {
-  background: var(--db-border-color);
-}
-
-/* ===== TabView ===== */
-body.dark-mode .p-tabview .p-tabview-nav {
-  background: transparent;
-  border-color: var(--db-border-color);
-}
-
-body.dark-mode .p-tabview .p-tabview-nav li .p-tabview-nav-link {
-  background: transparent;
-  color: var(--db-text-secondary);
-  border-color: var(--db-border-color);
-}
-
-body.dark-mode .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
-  color: var(--db-primary);
-  border-color: var(--db-primary);
-}
-
-body.dark-mode .p-tabview .p-tabview-panels {
-  background: transparent;
-  color: var(--db-text-primary);
-}
-
-/* ===== Panel ===== */
-body.dark-mode .p-panel .p-panel-header {
-  background: var(--db-bg-secondary);
-  color: var(--db-text-primary);
-  border-color: var(--db-border-color);
-}
-
-body.dark-mode .p-panel .p-panel-content {
-  background: transparent;
-  color: var(--db-text-primary);
-  border-color: var(--db-border-color);
-}
-
-/* The resource panel opts out of panel chrome; keep its transparent look. */
-body.dark-mode .resource-panel .p-panel-header,
-body.dark-mode .resource-panel .p-panel-content {
-  background: transparent;
-  border-color: var(--db-border-light);
-}
-
-/* ===== Tag ===== */
-body.dark-mode .p-tag.p-tag-success {
+body.dark-mode .okdp-tag.okdp-tag-success {
   background: rgba(5, 150, 105, 0.18);
   color: #34d399;
 }
 
-body.dark-mode .p-tag.p-tag-warning {
+body.dark-mode .okdp-tag.okdp-tag-warn {
   background: rgba(217, 119, 6, 0.18);
   color: #fbbf24;
 }
 
-body.dark-mode .p-tag.p-tag-danger {
+body.dark-mode .okdp-tag.okdp-tag-danger {
   background: rgba(220, 38, 38, 0.18);
   color: #f87171;
 }
 
-/* ===== Secondary / text buttons ===== */
-body.dark-mode .p-button.p-button-secondary.p-button-outlined,
-body.dark-mode .p-button.p-button-secondary.p-button-text {
-  color: var(--db-text-secondary);
-  border-color: var(--db-border-color);
+body.dark-mode .okdp-tag.okdp-tag-info {
+  background: rgba(59, 130, 246, 0.18);
+  color: #60a5fa;
 }
 
-body.dark-mode .p-button.p-button-secondary.p-button-outlined:enabled:hover,
-body.dark-mode .p-button.p-button-secondary.p-button-text:enabled:hover {
-  background: var(--db-bg-tertiary);
-  color: var(--db-text-primary);
-  border-color: var(--db-border-color);
+body.dark-mode .alert-danger {
+  background: rgba(220, 38, 38, 0.12);
+  border-color: rgba(220, 38, 38, 0.35);
+  color: #fca5a5;
 }
 
-body.dark-mode .p-button.p-button-text:not(.p-button-danger):not(.p-button-secondary) {
-  color: var(--db-primary);
+body.dark-mode .alert-warn {
+  background: rgba(217, 119, 6, 0.12);
+  border-color: rgba(217, 119, 6, 0.35);
+  color: #fcd34d;
 }
 
-body.dark-mode
-  .p-button.p-button-text:not(.p-button-danger):not(.p-button-secondary):enabled:hover {
-  background: var(--db-primary-50);
-  color: var(--db-primary);
+body.dark-mode .stat-chip.chip-warn.active {
+  background: rgba(217, 119, 6, 0.16);
+  border-color: rgba(217, 119, 6, 0.4);
+  color: #fbbf24;
 }
 
-/* ===== DataTable ===== */
-body.dark-mode .p-datatable .p-datatable-thead > tr > th {
-  background: var(--db-bg-secondary);
-  color: var(--db-text-secondary);
-  border-color: var(--db-border-light);
-}
-
-body.dark-mode .p-datatable .p-datatable-tbody > tr {
-  background: transparent;
-  color: var(--db-text-primary);
-}
-
-body.dark-mode .p-datatable .p-datatable-tbody > tr > td {
-  border-color: var(--db-border-light);
-}
-
-/* The minimal table's glassmorphism is built on white tints; flip them. */
-body.dark-mode .p-datatable.minimal-table {
-  background: rgba(255, 255, 255, 0.03);
-  border-color: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-}
-
-body.dark-mode .p-datatable.minimal-table .p-datatable-thead > tr > th {
-  background: rgba(255, 255, 255, 0.04);
-  border-bottom-color: rgba(255, 255, 255, 0.06);
-}
-
-body.dark-mode .p-datatable.minimal-table .p-datatable-tbody > tr > td {
-  border-bottom-color: rgba(255, 255, 255, 0.04);
-}
-
-body.dark-mode .p-datatable.minimal-table .p-datatable-tbody > tr:last-child > td {
-  border-bottom: none;
-}
-
-body.dark-mode .p-datatable.minimal-table .p-datatable-tbody > tr:hover {
-  background-color: rgba(255, 255, 255, 0.05) !important;
+body.dark-mode .stat-chip.chip-danger.active {
+  background: rgba(220, 38, 38, 0.16);
+  border-color: rgba(220, 38, 38, 0.4);
+  color: #f87171;
 }

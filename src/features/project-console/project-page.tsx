@@ -1,12 +1,23 @@
 import { useRef, useState } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { Dropdown } from 'primereact/dropdown';
+import {
+  siApacheairflow,
+  siApachekafka,
+  siApachespark,
+  siApachesuperset,
+  siJupyter,
+  siMlflow,
+  siTrino,
+  type SimpleIcon,
+} from 'simple-icons';
 import { useAuth } from '../../core/auth/auth-context';
 import { useProjectContext } from '../../core/context/project-context';
 import { NAV_EXPANDED_KEY, SIDEBAR_COLLAPSED_KEY } from '../../core/storage-keys';
 import type { Project } from '../../core/api/project-api';
 import { getProjectColor } from '../../core/services/project-colors';
 import { ConsoleShell, SideNavLink } from '../../shared/components/console-shell';
+import { BrandIcon } from '../../shared/components/brand-icon';
 import {
   sideNavIconClass,
   sideNavLabelClass,
@@ -16,7 +27,12 @@ import {
 interface NavItem {
   /** Path under /projects/:projectId — absent for inert placeholders. */
   segment?: string;
+  /** primeicons fallback for services without a packaged brand logo. */
   icon: string;
+  /** Brand logo (favicon equivalent) rendered instead of `icon`. */
+  brand?: SimpleIcon;
+  /** Follow text color instead of brand hex (near-black brands). */
+  brandMono?: boolean;
   label: string;
   disabled?: boolean;
   collapsedTitle?: string;
@@ -38,8 +54,9 @@ const NAV_CATEGORIES: NavCategory[] = [
     icon: 'pi-database',
     defaultExpanded: true,
     items: [
+      // Apache Polaris has no simple-icons entry yet — generic icon.
       { segment: 'lakehouse/polaris', icon: 'pi pi-table', label: 'Polaris' },
-      { segment: 'lakehouse/trino', icon: 'pi pi-bolt', label: 'Trino' },
+      { segment: 'lakehouse/trino', icon: 'pi pi-bolt', brand: siTrino, label: 'Trino' },
     ],
   },
   {
@@ -48,11 +65,30 @@ const NAV_CATEGORIES: NavCategory[] = [
     icon: 'pi-cog',
     defaultExpanded: true,
     items: [
-      { segment: 'data-engineering/airflow', icon: 'pi pi-sitemap', label: 'Airflow' },
-      { segment: 'spark/applications', icon: 'pi pi-play', label: 'Spark Applications' },
-      { segment: 'spark/history-server', icon: 'pi pi-history', label: 'Spark History' },
+      {
+        segment: 'data-engineering/airflow',
+        icon: 'pi pi-sitemap',
+        brand: siApacheairflow,
+        label: 'Airflow',
+      },
+      {
+        segment: 'spark/applications',
+        icon: 'pi pi-play',
+        brand: siApachespark,
+        label: 'Spark Applications',
+      },
+      {
+        segment: 'spark/history-server',
+        icon: 'pi pi-history',
+        brand: siApachespark,
+        label: 'Spark History',
+      },
       {
         icon: 'pi pi-share-alt',
+        brand: siApachekafka,
+        // The Kafka mark is near-black — keep it on the text color so it
+        // stays visible in dark mode.
+        brandMono: true,
         label: 'Kafka',
         disabled: true,
         collapsedTitle: 'Kafka — exploration',
@@ -64,7 +100,9 @@ const NAV_CATEGORIES: NavCategory[] = [
     label: 'Notebooks',
     icon: 'pi-book',
     defaultExpanded: true,
-    items: [{ segment: 'services', icon: 'pi pi-desktop', label: 'JupyterHub' }],
+    items: [
+      { segment: 'services', icon: 'pi pi-desktop', brand: siJupyter, label: 'JupyterHub' },
+    ],
   },
   {
     key: 'sql-bi',
@@ -72,7 +110,12 @@ const NAV_CATEGORIES: NavCategory[] = [
     icon: 'pi-chart-bar',
     defaultExpanded: true,
     items: [
-      { segment: 'bi/superset', icon: 'pi pi-chart-line', label: 'Superset' },
+      {
+        segment: 'bi/superset',
+        icon: 'pi pi-chart-line',
+        brand: siApachesuperset,
+        label: 'Superset',
+      },
       {
         icon: 'pi pi-pencil',
         label: 'SQL Editor',
@@ -95,6 +138,7 @@ const NAV_CATEGORIES: NavCategory[] = [
       },
       {
         icon: 'pi pi-flag',
+        brand: siMlflow,
         label: 'MLflow',
         disabled: true,
         collapsedTitle: 'MLflow — exploration',
@@ -167,7 +211,7 @@ function NavSection({ icon, label, expanded, collapsed, onToggle, children }: Na
 }
 
 interface DisabledNavLinkProps {
-  icon: string;
+  icon: React.ReactNode;
   label: string;
   collapsed: boolean;
   title: string;
@@ -182,10 +226,15 @@ function DisabledNavLink({ icon, label, collapsed, title, collapsedTitle }: Disa
       className={sideNavLinkClass({ collapsed, sub: true, disabled: true })}
       title={collapsed ? collapsedTitle : title}
     >
-      <i className={`${icon} ${sideNavIconClass(false)}`}></i>
+      {typeof icon === 'string' ? <i className={`${icon} ${sideNavIconClass(false)}`}></i> : icon}
       <span className={sideNavLabelClass(collapsed)}>{label}</span>
     </span>
   );
+}
+
+/** Brand logo when the service has one, primeicons fallback otherwise. */
+function navItemIcon(item: NavItem): React.ReactNode {
+  return item.brand ? <BrandIcon icon={item.brand} mono={item.brandMono} /> : item.icon;
 }
 
 export default function ProjectPage() {
@@ -315,7 +364,7 @@ export default function ProjectPage() {
                     item.disabled ? (
                       <DisabledNavLink
                         key={item.label}
-                        icon={item.icon}
+                        icon={navItemIcon(item)}
                         label={item.label}
                         collapsed={sidebarCollapsed}
                         title={futureTitle}
@@ -325,7 +374,7 @@ export default function ProjectPage() {
                       <SideNavLink
                         key={item.label}
                         to={`/projects/${projectName}/${item.segment}`}
-                        icon={item.icon}
+                        icon={navItemIcon(item)}
                         label={item.label}
                         collapsed={sidebarCollapsed}
                         sub

@@ -13,7 +13,8 @@ import { sideNavIconClass, sideNavLabelClass, sideNavLinkClass } from './console
 interface SideNavLinkProps {
   to: string;
   end?: boolean;
-  icon: string;
+  /** Either a primeicons class string or a ready-made icon node (brand logo). */
+  icon: ReactNode;
   label: string;
   collapsed: boolean;
   sub?: boolean;
@@ -30,7 +31,11 @@ export function SideNavLink({ to, end, icon, label, collapsed, sub }: SideNavLin
     >
       {({ isActive }) => (
         <>
-          <i className={`${icon} ${sideNavIconClass(isActive)}`}></i>
+          {typeof icon === 'string' ? (
+            <i className={`${icon} ${sideNavIconClass(isActive)}`}></i>
+          ) : (
+            icon
+          )}
           <span className={sideNavLabelClass(collapsed)}>{label}</span>
         </>
       )}

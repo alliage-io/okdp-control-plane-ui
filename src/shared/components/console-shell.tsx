@@ -156,7 +156,7 @@ export function ConsoleShell({
         collapsed
           ? 'grid-cols-[var(--db-sidebar-collapsed-width)_1fr]'
           : 'grid-cols-[var(--db-sidebar-width)_1fr]'
-      } grid-rows-[var(--db-header-height)_1fr] bg-surface transition-[grid-template-columns] duration-400 ease-smooth max-lg:grid-cols-[var(--db-sidebar-collapsed-width)_1fr] max-md:grid-cols-[1fr]`}
+      } grid-rows-[var(--db-header-height)_1fr] overflow-hidden bg-surface transition-[grid-template-columns] duration-400 ease-smooth max-lg:grid-cols-[var(--db-sidebar-collapsed-width)_1fr] max-md:grid-cols-[1fr]`}
     >
       {/* Unified header */}
       <header className="relative z-20 col-span-2 row-start-1 flex h-(--db-header-height) items-center justify-between border-b border-border-light bg-surface px-3 transition-[background-color,border-color] duration-150 ease-smooth max-md:col-span-1">
@@ -247,8 +247,10 @@ export function ConsoleShell({
 
       {/* Sidebar */}
       <aside className="z-[25] col-start-1 row-start-2 flex flex-col border-r border-border-light bg-surface transition-[width] duration-400 ease-smooth max-md:hidden">
+        {/* The sidebar is fixed with the shell: only the main content pane
+            scrolls, the nav itself never grows a scrollbar. */}
         <nav
-          className={`mt-0 flex-1 overflow-y-auto ${
+          className={`mt-0 flex-1 overflow-hidden ${
             collapsed ? 'px-[0.4rem] py-3' : 'py-2 pr-1.5 pl-0 max-lg:px-[0.4rem] max-lg:py-3'
           }`}
         >

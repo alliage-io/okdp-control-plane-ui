@@ -6,7 +6,7 @@ Roadmap is organized per component
 
 Contains all the category and services
 
-- [ ] Implement unfoldable categories
+- [x] Implement unfoldable categories
 - [ ] Use logo of project favicon for services (superset favicon for superset, etc.)
 - [ ] When lateral menu is collapsed, categories are simply horizontal separator, instead of unfoldable tree
 - [ ] Create a new category, "Project configuration", with "Secrets" within

@@ -11,7 +11,6 @@ import {
   siTrino,
   type SimpleIcon,
 } from 'simple-icons';
-import { useAuth } from '../../core/auth/auth-context';
 import { useProjectContext } from '../../core/context/project-context';
 import { NAV_EXPANDED_KEY, SIDEBAR_COLLAPSED_KEY } from '../../core/storage-keys';
 import type { Project } from '../../core/api/project-api';
@@ -251,7 +250,6 @@ function navItemIcon(item: NavItem): React.ReactNode {
 }
 
 export default function ProjectPage() {
-  const auth = useAuth();
   const context = useProjectContext();
   const switcherRef = useRef<Dropdown>(null);
 
@@ -343,15 +341,12 @@ export default function ProjectPage() {
     </div>
   );
 
-  const isAdmin = auth.hasRole('admins');
-
   return (
     <ConsoleShell
       collapsed={sidebarCollapsed}
       onToggleCollapsed={toggleSidebar}
       headerLeft={headerLeft}
       accentColor={envColor}
-      navBottomAriaLabel="Project tools"
       nav={
         <>
           {projectName && (
@@ -399,25 +394,6 @@ export default function ProjectPage() {
             </>
           )}
         </>
-      }
-      navBottom={
-        isAdmin && (
-          <>
-            {sidebarCollapsed ? (
-              <div className="mx-1 my-2 border-t border-border-light"></div>
-            ) : (
-              <div className="mt-3 mb-1 px-2.5 text-[0.65rem] font-bold tracking-[0.08em] text-fg-muted uppercase">
-                Admin
-              </div>
-            )}
-            <SideNavLink
-              to="/identity"
-              icon="pi pi-users"
-              label="Identity"
-              collapsed={sidebarCollapsed}
-            />
-          </>
-        )
       }
     >
       <Outlet />

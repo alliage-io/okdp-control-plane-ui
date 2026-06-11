@@ -10,7 +10,7 @@ Contains all the category and services
 - [x] Use logo of project favicon for services (superset favicon for superset, etc.)
 - [x] When lateral menu is collapsed, categories are simply horizontal separator, instead of unfoldable tree
 - [x] Create a new category, "Project configuration", with "Secrets" within
-- [ ] Remove section admin > identity
+- [x] Remove section admin > identity
 - [ ] Now that bottom is free, the arrow to collapse can now be placed at bottom, and follow appropriate/commonly used style for bottom collapsing arrow
 - [ ] Lateral menu should be sticky / fixed, not scrollable
 - [ ] This menu must be empty in any other pages than a project page (/projects/toto)

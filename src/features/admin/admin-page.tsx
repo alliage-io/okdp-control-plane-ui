@@ -7,7 +7,7 @@ export default function AdminPage() {
     <section className="flex animate-[fadeInUp_0.4s_ease-out] flex-col gap-7">
       <div>
         <h1>Administration</h1>
-        <p className="mt-1 text-base text-fg-secondary">
+        <p className="page-sub mt-1">
           Control plane administration. These settings apply to the whole platform.
         </p>
       </div>

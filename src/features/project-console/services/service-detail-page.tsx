@@ -264,13 +264,10 @@ export default function ServiceDetailPage() {
               onKeyDown={(e) => e.key === 'Enter' && goBack()}
               tabIndex={0}
             >
-              <i className="pi pi-arrow-left" style={{ fontSize: '11px' }}></i>
+              <i className="pi pi-arrow-left text-[11px]"></i>
               {parentLabel(instance?.service)}
             </a>
-            <i
-              className="pi pi-angle-right"
-              style={{ fontSize: '10px', color: 'var(--db-text-muted)' }}
-            ></i>
+            <i className="pi pi-angle-right text-[10px] text-fg-muted"></i>
             <span className="breadcrumb-current">{instance?.name || serviceName}</span>
           </nav>
 
@@ -422,7 +419,7 @@ export default function ServiceDetailPage() {
                           rel="noopener noreferrer"
                         >
                           {instance.url}
-                          <i className="pi pi-external-link" style={{ fontSize: '11px' }}></i>
+                          <i className="pi pi-external-link text-[11px]"></i>
                         </a>
                       </div>
                     )}

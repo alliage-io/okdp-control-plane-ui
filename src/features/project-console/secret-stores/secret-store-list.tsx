@@ -23,6 +23,7 @@ import { statusTone } from './secret-status';
 import { StatusTag } from '../../../shared/components/status-tag';
 import { StatusDetailContent } from './status-detail';
 import SearchFilter from '../../../shared/components/search-filter';
+import { PageHeader } from '../../../shared/components/page-header';
 
 const SECTION_TITLE_CLASS = 'm-0 mb-3 text-[14px] font-semibold text-fg';
 const DIVIDER_CLASS = 'my-4 border-0 border-t border-t-border';
@@ -422,15 +423,17 @@ export function SecretStoreList() {
   );
 
   return (
-    <div className="cluster-container">
+    <div>
       {/* Top Bar */}
-      <div className="top-bar">
-        <div className="left-group">
-          <h1>Secret Stores</h1>
-        </div>
-
-        <Button label="Add secret store" onClick={showCreateDialog} className="create-btn" />
-      </div>
+      <PageHeader
+        title="Secret Stores"
+        actions={
+          <button className="create-btn" onClick={showCreateDialog}>
+            <i className="pi pi-plus"></i>
+            <span>Add secret store</span>
+          </button>
+        }
+      />
 
       <SearchFilter
         value={globalFilter}

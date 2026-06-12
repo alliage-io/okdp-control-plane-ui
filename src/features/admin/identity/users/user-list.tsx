@@ -16,6 +16,7 @@ import { identityApi, type User } from '../../../../core/api/identity-api';
 import { StatusTag } from '../../../../shared/components/status-tag';
 import { useIdentityGroups, useIdentityUsers } from '../use-identity';
 import SearchFilter from '../../../../shared/components/search-filter';
+import { PageHeader } from '../../../../shared/components/page-header';
 
 export function UserList() {
   const toast = useRef<Toast>(null);
@@ -132,7 +133,7 @@ export function UserList() {
   );
 
   return (
-    <div className="user-container">
+    <div>
       <Toast ref={toast} />
       <ConfirmDialog
         className="db-confirm-dialog"
@@ -142,13 +143,15 @@ export function UserList() {
       />
 
       {/* Top Bar */}
-      <div className="top-bar">
-        <div className="left-group">
-          <h1>Users</h1>
-        </div>
-
-        <Button label="Create user" onClick={openNew} className="create-btn" />
-      </div>
+      <PageHeader
+        title="Users"
+        actions={
+          <button className="create-btn" onClick={openNew}>
+            <i className="pi pi-plus"></i>
+            <span>Create user</span>
+          </button>
+        }
+      />
 
       <SearchFilter value={globalFilter} onChange={setGlobalFilter} placeholder="Filter users..." />
 
@@ -161,7 +164,6 @@ export function UserList() {
           globalFilterFields={['name', 'email']}
           className="minimal-table"
           emptyMessage="No users found."
-          rowClassName={() => 'user-row'}
         >
           <Column
             header="Name"
@@ -172,7 +174,6 @@ export function UserList() {
           <Column
             header="Email"
             style={{ width: '25%' }}
-            className="email-cell"
             body={(u: User) => u.email?.join(', ') || '-'}
           />
           <Column

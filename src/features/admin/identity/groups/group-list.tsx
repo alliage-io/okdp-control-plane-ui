@@ -12,6 +12,7 @@ import type { MenuItem } from 'primereact/menuitem';
 import { identityApi, type Group } from '../../../../core/api/identity-api';
 import { useIdentityGroups } from '../use-identity';
 import SearchFilter from '../../../../shared/components/search-filter';
+import { PageHeader } from '../../../../shared/components/page-header';
 
 export function GroupList() {
   const toast = useRef<Toast>(null);
@@ -111,7 +112,7 @@ export function GroupList() {
   );
 
   return (
-    <div className="group-container">
+    <div>
       <Toast ref={toast} />
       <ConfirmDialog
         className="db-confirm-dialog"
@@ -121,13 +122,15 @@ export function GroupList() {
       />
 
       {/* Top Bar */}
-      <div className="top-bar">
-        <div className="left-group">
-          <h1>Groups</h1>
-        </div>
-
-        <Button label="Create group" onClick={openNew} className="create-btn" />
-      </div>
+      <PageHeader
+        title="Groups"
+        actions={
+          <button className="create-btn" onClick={openNew}>
+            <i className="pi pi-plus"></i>
+            <span>Create group</span>
+          </button>
+        }
+      />
 
       <SearchFilter
         value={globalFilter}
@@ -156,7 +159,6 @@ export function GroupList() {
             header="Description"
             field="description"
             style={{ width: '55%' }}
-            className="description-cell"
             body={(g: Group) => g.description || '-'}
           />
           <Column

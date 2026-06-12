@@ -275,26 +275,6 @@ a[href] {
    patterns below are still consumed by the feature pages and migrate
    with them. */
 
-.workspace-container {
-  padding: 0;
-  background-color: transparent;
-}
-
-/* Page Top Bar (Header + Search) */
-.top-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--db-space-lg);
-}
-
-.left-group {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--db-space-sm);
-}
-
 .page-title,
 h1 {
   font-size: var(--db-font-size-xl);
@@ -317,9 +297,9 @@ h1 {
    RESPONSIVE BREAKPOINTS
    ========================================= */
 
-/* Mobile */
+/* Mobile — stack the heading's action zone under the title. */
 @media (max-width: 768px) {
-  .top-bar {
+  .page-heading {
     flex-direction: column;
     align-items: stretch;
     gap: var(--db-space-md);
@@ -570,19 +550,17 @@ h1 {
 }
 
 /* Legacy cascade: must out-rank the global `.page-title, h1` rule defined
-   earlier in this file, so it cannot move into the utilities layer yet. */
+   earlier in this file, so it cannot move into the utilities layer yet.
+   Size and weight come from that global rule — every page title reads the
+   same; only the breadcrumb/subtitle rhythm is special here. */
 .page-heading h1.page-title {
   margin: 6px 0 4px;
-  font-size: 26px;
-  font-weight: 700;
-  color: var(--db-text-primary);
-  letter-spacing: -0.02em;
   line-height: 1.2;
 }
 
 @utility page-sub {
   margin: 0;
-  font-size: 14px;
+  font-size: var(--db-font-size-base);
   color: var(--db-text-secondary);
   max-width: 640px;
 }
@@ -1053,6 +1031,11 @@ h1 {
   & i {
     font-size: 20px;
     color: #fff;
+  }
+  /* Spark pages — amber brand tile, same geometry. */
+  &.amber {
+    background: linear-gradient(135deg, var(--db-accent-amber), var(--db-warning));
+    box-shadow: 0 6px 16px rgba(245, 158, 11, 0.25);
   }
 }
 

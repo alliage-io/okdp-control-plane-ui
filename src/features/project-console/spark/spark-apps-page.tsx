@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { Button } from 'primereact/button';
+import { PageHeader } from '../../../shared/components/page-header';
 import { SparkList } from './spark-list';
 
 export default function SparkAppsPage() {
@@ -13,13 +13,16 @@ export default function SparkAppsPage() {
   };
 
   return (
-    <div className="cluster-container">
-      <div className="top-bar">
-        <div className="left-group">
-          <h1>Spark Jobs</h1>
-        </div>
-        <Button label="Submit job" icon="pi pi-plus" onClick={goToSubmit} className="create-btn" />
-      </div>
+    <div>
+      <PageHeader
+        title="Spark Jobs"
+        actions={
+          <button className="create-btn" onClick={goToSubmit}>
+            <i className="pi pi-plus"></i>
+            <span>Submit job</span>
+          </button>
+        }
+      />
       <SparkList />
     </div>
   );

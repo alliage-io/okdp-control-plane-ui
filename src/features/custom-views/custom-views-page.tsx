@@ -35,7 +35,7 @@ export default function CustomViewsPage() {
     <section className="flex animate-[fadeInUp_0.4s_ease-out] flex-col gap-7">
       <div>
         <h1>Views</h1>
-        <p className="mt-1 text-base text-fg-secondary">
+        <p className="page-sub mt-1">
           {projectName ? (
             <>
               Service UIs and specialized views for the <strong>{projectName}</strong> project.

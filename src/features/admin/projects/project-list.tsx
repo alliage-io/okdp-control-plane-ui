@@ -25,6 +25,7 @@ import SearchFilter from '../../../shared/components/search-filter';
 import type { MetricValue } from '../../../core/models/service.model';
 import { formatCpuCores, formatMemoryBytes } from '../../project-console/services/service-utils';
 import { useProjectStats, type ProjectStats } from './use-project-stats';
+import { PageHeader } from '../../../shared/components/page-header';
 
 type ProjectRow = Project & { stats?: ProjectStats; color: string };
 
@@ -194,14 +195,20 @@ export default function ProjectList() {
   );
 
   return (
-    <div className="workspace-container">
+    <div>
       {/* Top Bar: Title (Left) | Create Button (Right), vertically aligned */}
-      <div className="top-bar">
-        <h1>Projects</h1>
-        {isAdmin && populated && (
-          <Button label="Create project" onClick={showDialog} className="create-btn" />
-        )}
-      </div>
+      <PageHeader
+        title="Projects"
+        actions={
+          isAdmin &&
+          populated && (
+            <button className="create-btn" onClick={showDialog}>
+              <i className="pi pi-plus"></i>
+              <span>Create project</span>
+            </button>
+          )
+        }
+      />
 
       {!loaded ? (
         /* Loading: same centered geometry as the wizard, so an empty result
@@ -294,7 +301,6 @@ export default function ProjectList() {
                 header="Description"
                 field="description"
                 style={{ width: '30%' }}
-                className="description-cell"
                 body={(project: Project) => project.description || '-'}
               />
               <Column

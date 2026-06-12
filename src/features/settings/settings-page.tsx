@@ -160,7 +160,7 @@ export default function SettingsPage() {
     <section className="form-page flex animate-[fadeInUp_0.4s_ease-out] flex-col gap-7">
       <div>
         <h1>User Settings</h1>
-        <p className="mt-1 text-base text-fg-secondary">
+        <p className="page-sub mt-1">
           Personal preferences for the OKDP console. They only apply to this browser.
         </p>
       </div>

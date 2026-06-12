@@ -18,9 +18,7 @@ export default function ProjectHome() {
         <>
           <div>
             <h1>Platform Dashboard</h1>
-            {project.description && (
-              <p className="mt-1 text-base text-fg-secondary">{project.description}</p>
-            )}
+            {project.description && <p className="page-sub mt-1">{project.description}</p>}
           </div>
 
           <ProjectKpis summary={summary} />

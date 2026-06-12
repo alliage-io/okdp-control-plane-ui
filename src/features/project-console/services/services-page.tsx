@@ -1,6 +1,7 @@
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { areaBasePath, parentLabel } from './service-utils';
 import { ServiceList } from './service-list';
+import { PageHeader } from '../../../shared/components/page-header';
 
 export interface ServicesPageProps {
   title?: string;
@@ -103,21 +104,17 @@ export default function ServicesPage(props: ServicesPageProps) {
 
   return (
     <div className="services-list animate-in">
-      <div className="page-heading">
-        <div>
-          <div className="breadcrumb-thin">
-            <span>{breadcrumbParent}</span>
-            <i className="pi pi-angle-right" style={{ fontSize: '10px' }}></i>
-            <span className="bc-current">{breadcrumbCurrent}</span>
-          </div>
-          <h1 className="page-title">{title}</h1>
-          <p className="page-sub">{subtitle}</p>
-        </div>
-        <button className="create-btn" onClick={goToDeploy}>
-          <i className="pi pi-plus"></i>
-          <span>{deployLabel}</span>
-        </button>
-      </div>
+      <PageHeader
+        breadcrumb={{ parent: breadcrumbParent, current: breadcrumbCurrent }}
+        title={title}
+        subtitle={subtitle}
+        actions={
+          <button className="create-btn" onClick={goToDeploy}>
+            <i className="pi pi-plus"></i>
+            <span>{deployLabel}</span>
+          </button>
+        }
+      />
 
       <ServiceList
         serviceFilter={serviceFilter}

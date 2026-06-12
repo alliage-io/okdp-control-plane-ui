@@ -214,31 +214,27 @@ export default function SparkSubmitPage() {
       <Toast ref={toast} />
 
       <div className="mx-auto w-full max-w-(--db-form-width) pt-3">
-        <div className="mb-7">
-          <nav className="mb-5 flex items-center gap-2 text-[13px]">
+        <div className="mb-5">
+          <nav className="breadcrumb">
             <a
-              className="flex cursor-pointer items-center gap-1.5 rounded-full py-1 pr-2.5 pl-2 font-medium text-fg-secondary no-underline transition-all duration-250 ease-smooth hover:bg-surface-tertiary hover:text-fg"
+              className="breadcrumb-link"
               onClick={goBack}
               onKeyDown={(e) => e.key === 'Enter' && goBack()}
               tabIndex={0}
             >
               <i className="pi pi-arrow-left text-[11px]"></i>
-              Spark Applications
+              Spark Jobs
             </a>
             <i className="pi pi-angle-right text-[10px] text-fg-muted"></i>
-            <span className="text-[13px] font-medium text-fg-muted">Submit Job</span>
+            <span className="breadcrumb-current">Submit Job</span>
           </nav>
-          <div className="flex flex-wrap items-center gap-3.5">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl shadow-[0_6px_16px_rgba(245,158,11,0.25)] [background:linear-gradient(135deg,#f59e0b,#d97706)]">
-              <i className="pi pi-bolt text-[1.4rem] text-white"></i>
+          <div className="header-row">
+            <div className="header-badge amber">
+              <i className="pi pi-bolt"></i>
             </div>
-            <div className="min-w-0 flex-1">
-              <h2 className="m-0 text-[28px] leading-[1.2] font-extrabold tracking-[-0.03em] text-fg">
-                Submit Spark Application
-              </h2>
-              <p className="mt-1.5 mb-0 text-[15px] text-fg-secondary">
-                Configure and submit a new Spark job or paste raw YAML
-              </p>
+            <div className="header-text">
+              <h2>Submit Spark Application</h2>
+              <p className="page-desc">Configure and submit a new Spark job or paste raw YAML</p>
             </div>
           </div>
         </div>

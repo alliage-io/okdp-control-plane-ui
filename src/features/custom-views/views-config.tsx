@@ -114,7 +114,7 @@ function withBadge(icon: ReactNode, badge: string): ReactNode {
     <span className="relative inline-flex shrink-0">
       {icon}
       <i
-        className={`${badge} absolute -right-1 -bottom-0.5 rounded-full bg-surface p-px text-[0.5rem] leading-none`}
+        className={`${badge} absolute -right-1 -bottom-0.5 rounded-full bg-surface p-px text-[length:calc(0.5rem*var(--nav-item-scale,1))] leading-none`}
       ></i>
     </span>
   );

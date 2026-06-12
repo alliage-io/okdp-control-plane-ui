@@ -12,15 +12,16 @@ export interface BrandGlyph {
   viewBox?: string;
 }
 
-/** Inline brand logo sized to the sidebar icon slot. `mono` follows the
- *  text color instead of the brand hex, for near-black brands that would
- *  vanish in dark mode. */
+/** Inline brand logo sized to the sidebar icon slot (it follows the menu's
+ *  `--nav-item-scale`; outside the rail the var is unset and the slot stays
+ *  16×18px). `mono` follows the text color instead of the brand hex, for
+ *  near-black brands that would vanish in dark mode. */
 export function BrandIcon({ icon, mono }: { icon: BrandGlyph; mono?: boolean }) {
   return (
     <svg
       viewBox={icon.viewBox ?? '0 0 24 24'}
       aria-hidden="true"
-      className="h-4 w-[18px] shrink-0"
+      className="h-[calc(1rem*var(--nav-item-scale,1))] w-[calc(18px*var(--nav-item-scale,1))] shrink-0"
       fill={mono ? 'currentColor' : icon.hex ? `#${icon.hex}` : undefined}
     >
       {icon.paths ? (

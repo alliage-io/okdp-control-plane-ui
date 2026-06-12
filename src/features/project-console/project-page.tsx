@@ -63,16 +63,16 @@ function NavSection({ icon, label, expanded, collapsed, onToggle, children }: Na
   return (
     <div className="mt-1">
       <button
-        className="group flex w-full cursor-pointer items-center rounded-r-md border-0 border-l-2 border-l-transparent bg-transparent px-2.5 py-1.5 text-base font-medium text-fg-secondary transition-[color,background-color] duration-150 ease-smooth hover:bg-surface-secondary hover:text-fg"
+        className="group flex w-full cursor-pointer items-center rounded-r-md border-0 border-l-2 border-l-transparent bg-transparent px-2.5 py-[calc(0.375rem*var(--nav-item-scale,1))] text-[length:calc(var(--db-font-size-base)*var(--nav-item-scale,1))] font-medium text-fg-secondary transition-[color,background-color] duration-150 ease-smooth hover:bg-surface-secondary hover:text-fg"
         onClick={onToggle}
         type="button"
       >
         <i
-          className={`pi ${icon} w-[18px] text-center text-[1rem] text-fg-muted transition-colors duration-150 ease-smooth group-hover:text-fg-secondary`}
+          className={`pi ${icon} w-[calc(18px*var(--nav-item-scale,1))] text-center text-[length:calc(1rem*var(--nav-item-scale,1))] text-fg-muted transition-colors duration-150 ease-smooth group-hover:text-fg-secondary`}
         ></i>
         <span className={sideNavLabelClass(false)}>{label}</span>
         <i
-          className={`pi ${expanded ? 'pi-chevron-down' : 'pi-chevron-right'} ml-auto text-[0.6rem] text-fg-muted transition-transform duration-250 ease-smooth`}
+          className={`pi ${expanded ? 'pi-chevron-down' : 'pi-chevron-right'} ml-auto text-[length:calc(0.6rem*var(--nav-item-scale,1))] text-fg-muted transition-transform duration-250 ease-smooth`}
         ></i>
       </button>
       {/* Bumped from 200px — Data Engineering holds 4 sub-items and Machine
@@ -132,7 +132,7 @@ function ExternalNavLink({ href, icon, label, collapsed, title }: ExternalNavLin
       {typeof icon === 'string' ? <i className={`${icon} ${sideNavIconClass(false)}`}></i> : icon}
       <span className={sideNavLabelClass(collapsed)}>{label}</span>
       {!collapsed && (
-        <i className="pi pi-external-link ml-auto text-[0.6rem] text-fg-muted max-lg:hidden"></i>
+        <i className="pi pi-external-link ml-auto text-[length:calc(0.6rem*var(--nav-item-scale,1))] text-fg-muted max-lg:hidden"></i>
       )}
     </a>
   );
@@ -192,15 +192,19 @@ function WorldSwitcher({ projectName, world, collapsed }: WorldSwitcherProps) {
             className={[
               'flex items-center justify-center rounded-[7px] no-underline',
               collapsed
-                ? 'p-2'
-                : 'flex-1 gap-1.5 px-2 py-1.5 text-sm max-lg:flex-none max-lg:gap-0 max-lg:p-2',
+                ? 'p-[calc(0.5rem*var(--nav-item-scale,1))]'
+                : 'flex-1 gap-1.5 px-2 py-[calc(0.375rem*var(--nav-item-scale,1))] text-[length:calc(var(--db-font-size-sm)*var(--nav-item-scale,1))] max-lg:flex-none max-lg:gap-0 max-lg:p-[calc(0.5rem*var(--nav-item-scale,1))]',
               active
                 ? 'bg-surface font-semibold text-fg shadow-xs'
                 : 'font-medium text-fg-muted transition-colors duration-150 ease-smooth hover:bg-surface hover:text-fg',
             ].join(' ')}
           >
             <i
-              className={`${segment.icon} ${collapsed ? 'text-[1rem]' : 'text-[0.8rem] max-lg:text-[1rem]'}`}
+              className={`${segment.icon} ${
+                collapsed
+                  ? 'text-[length:calc(1rem*var(--nav-item-scale,1))]'
+                  : 'text-[length:calc(0.8rem*var(--nav-item-scale,1))] max-lg:text-[length:calc(1rem*var(--nav-item-scale,1))]'
+              }`}
             ></i>
             <span className={collapsed ? 'hidden' : 'max-lg:hidden'}>{segment.label}</span>
           </Link>

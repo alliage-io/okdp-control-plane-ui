@@ -1,11 +1,12 @@
 import { useRef } from 'react';
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Avatar } from 'primereact/avatar';
 import { Menu } from 'primereact/menu';
 import type { MenuItem } from 'primereact/menuitem';
 import { useAuth } from '../../core/auth/auth-context';
 import { useEnvBar } from '../../core/preferences/env-bar-context';
+import { NAV_SIZE_SCALE, useNavPrefs } from '../../core/preferences/nav-prefs-context';
 import { environment } from '../../config/environment';
 import { sideNavIconClass, sideNavLabelClass, sideNavLinkClass } from './console-nav-classes';
 
@@ -72,6 +73,7 @@ export function ConsoleShell({
   const auth = useAuth();
   const navigate = useNavigate();
   const { envBarEnabled } = useEnvBar();
+  const { menuSizes } = useNavPrefs();
   const menuRef = useRef<Menu>(null);
 
   const displayName = auth.profile?.firstName ?? auth.profile?.username ?? 'User';
@@ -180,7 +182,22 @@ export function ConsoleShell({
       {/* Sidebar — only rendered when the page has menu content (project
           console); other pages get the full-width content zone. */}
       {hasSidebar && (
-        <aside className="z-[25] col-start-1 row-start-2 flex flex-col border-r border-border-light bg-surface transition-[width] duration-400 ease-smooth max-md:hidden">
+        /* --nav-item-scale resolves to the size preference of the collapse
+           state actually shown — including the max-lg viewport, where the
+           grid forces the rail while `collapsed` may still be false. */
+        <aside
+          style={
+            {
+              '--nav-scale-expanded': NAV_SIZE_SCALE[menuSizes.expanded],
+              '--nav-scale-collapsed': NAV_SIZE_SCALE[menuSizes.collapsed],
+            } as CSSProperties
+          }
+          className={`z-[25] col-start-1 row-start-2 flex flex-col border-r border-border-light bg-surface transition-[width] duration-400 ease-smooth max-md:hidden ${
+            collapsed
+              ? '[--nav-item-scale:var(--nav-scale-collapsed)]'
+              : '[--nav-item-scale:var(--nav-scale-expanded)] max-lg:[--nav-item-scale:var(--nav-scale-collapsed)]'
+          }`}
+        >
           {/* The sidebar is fixed with the shell. When the viewport is too
             short for the tree, the nav zone itself slides (scrolls) while
             the bottom collapse bar stays pinned. */}

@@ -29,7 +29,6 @@ export function GroupList() {
   const [group, setGroup] = useState<Group>({ name: '' });
   const [deleteTarget, setDeleteTarget] = useState<Group | null>(null);
 
-
   const openNew = () => {
     setGroup({ name: '' });
     setIsEditMode(false);

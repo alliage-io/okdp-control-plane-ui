@@ -174,10 +174,7 @@ export function SparkList() {
             header="Image"
             style={{ width: '15%' }}
             body={(app: SparkAppInstance) => (
-              <span
-                className="text-[12px] text-fg-secondary mono"
-                title={app.image}
-              >
+              <span className="text-[12px] text-fg-secondary mono" title={app.image}>
                 {shortenImage(app.image)}
               </span>
             )}

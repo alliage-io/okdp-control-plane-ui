@@ -103,7 +103,6 @@ export function SecretStoreList() {
 
   const patchForm = (patch: Partial<StoreForm>) => setForm((f) => ({ ...f, ...patch }));
 
-
   const mergeStores = useCallback((incoming: SecretStore[]) => {
     setStores((current) => {
       if (current.length !== incoming.length) {

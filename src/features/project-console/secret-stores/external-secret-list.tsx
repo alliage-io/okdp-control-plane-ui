@@ -83,7 +83,6 @@ export function ExternalSecretList() {
   const statusLoadingRef = useRef(false);
   statusLoadingRef.current = statusLoading;
 
-
   const mergeSecrets = useCallback((incoming: ExternalSecret[]) => {
     setSecrets((current) => {
       if (current.length !== incoming.length) {

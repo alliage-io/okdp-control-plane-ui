@@ -47,14 +47,6 @@ export default function HomePage() {
             <div className="flex flex-col gap-3">
               <Button
                 type="button"
-                label="My Account"
-                icon="pi pi-user"
-                outlined
-                className="w-full justify-center"
-                onClick={() => auth.accountManagement()}
-              />
-              <Button
-                type="button"
                 label="Sign out"
                 icon="pi pi-sign-out"
                 severity="secondary"

@@ -12,13 +12,13 @@ import { Menu } from 'primereact/menu';
 import { Toast } from 'primereact/toast';
 import type { MenuItem } from 'primereact/menuitem';
 import { identityApi, type User } from '../../../../core/api/identity-api';
-import { StatusTag } from '../../../../shared/components/status-tag';
 import { useIdentityGroups, useIdentityUsers } from '../use-identity';
 import SearchFilter from '../../../../shared/components/search-filter';
 import { PageHeader } from '../../../../shared/components/page-header';
 import { useToastMessages } from '../../../../shared/hooks/use-toast-messages';
 import { DialogFooter } from '../../../../shared/components/dialog-footer';
 import DeleteConfirmDialog from '../../../../shared/components/delete-confirm-dialog';
+import { StatusTag } from '../../../../shared/components/status-tag';
 
 export function UserList() {
   const { toast, showSuccess, showError } = useToastMessages();
@@ -35,7 +35,6 @@ export function UserList() {
   const [user, setUser] = useState<User>({ username: '', name: '' });
   const [emailInput, setEmailInput] = useState('');
   const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
-
 
   const openNew = () => {
     setUser({ username: '', name: '', disabled: false });

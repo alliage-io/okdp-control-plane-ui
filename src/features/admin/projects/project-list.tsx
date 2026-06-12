@@ -20,12 +20,12 @@ import {
   useProjectColorsVersion,
 } from '../../../core/services/project-colors';
 import EmptyState from '../../../shared/components/empty-state';
+import { PageHeader } from '../../../shared/components/page-header';
 import MetricCell from '../../../shared/components/metric-cell';
 import SearchFilter from '../../../shared/components/search-filter';
 import type { MetricValue } from '../../../core/models/service.model';
 import { formatCpuCores, formatMemoryBytes } from '../../project-console/services/service-utils';
 import { useProjectStats, type ProjectStats } from './use-project-stats';
-import { PageHeader } from '../../../shared/components/page-header';
 import { useToastMessages } from '../../../shared/hooks/use-toast-messages';
 import { DialogFooter } from '../../../shared/components/dialog-footer';
 
@@ -91,7 +91,6 @@ export default function ProjectList() {
   const [visible, setVisible] = useState(false);
   const [newProject, setNewProject] = useState<Project>({ name: '', description: '' });
   const [newColor, setNewColor] = useState<string>(PROJECT_COLOR_PALETTE[0]);
-
 
   const applyProjects = (next: Project[]) => {
     projectsRef.current = next;

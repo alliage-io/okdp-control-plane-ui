@@ -17,6 +17,7 @@ import { NAV_CATEGORIES, navItemIcon, type NavCategory } from './nav-config';
 import {
   BUILT_IN_VIEWS,
   builtInViewIcon,
+  launcherUrl,
   uiServiceLaunchers,
   uiServiceViewIcon,
 } from '../custom-views/views-config';
@@ -272,10 +273,11 @@ export default function ProjectPage() {
   // /views tiles — external launchers for deployed UI services plus the
   // built-in views. Categories with nothing to show disappear.
   const allLaunchers = uiServiceLaunchers(viewServices.instances);
-  // With several instances of one service, the instance name disambiguates.
+  // With several instances of one service, the instance name disambiguates
+  // (counted per view label — a service may carry several views).
   const launcherCounts = new Map<string, number>();
   for (const { view } of allLaunchers) {
-    launcherCounts.set(view.service, (launcherCounts.get(view.service) ?? 0) + 1);
+    launcherCounts.set(view.label, (launcherCounts.get(view.label) ?? 0) + 1);
   }
   // User-created views flagged for the menu, slotted by their (mandatory)
   // category: a lateral-menu category label merges them into that section,
@@ -446,13 +448,17 @@ export default function ProjectPage() {
                     sub
                   />
                 ))}
-                {launchers.map(({ svc, view }) => {
+                {launchers.map((launcher) => {
+                  const { svc, view } = launcher;
                   const icon = uiServiceViewIcon(view);
-                  const label = (launcherCounts.get(view.service) ?? 0) > 1 ? svc.name : view.label;
+                  const label =
+                    (launcherCounts.get(view.label) ?? 0) > 1
+                      ? `${view.label} · ${svc.name}`
+                      : view.label;
                   return svc.status === 'Ready' ? (
                     <ExternalNavLink
-                      key={svc.name}
-                      href={svc.url!}
+                      key={`${svc.name}:${view.label}`}
+                      href={launcherUrl(launcher)}
                       icon={icon}
                       label={label}
                       collapsed={sidebarCollapsed}
@@ -460,7 +466,7 @@ export default function ProjectPage() {
                     />
                   ) : (
                     <DisabledNavLink
-                      key={svc.name}
+                      key={`${svc.name}:${view.label}`}
                       icon={icon}
                       label={label}
                       collapsed={sidebarCollapsed}

@@ -157,13 +157,8 @@ export const NAV_CATEGORIES: NavCategory[] = [
         brand: siApachesuperset,
         label: 'Superset',
       },
-      {
-        icon: 'pi pi-pencil',
-        label: 'SQL Editor',
-        disabled: true,
-        defaultHidden: true,
-        collapsedTitle: 'SQL Editor — exploration',
-      },
+      // SQL Lab is not a service: it lives in the views world as a launcher
+      // derived from the deployed Superset instance (views-config).
     ],
   },
   {

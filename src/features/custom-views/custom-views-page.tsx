@@ -6,6 +6,7 @@ import SectionHeading from '../../shared/components/section-heading';
 import {
   BUILT_IN_VIEWS,
   builtInViewIcon,
+  launcherUrl,
   uiServiceLaunchers,
   uiServiceViewIcon,
 } from './views-config';
@@ -109,19 +110,22 @@ export default function CustomViewsPage() {
               </p>
             ) : launchers.length > 0 ? (
               <QuickActions>
-                {launchers.map(({ svc, view }) => {
+                {launchers.map((launcher) => {
+                  const { svc, view } = launcher;
                   const ready = svc.status === 'Ready';
                   return (
                     <ActionCard
-                      key={svc.name}
-                      to={svc.url!}
+                      key={`${svc.name}:${view.label}`}
+                      to={launcherUrl(launcher)}
                       external
                       disabled={!ready}
                       icon={uiServiceViewIcon(view)}
                       tone={view.tone}
                       title={view.label}
                       description={
-                        ready ? `Open ${svc.name} in a new tab` : `${svc.name} — ${svc.status}`
+                        ready
+                          ? (view.description ?? `Open ${svc.name} in a new tab`)
+                          : `${svc.name} — ${svc.status}`
                       }
                     />
                   );

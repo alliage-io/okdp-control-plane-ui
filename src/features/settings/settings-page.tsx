@@ -2,6 +2,7 @@ import { InputSwitch } from 'primereact/inputswitch';
 import { useTheme, type ThemeMode } from '../../core/theme/theme-context';
 import { useEnvBar } from '../../core/preferences/env-bar-context';
 import { useNavPrefs } from '../../core/preferences/nav-prefs-context';
+import { useConfirmPrefs } from '../../core/preferences/confirm-prefs-context';
 import { NAV_CATEGORIES } from '../project-console/nav-config';
 import SectionHeading from '../../shared/components/section-heading';
 
@@ -154,6 +155,7 @@ function NavMenuPrefs() {
 /** /settings — personal preferences for the console. */
 export default function SettingsPage() {
   const { envBarEnabled, setEnvBarEnabled } = useEnvBar();
+  const { typedDeleteEnabled, setTypedDeleteEnabled } = useConfirmPrefs();
   return (
     <section className="form-page flex animate-[fadeInUp_0.4s_ease-out] flex-col gap-7">
       <div>
@@ -195,6 +197,28 @@ export default function SettingsPage() {
               inputId="env-bar-switch"
               checked={envBarEnabled}
               onChange={(e) => setEnvBarEnabled(e.value ?? false)}
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <SectionHeading>Confirmations</SectionHeading>
+        <div className="form-card">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col gap-1">
+              <label htmlFor="typed-delete-switch" className="text-[12.5px] font-semibold text-fg">
+                Type-to-confirm deletions
+              </label>
+              <small className="field-hint">
+                Require typing the resource name before deleting an instance. Deleting a whole
+                project always requires it.
+              </small>
+            </div>
+            <InputSwitch
+              inputId="typed-delete-switch"
+              checked={typedDeleteEnabled}
+              onChange={(e) => setTypedDeleteEnabled(e.value ?? true)}
             />
           </div>
         </div>

@@ -13,3 +13,4 @@ export const NAV_HIDDEN_KEY = 'okdp-nav-hidden';
 // User-created view launchers, keyed by project. Local-only for now — the
 // API knows nothing about them.
 export const CUSTOM_VIEWS_KEY = 'okdp-custom-views';
+export const TYPED_DELETE_KEY = 'okdp-typed-delete';

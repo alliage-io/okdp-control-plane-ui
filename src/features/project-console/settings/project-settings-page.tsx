@@ -198,6 +198,7 @@ export default function ProjectSettingsPage() {
       <DeleteConfirmDialog
         resourceName={confirmDelete ? projectName : null}
         resourceKind="project"
+        forceTyped
         message={
           confirmDelete && (
             <>

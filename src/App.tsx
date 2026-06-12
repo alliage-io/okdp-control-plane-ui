@@ -8,6 +8,7 @@ import { ThemeProvider } from './core/theme/theme-context';
 import { EnvBarProvider } from './core/preferences/env-bar-context';
 import { NavPrefsProvider } from './core/preferences/nav-prefs-context';
 import { CustomViewsProvider } from './core/preferences/custom-views-context';
+import { ConfirmPrefsProvider } from './core/preferences/confirm-prefs-context';
 import { AppRoutes } from './app-routes';
 
 // Gate rendering until the OIDC check completes (APP_INITIALIZER equivalent)
@@ -35,17 +36,19 @@ export function App() {
         <EnvBarProvider>
           <NavPrefsProvider>
             <CustomViewsProvider>
-              <BrowserRouter>
-                <ScrollToTop />
-                <AuthProvider>
-                  <AuthGate>
-                    <AuthRedirector />
-                    <ProjectContextProvider>
-                      <AppRoutes />
-                    </ProjectContextProvider>
-                  </AuthGate>
-                </AuthProvider>
-              </BrowserRouter>
+              <ConfirmPrefsProvider>
+                <BrowserRouter>
+                  <ScrollToTop />
+                  <AuthProvider>
+                    <AuthGate>
+                      <AuthRedirector />
+                      <ProjectContextProvider>
+                        <AppRoutes />
+                      </ProjectContextProvider>
+                    </AuthGate>
+                  </AuthProvider>
+                </BrowserRouter>
+              </ConfirmPrefsProvider>
             </CustomViewsProvider>
           </NavPrefsProvider>
         </EnvBarProvider>

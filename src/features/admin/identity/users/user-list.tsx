@@ -10,7 +10,6 @@ import { MultiSelect } from 'primereact/multiselect';
 import { Checkbox } from 'primereact/checkbox';
 import { Menu } from 'primereact/menu';
 import { Toast } from 'primereact/toast';
-import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import type { MenuItem } from 'primereact/menuitem';
 import { identityApi, type User } from '../../../../core/api/identity-api';
 import { StatusTag } from '../../../../shared/components/status-tag';
@@ -19,6 +18,7 @@ import SearchFilter from '../../../../shared/components/search-filter';
 import { PageHeader } from '../../../../shared/components/page-header';
 import { useToastMessages } from '../../../../shared/hooks/use-toast-messages';
 import { DialogFooter } from '../../../../shared/components/dialog-footer';
+import DeleteConfirmDialog from '../../../../shared/components/delete-confirm-dialog';
 
 export function UserList() {
   const { toast, showSuccess, showError } = useToastMessages();
@@ -31,6 +31,7 @@ export function UserList() {
   const [globalFilter, setGlobalFilter] = useState('');
   const [userDialog, setUserDialog] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<User | null>(null);
   const [user, setUser] = useState<User>({ username: '', name: '' });
   const [emailInput, setEmailInput] = useState('');
   const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
@@ -53,26 +54,13 @@ export function UserList() {
   };
 
   const deleteUser = (u: User) => {
-    confirmDialog({
-      message: (
-        <span>
-          Are you sure you want to delete <strong>{u.name}</strong>? This action cannot be undone.
-        </span>
-      ),
-      header: 'Delete user?',
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Delete',
-      rejectLabel: 'Cancel',
-      accept: () => {
-        identityApi
-          .deleteUser(u.username)
-          .then(() => {
-            showSuccess('User deleted');
-            refreshUsers();
-          })
-          .catch(() => showError('Failed to delete user'));
-      },
-    });
+    identityApi
+      .deleteUser(u.username)
+      .then(() => {
+        showSuccess('User deleted');
+        refreshUsers();
+      })
+      .catch(() => showError('Failed to delete user'));
   };
 
   const hideDialog = () => setUserDialog(false);
@@ -114,7 +102,7 @@ export function UserList() {
       label: 'Delete',
       icon: 'pi pi-trash',
       command: () => {
-        if (selectedUserRef.current) deleteUser(selectedUserRef.current);
+        if (selectedUserRef.current) setDeleteTarget(selectedUserRef.current);
       },
     },
   ];
@@ -131,11 +119,22 @@ export function UserList() {
   return (
     <div>
       <Toast ref={toast} />
-      <ConfirmDialog
-        className="db-confirm-dialog"
-        style={{ width: '400px' }}
-        acceptClassName="p-button-danger"
-        rejectClassName="p-button-text"
+      <DeleteConfirmDialog
+        resourceName={deleteTarget?.username ?? null}
+        resourceKind="user"
+        message={
+          deleteTarget && (
+            <>
+              This will permanently remove <strong>{deleteTarget.name}</strong>. This action cannot
+              be undone.
+            </>
+          )
+        }
+        onHide={() => setDeleteTarget(null)}
+        onConfirm={() => {
+          if (deleteTarget) deleteUser(deleteTarget);
+          setDeleteTarget(null);
+        }}
       />
 
       {/* Top Bar */}

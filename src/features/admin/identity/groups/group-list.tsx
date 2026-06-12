@@ -7,7 +7,6 @@ import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Menu } from 'primereact/menu';
 import { Toast } from 'primereact/toast';
-import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import type { MenuItem } from 'primereact/menuitem';
 import { identityApi, type Group } from '../../../../core/api/identity-api';
 import { useIdentityGroups } from '../use-identity';
@@ -15,6 +14,7 @@ import SearchFilter from '../../../../shared/components/search-filter';
 import { PageHeader } from '../../../../shared/components/page-header';
 import { useToastMessages } from '../../../../shared/hooks/use-toast-messages';
 import { DialogFooter } from '../../../../shared/components/dialog-footer';
+import DeleteConfirmDialog from '../../../../shared/components/delete-confirm-dialog';
 
 export function GroupList() {
   const { toast, showSuccess, showError } = useToastMessages();
@@ -27,6 +27,7 @@ export function GroupList() {
   const [groupDialog, setGroupDialog] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [group, setGroup] = useState<Group>({ name: '' });
+  const [deleteTarget, setDeleteTarget] = useState<Group | null>(null);
 
 
   const openNew = () => {
@@ -42,26 +43,13 @@ export function GroupList() {
   };
 
   const deleteGroup = (g: Group) => {
-    confirmDialog({
-      message: (
-        <span>
-          Are you sure you want to delete <strong>{g.name}</strong>? This action cannot be undone.
-        </span>
-      ),
-      header: 'Delete group?',
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Delete',
-      rejectLabel: 'Cancel',
-      accept: () => {
-        identityApi
-          .deleteGroup(g.name)
-          .then(() => {
-            showSuccess('Group deleted');
-            refreshGroups();
-          })
-          .catch(() => showError('Failed to delete group'));
-      },
-    });
+    identityApi
+      .deleteGroup(g.name)
+      .then(() => {
+        showSuccess('Group deleted');
+        refreshGroups();
+      })
+      .catch(() => showError('Failed to delete group'));
   };
 
   const hideDialog = () => setGroupDialog(false);
@@ -97,7 +85,7 @@ export function GroupList() {
       label: 'Delete',
       icon: 'pi pi-trash',
       command: () => {
-        if (selectedGroupRef.current) deleteGroup(selectedGroupRef.current);
+        if (selectedGroupRef.current) setDeleteTarget(selectedGroupRef.current);
       },
     },
   ];
@@ -114,11 +102,22 @@ export function GroupList() {
   return (
     <div>
       <Toast ref={toast} />
-      <ConfirmDialog
-        className="db-confirm-dialog"
-        style={{ width: '400px' }}
-        acceptClassName="p-button-danger"
-        rejectClassName="p-button-text"
+      <DeleteConfirmDialog
+        resourceName={deleteTarget?.name ?? null}
+        resourceKind="group"
+        message={
+          deleteTarget && (
+            <>
+              This will permanently remove <strong>{deleteTarget.name}</strong>. This action cannot
+              be undone.
+            </>
+          )
+        }
+        onHide={() => setDeleteTarget(null)}
+        onConfirm={() => {
+          if (deleteTarget) deleteGroup(deleteTarget);
+          setDeleteTarget(null);
+        }}
       />
 
       {/* Top Bar */}

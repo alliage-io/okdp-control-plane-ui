@@ -198,7 +198,12 @@ export default function CustomViewsSection({ projectName }: { projectName: strin
         )}
       </div>
 
-      <ConfirmDialog />
+      <ConfirmDialog
+        className="db-confirm-dialog"
+        style={{ width: '400px' }}
+        acceptClassName="p-button-danger"
+        rejectClassName="p-button-text"
+      />
       <Dialog
         header={draft?.id ? 'Edit custom view' : 'New custom view'}
         visible={draft !== null}

@@ -4,7 +4,6 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
-import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { sparkApi } from '../../../core/api/spark-api';
 import { applyListEvent } from '../../../core/api/sse';
 import type { SparkAppInstance, SparkUIInfo } from '../../../core/models/spark.model';
@@ -12,6 +11,7 @@ import { apiErrorMessage, formatMediumDate } from '../services/service-utils';
 import { StatusTag } from '../../../shared/components/status-tag';
 import { getStatusTone, isTerminalStatus } from './spark-utils';
 import SearchFilter from '../../../shared/components/search-filter';
+import DeleteConfirmDialog from '../../../shared/components/delete-confirm-dialog';
 
 function shortenImage(image: string): string {
   if (!image) return '';
@@ -27,6 +27,7 @@ export function SparkList() {
   const [apps, setApps] = useState<SparkAppInstance[]>([]);
   const [loading, setLoading] = useState(true);
   const [globalFilter, setGlobalFilter] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState<SparkAppInstance | null>(null);
 
   useEffect(() => {
     if (!projectName) return;
@@ -66,33 +67,27 @@ export function SparkList() {
     }
   };
 
-  const confirmDelete = (app: SparkAppInstance) => {
-    confirmDialog({
-      message: `Are you sure you want to delete Spark job "${app.name}"?`,
-      header: 'Confirm Delete',
-      icon: 'pi pi-exclamation-triangle',
-      acceptClassName: 'p-button-danger',
-      accept: () => {
-        if (!projectName) return;
-        sparkApi
-          .deleteApp(projectName, app.name)
-          .then(() => {
-            toast.current?.show({
-              severity: 'success',
-              summary: 'Deleted',
-              detail: `Spark job "${app.name}" has been removed`,
-            });
-            setApps((current) => current.filter((a) => a.name !== app.name));
-          })
-          .catch((err) => {
-            toast.current?.show({
-              severity: 'error',
-              summary: 'Error',
-              detail: apiErrorMessage(err, 'Failed to delete Spark job'),
-            });
-          });
-      },
-    });
+  const confirmDelete = (app: SparkAppInstance) => setDeleteTarget(app);
+
+  const deleteApp = (app: SparkAppInstance) => {
+    if (!projectName) return;
+    sparkApi
+      .deleteApp(projectName, app.name)
+      .then(() => {
+        toast.current?.show({
+          severity: 'success',
+          summary: 'Deleted',
+          detail: `Spark job "${app.name}" has been removed`,
+        });
+        setApps((current) => current.filter((a) => a.name !== app.name));
+      })
+      .catch((err) => {
+        toast.current?.show({
+          severity: 'error',
+          summary: 'Error',
+          detail: apiErrorMessage(err, 'Failed to delete Spark job'),
+        });
+      });
   };
 
   const openSparkLink = (app: SparkAppInstance, field: keyof SparkUIInfo, warnTitle: string) => {
@@ -123,7 +118,15 @@ export function SparkList() {
   return (
     <div>
       <Toast ref={toast} />
-      <ConfirmDialog />
+      <DeleteConfirmDialog
+        resourceName={deleteTarget?.name ?? null}
+        resourceKind="Spark job"
+        onHide={() => setDeleteTarget(null)}
+        onConfirm={(name) => {
+          if (deleteTarget?.name === name) deleteApp(deleteTarget);
+          setDeleteTarget(null);
+        }}
+      />
 
       <SearchFilter value={globalFilter} onChange={setGlobalFilter} placeholder="Filter jobs..." />
 

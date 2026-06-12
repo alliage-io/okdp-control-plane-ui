@@ -8,7 +8,6 @@ import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
 import { Menu } from 'primereact/menu';
 import { Toast } from 'primereact/toast';
-import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import type { MenuItem } from 'primereact/menuitem';
 import {
   externalSecretApi,
@@ -27,6 +26,7 @@ import { PageHeader } from '../../../shared/components/page-header';
 import { useToastMessages } from '../../../shared/hooks/use-toast-messages';
 import { k8sNameError } from '../../../shared/utils/k8s-names';
 import { DialogFooter } from '../../../shared/components/dialog-footer';
+import DeleteConfirmDialog from '../../../shared/components/delete-confirm-dialog';
 
 const SECTION_TITLE_CLASS = 'm-0 mb-3 text-[14px] font-semibold text-fg';
 const DIVIDER_CLASS = 'my-4 border-0 border-t border-t-border';
@@ -60,6 +60,7 @@ export function ExternalSecretList() {
   const [loading, setLoading] = useState(true);
   const [readyStores, setReadyStores] = useState<SecretStore[]>([]);
   const [globalFilter, setGlobalFilter] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState<ExternalSecret | null>(null);
 
   // Dialog state
   const [dialogVisible, setDialogVisible] = useState(false);
@@ -238,30 +239,18 @@ export function ExternalSecretList() {
       });
   };
 
-  const confirmDelete = (es: ExternalSecret) => {
-    confirmDialog({
-      message: (
-        <span>
-          Are you sure you want to delete <strong>{es.name}</strong>? The associated Kubernetes
-          secret will also be removed.
-        </span>
-      ),
-      header: 'Delete external secret?',
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Delete',
-      rejectLabel: 'Cancel',
-      accept: () => {
-        externalSecretApi
-          .delete(projectId, es.name)
-          .then(() => {
-            showSuccess(`External secret "${es.name}" deleted successfully`);
-            loadSecrets();
-          })
-          .catch((err) => {
-            showError(apiErrorMessage(err, 'Failed to delete external secret'));
-          });
-      },
-    });
+  const confirmDelete = (es: ExternalSecret) => setDeleteTarget(es);
+
+  const deleteSecret = (es: ExternalSecret) => {
+    externalSecretApi
+      .delete(projectId, es.name)
+      .then(() => {
+        showSuccess(`External secret "${es.name}" deleted successfully`);
+        loadSecrets();
+      })
+      .catch((err) => {
+        showError(apiErrorMessage(err, 'Failed to delete external secret'));
+      });
   };
 
   // --- Status detail ---
@@ -709,11 +698,22 @@ export function ExternalSecretList() {
         />
       </Dialog>
 
-      <ConfirmDialog
-        className="db-confirm-dialog"
-        style={{ width: '440px' }}
-        acceptClassName="p-button-danger"
-        rejectClassName="p-button-text"
+      <DeleteConfirmDialog
+        resourceName={deleteTarget?.name ?? null}
+        resourceKind="external secret"
+        message={
+          deleteTarget && (
+            <>
+              This will remove <strong>{deleteTarget.name}</strong>. The associated Kubernetes
+              secret will also be removed.
+            </>
+          )
+        }
+        onHide={() => setDeleteTarget(null)}
+        onConfirm={() => {
+          if (deleteTarget) deleteSecret(deleteTarget);
+          setDeleteTarget(null);
+        }}
       />
 
       <Toast ref={toast} position="bottom-right" />

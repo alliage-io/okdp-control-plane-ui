@@ -9,7 +9,6 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { Checkbox } from 'primereact/checkbox';
 import { Menu } from 'primereact/menu';
 import { Toast } from 'primereact/toast';
-import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import type { MenuItem } from 'primereact/menuitem';
 import {
   secretStoreApi,
@@ -27,6 +26,7 @@ import { PageHeader } from '../../../shared/components/page-header';
 import { useToastMessages } from '../../../shared/hooks/use-toast-messages';
 import { k8sNameError } from '../../../shared/utils/k8s-names';
 import { DialogFooter } from '../../../shared/components/dialog-footer';
+import DeleteConfirmDialog from '../../../shared/components/delete-confirm-dialog';
 
 const SECTION_TITLE_CLASS = 'm-0 mb-3 text-[14px] font-semibold text-fg';
 const DIVIDER_CLASS = 'my-4 border-0 border-t border-t-border';
@@ -84,6 +84,7 @@ export function SecretStoreList() {
   const [stores, setStores] = useState<SecretStore[]>([]);
   const [loading, setLoading] = useState(true);
   const [globalFilter, setGlobalFilter] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState<SecretStore | null>(null);
 
   // Dialog state
   const [dialogVisible, setDialogVisible] = useState(false);
@@ -241,30 +242,18 @@ export function SecretStoreList() {
       });
   };
 
-  const confirmDelete = (store: SecretStore) => {
-    confirmDialog({
-      message: (
-        <span>
-          Are you sure you want to delete <strong>{store.name}</strong>? This action cannot be
-          undone.
-        </span>
-      ),
-      header: 'Delete secret store?',
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Delete',
-      rejectLabel: 'Cancel',
-      accept: () => {
-        secretStoreApi
-          .delete(projectId, store.name)
-          .then(() => {
-            showSuccess(`Secret store "${store.name}" deleted successfully`);
-            loadStores();
-          })
-          .catch((err) => {
-            showError(apiErrorMessage(err, 'Failed to delete secret store'));
-          });
-      },
-    });
+  const confirmDelete = (store: SecretStore) => setDeleteTarget(store);
+
+  const deleteStore = (store: SecretStore) => {
+    secretStoreApi
+      .delete(projectId, store.name)
+      .then(() => {
+        showSuccess(`Secret store "${store.name}" deleted successfully`);
+        loadStores();
+      })
+      .catch((err) => {
+        showError(apiErrorMessage(err, 'Failed to delete secret store'));
+      });
   };
 
   // --- Status detail ---
@@ -716,11 +705,21 @@ export function SecretStoreList() {
         />
       </Dialog>
 
-      <ConfirmDialog
-        className="db-confirm-dialog"
-        style={{ width: '440px' }}
-        acceptClassName="p-button-danger"
-        rejectClassName="p-button-text"
+      <DeleteConfirmDialog
+        resourceName={deleteTarget?.name ?? null}
+        resourceKind="secret store"
+        message={
+          deleteTarget && (
+            <>
+              This will remove <strong>{deleteTarget.name}</strong>. This action cannot be undone.
+            </>
+          )
+        }
+        onHide={() => setDeleteTarget(null)}
+        onConfirm={() => {
+          if (deleteTarget) deleteStore(deleteTarget);
+          setDeleteTarget(null);
+        }}
       />
 
       <Toast ref={toast} position="bottom-right" />

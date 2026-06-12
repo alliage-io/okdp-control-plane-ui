@@ -1378,6 +1378,33 @@ h1 {
   color: #92400e;
 }
 
+/* ========== Log viewer (terminal surface) ========== */
+/* Deliberately dark in BOTH themes — a terminal, not a themed panel. One
+   definition shared by the pod log viewer and the spark executor logs so
+   the two read identically. */
+@utility log-block {
+  background: #111827;
+  color: #e5e7eb;
+  font-family: var(--db-font-mono);
+  font-size: 12.5px;
+  line-height: 1.7;
+}
+
+/* Secondary text on the log surface (loading / empty status lines). */
+@utility log-muted {
+  color: #9ca3af;
+}
+
+/* De-emphasized log chrome (line numbers). */
+@utility log-dim {
+  color: #6b7280;
+}
+
+/* Live-stream accent — pairs with the log-pulse keyframes' emerald glow. */
+@utility log-live {
+  color: #10b981;
+}
+
 /* ========== Parameters list ========== */
 @utility param-list {
   display: flex;

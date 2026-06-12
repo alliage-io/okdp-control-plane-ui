@@ -172,7 +172,7 @@ export function SparkList() {
             style={{ width: '15%' }}
             body={(app: SparkAppInstance) => (
               <span
-                className="text-[12px] text-fg-secondary [font-family:monospace]"
+                className="text-[12px] text-fg-secondary mono"
                 title={app.image}
               >
                 {shortenImage(app.image)}

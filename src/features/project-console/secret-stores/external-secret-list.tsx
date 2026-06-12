@@ -468,7 +468,7 @@ export function ExternalSecretList() {
             header="Target Secret"
             style={{ width: '20%' }}
             body={(es: ExternalSecret) => (
-              <span className="text-[13px] text-fg-secondary [font-family:monospace]">
+              <span className="text-[13px] text-fg-secondary mono">
                 {es.target?.name || '-'}
               </span>
             )}
@@ -541,13 +541,11 @@ export function ExternalSecretList() {
               id="esName"
               value={secretName}
               onChange={(e) => setSecretName(e.target.value)}
-              className={`w-full dialog-input${nameError ? ' border-[#d32f2f]!' : ''}`}
+              className={`w-full dialog-input${nameError ? ' border-danger!' : ''}`}
               placeholder="e.g., db-credentials"
               disabled={editMode}
             />
-            {nameError && (
-              <small className="mt-1 block text-[12px] text-[#d32f2f]">{nameError}</small>
-            )}
+            {nameError && <small className="mt-1 block text-[12px] text-danger">{nameError}</small>}
           </div>
 
           <hr className={DIVIDER_CLASS} />
@@ -557,7 +555,7 @@ export function ExternalSecretList() {
           <div className="field">
             <label htmlFor="storeRef">Secret Store</label>
             {readyStores.length === 0 ? (
-              <div className="flex items-center gap-2 rounded-md border border-[#ffe0b2] bg-[#fff3e0] px-3 py-2.5 text-[13px] text-[#e65100]">
+              <div className="alert-warn flex items-center gap-2 rounded-md border px-3 py-2.5 text-[13px]">
                 <i className="pi pi-info-circle shrink-0 text-[14px]"></i>
                 <span>
                   No ready secret stores available. Create and connect a secret store first.

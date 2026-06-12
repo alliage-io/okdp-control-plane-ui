@@ -343,7 +343,7 @@ export default function SparkSubmitPage() {
                   value={yamlContent}
                   rows={20}
                   placeholder="Paste your SparkApplication YAML here..."
-                  className="w-full resize-y text-[13px]! [font-family:monospace]!"
+                  className="w-full resize-y text-[13px]! mono!"
                   onChange={(e) => setYamlContent(e.target.value)}
                 />
               </div>

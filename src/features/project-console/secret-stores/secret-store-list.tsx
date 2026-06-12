@@ -464,11 +464,7 @@ export function SecretStoreList() {
             body={(store: SecretStore) => (
               <>
                 <span className="font-medium">{store.name}</span>
-                {store.isDefault && (
-                  <span className="ml-2 rounded-xs bg-[#e6f4ea] px-2 py-[3px] text-[11px] font-medium text-[#1e8e3e] os-dark:bg-[rgba(21,101,192,0.3)] os-dark:text-[#90caf9]">
-                    default
-                  </span>
-                )}
+                {store.isDefault && <span className="okdp-tag okdp-tag-info ml-2">default</span>}
               </>
             )}
           />
@@ -486,7 +482,7 @@ export function SecretStoreList() {
           <Column
             header="Server"
             style={{ width: '28%' }}
-            className="max-w-0 overflow-hidden text-[13px] text-ellipsis whitespace-nowrap text-fg-secondary [font-family:monospace]"
+            className="max-w-0 overflow-hidden text-[13px] text-ellipsis whitespace-nowrap text-fg-secondary mono"
             body={(store: SecretStore) => (
               <span title={store.vault?.server || ''}>{store.vault?.server || '-'}</span>
             )}
@@ -559,13 +555,11 @@ export function SecretStoreList() {
               id="storeName"
               value={form.storeName}
               onChange={(e) => patchForm({ storeName: e.target.value })}
-              className={`w-full dialog-input${nameError ? ' border-[#d32f2f]!' : ''}`}
+              className={`w-full dialog-input${nameError ? ' border-danger!' : ''}`}
               placeholder="e.g., vault-main"
               disabled={editMode}
             />
-            {nameError && (
-              <small className="mt-1 block text-[12px] text-[#d32f2f]">{nameError}</small>
-            )}
+            {nameError && <small className="mt-1 block text-[12px] text-danger">{nameError}</small>}
           </div>
 
           <hr className={DIVIDER_CLASS} />
@@ -627,7 +621,7 @@ export function SecretStoreList() {
               id="caBundle"
               value={form.caBundle}
               onChange={(e) => patchForm({ caBundle: e.target.value })}
-              className="w-full dialog-input resize-y text-[12px]! [font-family:monospace]"
+              className="w-full dialog-input resize-y text-[12px]! mono"
               placeholder={'-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----'}
               rows={3}
             />

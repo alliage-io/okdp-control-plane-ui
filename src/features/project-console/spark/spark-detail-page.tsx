@@ -215,7 +215,7 @@ export default function SparkDetailPage() {
                   <span className="text-[12px] font-medium tracking-[0.05em] text-fg-muted uppercase">
                     Image
                   </span>
-                  <span className="text-[13px] font-medium text-fg [font-family:monospace]">
+                  <span className="text-[13px] font-medium text-fg mono">
                     {app.image}
                   </span>
                 </div>
@@ -232,7 +232,7 @@ export default function SparkDetailPage() {
                     <span className="text-[12px] font-medium tracking-[0.05em] text-fg-muted uppercase">
                       Driver Pod
                     </span>
-                    <span className="text-[13px] font-medium text-fg [font-family:monospace]">
+                    <span className="text-[13px] font-medium text-fg mono">
                       {app.driverPodName}
                     </span>
                   </div>
@@ -266,7 +266,7 @@ export default function SparkDetailPage() {
                       key={key}
                       className="flex items-center justify-between border-b border-b-border-light py-2 last:border-b-0"
                     >
-                      <span className="text-[13px] font-medium text-fg [font-family:monospace]">
+                      <span className="text-[13px] font-medium text-fg mono">
                         {key}
                       </span>
                       <Tag value={executors[key]} severity={getExecutorSeverity(executors[key])} />
@@ -298,8 +298,8 @@ export default function SparkDetailPage() {
                   />
                 </div>
               </div>
-              <div className="max-h-[500px] overflow-auto rounded-md bg-[#1e1e1e] p-3">
-                <pre className="m-0 text-[12px] leading-[1.6] break-all whitespace-pre-wrap text-[#d4d4d4] [font-family:monospace]">
+              <div className="log-block max-h-[500px] overflow-auto rounded-md p-3">
+                <pre className="m-0 font-[inherit] break-all whitespace-pre-wrap">
                   {logContent || 'No logs available.'}
                 </pre>
               </div>

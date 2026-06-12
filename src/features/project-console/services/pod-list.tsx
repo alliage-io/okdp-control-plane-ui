@@ -44,7 +44,7 @@ export function PodList({ pods, onViewLogs }: PodListProps) {
         header="Pod"
         style={{ width: '35%' }}
         body={(pod: Pod) => (
-          <span className="text-[13px] font-medium [font-family:monospace]">{pod.name}</span>
+          <span className="text-[13px] font-medium mono">{pod.name}</span>
         )}
       />
       <Column

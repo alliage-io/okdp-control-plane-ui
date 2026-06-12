@@ -160,37 +160,21 @@ function SizeSegments({ value, onChange, ariaLabel }: SizeSegmentsProps) {
   );
 }
 
-/** Entry size (expanded sidebar) and icon size (collapsed rail) choices. */
+/** Size of the menu entries — one choice covering both the expanded
+ *  sidebar and the collapsed rail. */
 function NavSizePrefs() {
-  const { menuSizes, setMenuSize } = useNavPrefs();
+  const { menuSize, setMenuSize } = useNavPrefs();
 
   return (
-    <>
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <span className="text-[12.5px] font-semibold text-fg">Entry size</span>
-          <small className="field-hint">
-            Text and icon size of the menu entries when the sidebar is expanded.
-          </small>
-        </div>
-        <SizeSegments
-          value={menuSizes.expanded}
-          onChange={(size) => setMenuSize('expanded', size)}
-          ariaLabel="Expanded menu entry size"
-        />
+    <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-col gap-1">
+        <span className="text-[12.5px] font-semibold text-fg">Menu size</span>
+        <small className="field-hint">
+          Text and icon size of the menu entries, expanded or collapsed.
+        </small>
       </div>
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <span className="text-[12.5px] font-semibold text-fg">Icon size</span>
-          <small className="field-hint">Icon size when the sidebar is collapsed to the rail.</small>
-        </div>
-        <SizeSegments
-          value={menuSizes.collapsed}
-          onChange={(size) => setMenuSize('collapsed', size)}
-          ariaLabel="Collapsed menu icon size"
-        />
-      </div>
-    </>
+      <SizeSegments value={menuSize} onChange={setMenuSize} ariaLabel="Lateral menu size" />
+    </div>
   );
 }
 

@@ -73,7 +73,7 @@ export function ConsoleShell({
   const auth = useAuth();
   const navigate = useNavigate();
   const { envBarEnabled } = useEnvBar();
-  const { menuSizes } = useNavPrefs();
+  const { menuSize } = useNavPrefs();
   const menuRef = useRef<Menu>(null);
 
   const displayName = auth.profile?.firstName ?? auth.profile?.username ?? 'User';
@@ -182,21 +182,11 @@ export function ConsoleShell({
       {/* Sidebar — only rendered when the page has menu content (project
           console); other pages get the full-width content zone. */}
       {hasSidebar && (
-        /* --nav-item-scale resolves to the size preference of the collapse
-           state actually shown — including the max-lg viewport, where the
-           grid forces the rail while `collapsed` may still be false. */
+        /* --nav-item-scale carries the menu-size preference; every entry
+           metric in the rail multiplies it. */
         <aside
-          style={
-            {
-              '--nav-scale-expanded': NAV_SIZE_SCALE[menuSizes.expanded],
-              '--nav-scale-collapsed': NAV_SIZE_SCALE[menuSizes.collapsed],
-            } as CSSProperties
-          }
-          className={`z-[25] col-start-1 row-start-2 flex flex-col border-r border-border-light bg-surface transition-[width] duration-400 ease-smooth max-md:hidden ${
-            collapsed
-              ? '[--nav-item-scale:var(--nav-scale-collapsed)]'
-              : '[--nav-item-scale:var(--nav-scale-expanded)] max-lg:[--nav-item-scale:var(--nav-scale-collapsed)]'
-          }`}
+          style={{ '--nav-item-scale': NAV_SIZE_SCALE[menuSize] } as CSSProperties}
+          className="z-[25] col-start-1 row-start-2 flex flex-col border-r border-border-light bg-surface transition-[width] duration-400 ease-smooth max-md:hidden"
         >
           {/* The sidebar is fixed with the shell. When the viewport is too
             short for the tree, the nav zone itself slides (scrolls) while

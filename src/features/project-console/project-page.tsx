@@ -148,59 +148,64 @@ interface WorldSwitcherProps {
  *  as the world-root link (replacing separate dashboard / All views
  *  entries): the raised segment is the current world and clicks back to its
  *  root, the muted one switches worlds — both always visible, no
- *  flipping-label ambiguity, no icon duplicated elsewhere in the rail. */
+ *  flipping-label ambiguity, no icon duplicated elsewhere in the rail. On
+ *  the collapsed rail it stacks vertically, icons only, so the raised
+ *  segment keeps marking the current world instead of the rail showing the
+ *  destination icon alone (which read as the wrong current world). */
 function WorldSwitcher({ projectName, world, collapsed }: WorldSwitcherProps) {
   const segments = [
     {
       key: 'platform' as const,
       label: 'Platform',
-      // Administrative management of the platform — the governance glyph.
-      icon: 'pi pi-building-columns',
+      // Administrative management of the platform.
+      icon: 'pi pi-sitemap',
       to: `/projects/${projectName}`,
       rootTitle: 'Platform dashboard',
     },
     {
       key: 'views' as const,
       label: 'Views',
-      // User-facing portal of service UIs — the discovery glyph.
-      icon: 'pi pi-compass',
+      // User-facing portal of service UIs.
+      icon: 'pi pi-window-maximize',
       to: `/projects/${projectName}/views`,
       rootTitle: 'All views',
     },
   ];
 
-  // Collapsed rail: one icon only — the destination world; clicking toggles.
-  if (collapsed) {
-    const other = segments.find((segment) => segment.key !== world)!;
-    return (
-      <Link
-        to={other.to}
-        title={`Switch to ${other.label}`}
-        className="flex items-center justify-center rounded-md p-2 text-fg-muted transition-colors duration-150 ease-smooth hover:bg-surface-tertiary hover:text-fg"
-      >
-        <i className={`${other.icon} text-[1rem]`}></i>
-      </Link>
-    );
-  }
-
+  // The collapsed-state classes also cover the max-lg viewport, where the
+  // grid forces the collapsed rail while `collapsed` (the user toggle) may
+  // still be false — same dual-state handling as sideNavLinkClass.
   return (
-    <div className="mx-1.5 flex gap-0.5 rounded-md border border-border-light bg-surface-secondary p-0.5">
-      {segments.map((segment) => (
-        <Link
-          key={segment.key}
-          to={segment.to}
-          aria-current={segment.key === world ? 'true' : undefined}
-          title={segment.key === world ? segment.rootTitle : `Switch to ${segment.label}`}
-          className={
-            segment.key === world
-              ? 'flex flex-1 items-center justify-center gap-1.5 rounded-[7px] bg-surface px-2 py-1.5 text-sm font-semibold text-fg no-underline shadow-xs'
-              : 'flex flex-1 items-center justify-center gap-1.5 rounded-[7px] px-2 py-1.5 text-sm font-medium text-fg-muted no-underline transition-colors duration-150 ease-smooth hover:bg-surface hover:text-fg'
-          }
-        >
-          <i className={`${segment.icon} text-[0.8rem]`}></i>
-          {segment.label}
-        </Link>
-      ))}
+    <div
+      className={`flex gap-0.5 rounded-md border border-border-light bg-surface-secondary p-0.5 ${
+        collapsed ? 'flex-col' : 'mx-1.5 max-lg:mx-0 max-lg:flex-col'
+      }`}
+    >
+      {segments.map((segment) => {
+        const active = segment.key === world;
+        return (
+          <Link
+            key={segment.key}
+            to={segment.to}
+            aria-current={active ? 'true' : undefined}
+            title={active ? segment.rootTitle : `Switch to ${segment.label}`}
+            className={[
+              'flex items-center justify-center rounded-[7px] no-underline',
+              collapsed
+                ? 'p-2'
+                : 'flex-1 gap-1.5 px-2 py-1.5 text-sm max-lg:flex-none max-lg:gap-0 max-lg:p-2',
+              active
+                ? 'bg-surface font-semibold text-fg shadow-xs'
+                : 'font-medium text-fg-muted transition-colors duration-150 ease-smooth hover:bg-surface hover:text-fg',
+            ].join(' ')}
+          >
+            <i
+              className={`${segment.icon} ${collapsed ? 'text-[1rem]' : 'text-[0.8rem] max-lg:text-[1rem]'}`}
+            ></i>
+            <span className={collapsed ? 'hidden' : 'max-lg:hidden'}>{segment.label}</span>
+          </Link>
+        );
+      })}
     </div>
   );
 }

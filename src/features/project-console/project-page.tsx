@@ -139,23 +139,23 @@ function ExternalNavLink({ href, icon, label, collapsed, title }: ExternalNavLin
 
 interface WorldSwitcherProps {
   projectName: string;
-  world: 'console' | 'views';
+  world: 'platform' | 'views';
   collapsed: boolean;
 }
 
-/** Segmented console ↔ views switcher at the head of the tree. It doubles
- *  as the world-root link (replacing separate Overview / All views entries):
- *  the raised segment is the current world and clicks back to its root, the
- *  muted one switches worlds — both always visible, no flipping-label
- *  ambiguity, no icon duplicated elsewhere in the rail. */
+/** Segmented platform ↔ views switcher at the head of the tree. It doubles
+ *  as the world-root link (replacing separate dashboard / All views
+ *  entries): the raised segment is the current world and clicks back to its
+ *  root, the muted one switches worlds — both always visible, no
+ *  flipping-label ambiguity, no icon duplicated elsewhere in the rail. */
 function WorldSwitcher({ projectName, world, collapsed }: WorldSwitcherProps) {
   const segments = [
     {
-      key: 'console' as const,
-      label: 'Console',
+      key: 'platform' as const,
+      label: 'Platform',
       icon: 'pi pi-objects-column',
       to: `/projects/${projectName}`,
-      rootTitle: 'Project overview',
+      rootTitle: 'Platform dashboard',
     },
     {
       key: 'views' as const,
@@ -166,26 +166,17 @@ function WorldSwitcher({ projectName, world, collapsed }: WorldSwitcherProps) {
     },
   ];
 
-  // Collapsed rail: the two worlds as stacked icons, current one tinted.
+  // Collapsed rail: one icon only — the destination world; clicking toggles.
   if (collapsed) {
+    const other = segments.find((segment) => segment.key !== world)!;
     return (
-      <div className="flex flex-col gap-1">
-        {segments.map((segment) => (
-          <Link
-            key={segment.key}
-            to={segment.to}
-            aria-current={segment.key === world ? 'true' : undefined}
-            title={segment.key === world ? segment.rootTitle : `Switch to ${segment.label}`}
-            className={
-              segment.key === world
-                ? 'flex items-center justify-center rounded-md bg-primary-50 p-2 text-primary'
-                : 'flex items-center justify-center rounded-md p-2 text-fg-muted transition-colors duration-150 ease-smooth hover:bg-surface-tertiary hover:text-fg'
-            }
-          >
-            <i className={`${segment.icon} text-[1rem]`}></i>
-          </Link>
-        ))}
-      </div>
+      <Link
+        to={other.to}
+        title={`Switch to ${other.label}`}
+        className="flex items-center justify-center rounded-md p-2 text-fg-muted transition-colors duration-150 ease-smooth hover:bg-surface-tertiary hover:text-fg"
+      >
+        <i className={`${other.icon} text-[1rem]`}></i>
+      </Link>
     );
   }
 
@@ -391,7 +382,11 @@ export default function ProjectPage() {
       nav={
         projectName && onProjectConsole ? (
           <>
-            <WorldSwitcher projectName={projectName} world="console" collapsed={sidebarCollapsed} />
+            <WorldSwitcher
+              projectName={projectName}
+              world="platform"
+              collapsed={sidebarCollapsed}
+            />
 
             {visibleCategories.map((category) => (
               <NavSection

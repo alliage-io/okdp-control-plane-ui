@@ -17,7 +17,7 @@ export default function ProjectHome() {
       {project ? (
         <>
           <div>
-            <h1>Overview</h1>
+            <h1>Platform Dashboard</h1>
             {project.description && (
               <p className="mt-1 text-base text-fg-secondary">{project.description}</p>
             )}

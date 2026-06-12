@@ -8,11 +8,10 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { Menu } from 'primereact/menu';
 import { Toast } from 'primereact/toast';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
-import { IconField } from 'primereact/iconfield';
-import { InputIcon } from 'primereact/inputicon';
 import type { MenuItem } from 'primereact/menuitem';
 import { identityApi, type Group } from '../../../../core/api/identity-api';
 import { useIdentityGroups } from '../use-identity';
+import SearchFilter from '../../../../shared/components/search-filter';
 
 export function GroupList() {
   const toast = useRef<Toast>(null);
@@ -125,19 +124,16 @@ export function GroupList() {
       <div className="top-bar">
         <div className="left-group">
           <h1>Groups</h1>
-          <IconField>
-            <InputIcon className="pi pi-search" />
-            <InputText
-              type="text"
-              placeholder="Filter groups..."
-              value={globalFilter}
-              onChange={(e) => setGlobalFilter(e.target.value)}
-            />
-          </IconField>
         </div>
 
         <Button label="Create group" onClick={openNew} className="create-btn" />
       </div>
+
+      <SearchFilter
+        value={globalFilter}
+        onChange={setGlobalFilter}
+        placeholder="Filter groups..."
+      />
 
       {/* Data Table */}
       <div className="table-wrapper">

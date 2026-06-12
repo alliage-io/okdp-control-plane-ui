@@ -21,6 +21,7 @@ import {
 } from '../../../core/services/project-colors';
 import EmptyState from '../../../shared/components/empty-state';
 import MetricCell from '../../../shared/components/metric-cell';
+import SearchFilter from '../../../shared/components/search-filter';
 import type { MetricValue } from '../../../core/models/service.model';
 import { formatCpuCores, formatMemoryBytes } from '../../project-console/services/service-utils';
 import { useProjectStats, type ProjectStats } from './use-project-stats';
@@ -245,17 +246,11 @@ export default function ProjectList() {
         />
       ) : (
         <>
-          <div className="okdp-filter-bar">
-            <div className="okdp-search-wrapper">
-              <i className="pi pi-search search-icon"></i>
-              <input
-                className="okdp-search-input"
-                placeholder="Filter projects..."
-                value={globalFilter}
-                onChange={(e) => setGlobalFilter(e.target.value)}
-              />
-            </div>
-          </div>
+          <SearchFilter
+            value={globalFilter}
+            onChange={setGlobalFilter}
+            placeholder="Filter projects..."
+          />
 
           {/* Data Table */}
           <div className="table-wrapper">

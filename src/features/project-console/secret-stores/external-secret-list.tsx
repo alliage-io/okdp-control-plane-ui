@@ -10,8 +10,6 @@ import { Tag } from 'primereact/tag';
 import { Menu } from 'primereact/menu';
 import { Toast } from 'primereact/toast';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
-import { IconField } from 'primereact/iconfield';
-import { InputIcon } from 'primereact/inputicon';
 import type { MenuItem } from 'primereact/menuitem';
 import {
   externalSecretApi,
@@ -24,6 +22,7 @@ import { secretStoreApi, type SecretStore } from '../../../core/api/secret-store
 import { apiErrorMessage, formatMediumDateTime } from '../services/service-utils';
 import { statusSeverity } from './secret-status';
 import { StatusDetailContent } from './status-detail';
+import SearchFilter from '../../../shared/components/search-filter';
 
 const SECTION_TITLE_CLASS = 'm-0 mb-3 text-[14px] font-semibold text-fg';
 const DIVIDER_CLASS = 'my-4 border-0 border-t border-t-border';
@@ -417,19 +416,16 @@ export function ExternalSecretList() {
       <div className="top-bar">
         <div className="left-group">
           <h1>External Secrets</h1>
-          <IconField>
-            <InputIcon className="pi pi-search" />
-            <InputText
-              type="text"
-              placeholder="Filter secrets..."
-              value={globalFilter}
-              onChange={(e) => setGlobalFilter(e.target.value)}
-            />
-          </IconField>
         </div>
 
         <Button label="Add external secret" onClick={showCreateDialog} className="create-btn" />
       </div>
+
+      <SearchFilter
+        value={globalFilter}
+        onChange={setGlobalFilter}
+        placeholder="Filter secrets..."
+      />
 
       {/* Data Table */}
       <div className="table-wrapper">

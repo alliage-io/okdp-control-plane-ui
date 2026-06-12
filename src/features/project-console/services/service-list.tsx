@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Toast } from 'primereact/toast';
 import DeleteConfirmDialog from '../../../shared/components/delete-confirm-dialog';
+import SearchFilter from '../../../shared/components/search-filter';
 import { serviceApi } from '../../../core/api/service-api';
 import { applyListEvent } from '../../../core/api/sse';
 import { readUiCache, writeUiCache } from '../../../core/api/ui-cache';
@@ -230,20 +231,12 @@ export function ServiceList({
         ))}
       </div>
 
-      <div className="okdp-filter-bar">
-        <div className="okdp-search-wrapper">
-          <i className="pi pi-search search-icon"></i>
-          <input
-            className="okdp-search-input"
-            placeholder="Filter by name, version, namespace…"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-        </div>
-        <div className="filter-hint">
-          {filtered.length} of {services.length}
-        </div>
-      </div>
+      <SearchFilter
+        value={query}
+        onChange={setQuery}
+        placeholder="Filter by name, version, namespace…"
+        hint={`${filtered.length} of ${services.length}`}
+      />
 
       {loading ? (
         <div className="empty-state-panel">

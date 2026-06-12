@@ -6,14 +6,12 @@ import { Button } from 'primereact/button';
 import { Tag } from 'primereact/tag';
 import { Toast } from 'primereact/toast';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
-import { IconField } from 'primereact/iconfield';
-import { InputIcon } from 'primereact/inputicon';
-import { InputText } from 'primereact/inputtext';
 import { sparkApi } from '../../../core/api/spark-api';
 import { applyListEvent } from '../../../core/api/sse';
 import type { SparkAppInstance, SparkUIInfo } from '../../../core/models/spark.model';
 import { apiErrorMessage, formatMediumDate } from '../services/service-utils';
 import { getStatusSeverity, isTerminalStatus } from './spark-utils';
+import SearchFilter from '../../../shared/components/search-filter';
 
 function shortenImage(image: string): string {
   if (!image) return '';
@@ -127,17 +125,7 @@ export function SparkList() {
       <Toast ref={toast} />
       <ConfirmDialog />
 
-      <div className="mb-3">
-        <IconField>
-          <InputIcon className="pi pi-search" />
-          <InputText
-            type="text"
-            placeholder="Filter jobs..."
-            value={globalFilter}
-            onChange={(e) => setGlobalFilter(e.target.value)}
-          />
-        </IconField>
-      </div>
+      <SearchFilter value={globalFilter} onChange={setGlobalFilter} placeholder="Filter jobs..." />
 
       <div className="table-wrapper">
         <DataTable

@@ -126,29 +126,7 @@
   --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
-  --animate-fade-in-up: fade-in-up 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-  --animate-fade-in: fade-in 0.25s ease-out;
   --animate-log-pulse: log-pulse 1.4s ease-in-out infinite;
-
-  @keyframes fade-in-up {
-    from {
-      opacity: 0;
-      transform: translateY(8px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes fade-in {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
 
   @keyframes log-pulse {
     0% {
@@ -255,7 +233,9 @@
   }
 }
 
-@keyframes pulse {
+/* Named tag-pulse (not `pulse`) so it can't shadow Tailwind's built-in
+   `pulse` keyframes that the animate-pulse loading placeholders rely on. */
+@keyframes tag-pulse {
   0%,
   100% {
     opacity: 0.4;
@@ -331,32 +311,6 @@ h1 {
   gap: var(--db-space-sm);
   justify-content: flex-end;
   align-items: center;
-}
-
-.action-link {
-  background: none;
-  border: none;
-  color: var(--db-text-secondary);
-  cursor: pointer;
-  font-size: var(--db-font-size-sm);
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
-  border-radius: var(--db-radius-sm);
-  transition:
-    color var(--db-transition-fast),
-    background var(--db-transition-fast);
-}
-
-.action-link:hover {
-  background-color: var(--db-bg-tertiary);
-  color: var(--db-primary);
-}
-
-.action-link.primary {
-  color: var(--db-primary);
-  font-weight: 500;
 }
 
 /* =========================================
@@ -593,7 +547,7 @@ h1 {
 
 /* Shared utility classes */
 @utility mono {
-  font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  font-family: var(--db-font-mono);
 }
 
 @utility muted-text {
@@ -769,7 +723,7 @@ h1 {
     border-radius: var(--db-radius-full);
     font-size: 11px;
     font-weight: 600;
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-family: var(--db-font-mono);
   }
   &.active .sc-count {
     background: var(--db-primary);
@@ -845,7 +799,7 @@ h1 {
 @utility filter-hint {
   font-size: 12px;
   color: var(--db-text-muted);
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-family: var(--db-font-mono);
 }
 
 /* ========== OKDP minimal table (native, not PrimeNG) ========== */
@@ -995,7 +949,7 @@ h1 {
   height: 6px;
   border-radius: 50%;
   background: currentColor;
-  animation: pulse 1.4s infinite;
+  animation: tag-pulse 1.4s infinite;
 }
 
 /* ========== Empty state ========== */
@@ -1181,7 +1135,7 @@ h1 {
   font-weight: 700;
   padding: 1px 7px;
   border-radius: var(--db-radius-full);
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-family: var(--db-font-mono);
 }
 
 /* ========== Info card ========== */
@@ -1314,7 +1268,7 @@ h1 {
     font-size: 18px;
     font-weight: 700;
     color: var(--db-text-primary);
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-family: var(--db-font-mono);
     letter-spacing: -0.01em;
   }
   &.unbounded .metric-hint {
@@ -1348,7 +1302,7 @@ h1 {
 @utility metric-unit {
   font-size: 11.5px;
   color: var(--db-text-muted);
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-family: var(--db-font-mono);
   & .metric-used {
     color: var(--db-text-primary);
     font-weight: 600;
@@ -1383,7 +1337,7 @@ h1 {
 @utility metric-pct {
   font-size: 11px;
   color: var(--db-text-muted);
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-family: var(--db-font-mono);
   text-align: right;
 }
 

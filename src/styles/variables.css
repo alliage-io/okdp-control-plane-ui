@@ -71,7 +71,6 @@
 
   --db-transition-fast: 0.15s cubic-bezier(0.22, 1, 0.36, 1);
   --db-transition-base: 0.25s cubic-bezier(0.22, 1, 0.36, 1);
-  --db-transition-slow: 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   --db-transition-spring: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 
   /* Sidebar */
@@ -89,6 +88,9 @@
   --db-link: var(--db-primary);
 
   /* Typography density */
+  /* Single mono stack for counts, hints and logs. No mono webfont is
+     shipped — this is the system stack every mono surface shares. */
+  --db-font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
   --db-font-size-xs: 12px;
   --db-font-size-sm: 13px;
   --db-font-size-base: 15px;

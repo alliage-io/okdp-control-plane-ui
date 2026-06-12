@@ -1,12 +1,32 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useCallback, useContext, useState, type ReactNode } from 'react';
-import { NAV_HIDDEN_KEY } from '../storage-keys';
+import { NAV_HIDDEN_KEY, NAV_SIZE_KEY } from '../storage-keys';
+
+export type NavMenuSize = 'compact' | 'default' | 'large';
+
+/** Entry/icon size of the lateral menu, one choice per collapse state. */
+export interface NavMenuSizes {
+  /** Entry size (text, icon, row height) when the sidebar is expanded. */
+  expanded: NavMenuSize;
+  /** Icon size when the sidebar is collapsed to the rail. */
+  collapsed: NavMenuSize;
+}
+
+/** Factor each size applies to the menu's font/icon/padding metrics — the
+ *  value of `--nav-item-scale` on the sidebar (1 everywhere else). */
+export const NAV_SIZE_SCALE: Record<NavMenuSize, number> = {
+  compact: 0.9,
+  default: 1,
+  large: 1.2,
+};
 
 export interface NavPrefsContextValue {
   /** Effective visibility: the user's explicit choice when there is one,
    *  the item's `defaultHidden` flag otherwise. */
   isNavItemHidden: (label: string, defaultHidden?: boolean) => boolean;
   setNavItemHidden: (label: string, hidden: boolean) => void;
+  menuSizes: NavMenuSizes;
+  setMenuSize: (state: keyof NavMenuSizes, size: NavMenuSize) => void;
 }
 
 const NavPrefsContext = createContext<NavPrefsContextValue | null>(null);
@@ -30,11 +50,33 @@ function storedOverrides(): Record<string, boolean> {
   return {};
 }
 
-/** Which lateral-menu entries the user hid or re-enabled. Persisted per
- *  browser; shared between the project console (reader) and the settings
- *  page (writer). */
+function isNavMenuSize(value: unknown): value is NavMenuSize {
+  return value === 'compact' || value === 'default' || value === 'large';
+}
+
+/** Stored size choices; unknown or corrupt values fall back per state. */
+function storedSizes(): NavMenuSizes {
+  try {
+    const raw = localStorage.getItem(NAV_SIZE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as Partial<NavMenuSizes>;
+      return {
+        expanded: isNavMenuSize(parsed.expanded) ? parsed.expanded : 'default',
+        collapsed: isNavMenuSize(parsed.collapsed) ? parsed.collapsed : 'default',
+      };
+    }
+  } catch {
+    // corrupt value — fall back to defaults
+  }
+  return { expanded: 'default', collapsed: 'default' };
+}
+
+/** Which lateral-menu entries the user hid or re-enabled, and how large the
+ *  menu renders. Persisted per browser; shared between the project console
+ *  (reader) and the settings page (writer). */
 export function NavPrefsProvider({ children }: { children: ReactNode }) {
   const [overrides, setOverrides] = useState<Record<string, boolean>>(storedOverrides);
+  const [menuSizes, setMenuSizes] = useState<NavMenuSizes>(storedSizes);
 
   const isNavItemHidden = useCallback(
     (label: string, defaultHidden?: boolean) => overrides[label] ?? defaultHidden ?? false,
@@ -49,8 +91,16 @@ export function NavPrefsProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const setMenuSize = useCallback((state: keyof NavMenuSizes, size: NavMenuSize) => {
+    setMenuSizes((prev) => {
+      const next = { ...prev, [state]: size };
+      localStorage.setItem(NAV_SIZE_KEY, JSON.stringify(next));
+      return next;
+    });
+  }, []);
+
   return (
-    <NavPrefsContext.Provider value={{ isNavItemHidden, setNavItemHidden }}>
+    <NavPrefsContext.Provider value={{ isNavItemHidden, setNavItemHidden, menuSizes, setMenuSize }}>
       {children}
     </NavPrefsContext.Provider>
   );

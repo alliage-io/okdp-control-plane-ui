@@ -1,7 +1,7 @@
 import { InputSwitch } from 'primereact/inputswitch';
 import { useTheme, type ThemeMode } from '../../core/theme/theme-context';
 import { useEnvBar } from '../../core/preferences/env-bar-context';
-import { useNavPrefs } from '../../core/preferences/nav-prefs-context';
+import { useNavPrefs, type NavMenuSize } from '../../core/preferences/nav-prefs-context';
 import { useConfirmPrefs } from '../../core/preferences/confirm-prefs-context';
 import { NAV_CATEGORIES } from '../project-console/nav-config';
 import SectionHeading from '../../shared/components/section-heading';
@@ -116,6 +116,84 @@ function ThemeCard({ mode, label, description, icon }: ThemeCardProps) {
   );
 }
 
+const SIZE_OPTIONS: { value: NavMenuSize; label: string }[] = [
+  { value: 'compact', label: 'Compact' },
+  { value: 'default', label: 'Default' },
+  { value: 'large', label: 'Large' },
+];
+
+interface SizeSegmentsProps {
+  value: NavMenuSize;
+  onChange: (size: NavMenuSize) => void;
+  ariaLabel: string;
+}
+
+/** Compact / Default / Large segmented control — same raised-segment idiom
+ *  as the sidebar's world switcher. */
+function SizeSegments({ value, onChange, ariaLabel }: SizeSegmentsProps) {
+  return (
+    <div
+      role="radiogroup"
+      aria-label={ariaLabel}
+      className="flex shrink-0 gap-0.5 rounded-md border border-border-light bg-surface-secondary p-0.5"
+    >
+      {SIZE_OPTIONS.map((option) => {
+        const active = option.value === value;
+        return (
+          <button
+            key={option.value}
+            type="button"
+            role="radio"
+            aria-checked={active}
+            onClick={() => onChange(option.value)}
+            className={`cursor-pointer rounded-[7px] border-0 px-2.5 py-1 text-sm ${
+              active
+                ? 'bg-surface font-semibold text-fg shadow-xs'
+                : 'bg-transparent font-medium text-fg-muted transition-colors duration-150 ease-smooth hover:bg-surface hover:text-fg'
+            }`}
+          >
+            {option.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/** Entry size (expanded sidebar) and icon size (collapsed rail) choices. */
+function NavSizePrefs() {
+  const { menuSizes, setMenuSize } = useNavPrefs();
+
+  return (
+    <>
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-col gap-1">
+          <span className="text-[12.5px] font-semibold text-fg">Entry size</span>
+          <small className="field-hint">
+            Text and icon size of the menu entries when the sidebar is expanded.
+          </small>
+        </div>
+        <SizeSegments
+          value={menuSizes.expanded}
+          onChange={(size) => setMenuSize('expanded', size)}
+          ariaLabel="Expanded menu entry size"
+        />
+      </div>
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-col gap-1">
+          <span className="text-[12.5px] font-semibold text-fg">Icon size</span>
+          <small className="field-hint">Icon size when the sidebar is collapsed to the rail.</small>
+        </div>
+        <SizeSegments
+          value={menuSizes.collapsed}
+          onChange={(size) => setMenuSize('collapsed', size)}
+          ariaLabel="Collapsed menu icon size"
+        />
+      </div>
+    </>
+  );
+}
+
 /** Per-category groups of lateral-menu entries with show/hide switches.
  *  Core entries (the world switcher, Project Panel) are not listed: they
  *  always stay in the menu. */
@@ -227,10 +305,13 @@ export default function SettingsPage() {
       <div className="flex flex-col gap-3">
         <SectionHeading>Lateral menu</SectionHeading>
         <div className="form-card flex flex-col gap-5">
-          <small className="field-hint">
-            Choose which services appear in the project lateral menu.
-          </small>
-          <NavMenuPrefs />
+          <NavSizePrefs />
+          <div className="flex flex-col gap-3 border-t border-border-light pt-5">
+            <small className="field-hint">
+              Choose which services appear in the project lateral menu.
+            </small>
+            <NavMenuPrefs />
+          </div>
         </div>
       </div>
     </section>

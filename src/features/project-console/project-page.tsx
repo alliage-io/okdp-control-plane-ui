@@ -153,14 +153,16 @@ function WorldSwitcher({ projectName, world, collapsed }: WorldSwitcherProps) {
     {
       key: 'platform' as const,
       label: 'Platform',
-      icon: 'pi pi-objects-column',
+      // Administrative management of the platform — the governance glyph.
+      icon: 'pi pi-building-columns',
       to: `/projects/${projectName}`,
       rootTitle: 'Platform dashboard',
     },
     {
       key: 'views' as const,
       label: 'Views',
-      icon: 'pi pi-th-large',
+      // User-facing portal of service UIs — the discovery glyph.
+      icon: 'pi pi-compass',
       to: `/projects/${projectName}/views`,
       rootTitle: 'All views',
     },
@@ -365,7 +367,7 @@ export default function ProjectPage() {
             className="flex items-center gap-2 border-t border-border-light px-4 py-2.5 text-sm font-medium text-fg-secondary no-underline transition-colors duration-150 ease-smooth hover:bg-surface-secondary hover:text-fg"
             onClick={() => switcherRef.current?.hide()}
           >
-            <i className="pi pi-th-large text-[0.85rem]"></i>
+            <i className="pi pi-folder-open text-[0.85rem]"></i>
             All projects
           </Link>
         )}

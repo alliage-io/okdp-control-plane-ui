@@ -21,7 +21,8 @@ const ICON_CHOICES = [
   'pi pi-code',
   'pi pi-bolt',
   'pi pi-eye',
-  'pi pi-compass',
+  // pi-map, not pi-compass: the compass is the chrome's Views glyph.
+  'pi pi-map',
   'pi pi-wrench',
 ];
 

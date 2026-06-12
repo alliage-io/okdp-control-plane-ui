@@ -2,7 +2,7 @@
 import { createContext, useCallback, useContext, useState, type ReactNode } from 'react';
 import { NAV_HIDDEN_KEY, NAV_SIZE_KEY } from '../storage-keys';
 
-export type NavMenuSize = 'compact' | 'default' | 'large';
+export type NavMenuSize = 'compact' | 'default' | 'large' | 'xl';
 
 /** Factor each size applies to the menu's font/icon/padding metrics — the
  *  value of `--nav-item-scale` on the sidebar (1 everywhere else). One
@@ -12,6 +12,7 @@ export const NAV_SIZE_SCALE: Record<NavMenuSize, number> = {
   compact: 0.9,
   default: 1,
   large: 1.2,
+  xl: 1.4,
 };
 
 export interface NavPrefsContextValue {
@@ -45,7 +46,7 @@ function storedOverrides(): Record<string, boolean> {
 }
 
 function isNavMenuSize(value: unknown): value is NavMenuSize {
-  return value === 'compact' || value === 'default' || value === 'large';
+  return value === 'compact' || value === 'default' || value === 'large' || value === 'xl';
 }
 
 /** Stored size choice. The legacy format was a per-collapse-state object

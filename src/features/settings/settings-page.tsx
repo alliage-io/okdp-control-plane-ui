@@ -120,6 +120,7 @@ const SIZE_OPTIONS: { value: NavMenuSize; label: string }[] = [
   { value: 'compact', label: 'Compact' },
   { value: 'default', label: 'Default' },
   { value: 'large', label: 'Large' },
+  { value: 'xl', label: 'Extra large' },
 ];
 
 interface SizeSegmentsProps {
@@ -128,8 +129,8 @@ interface SizeSegmentsProps {
   ariaLabel: string;
 }
 
-/** Compact / Default / Large segmented control — same raised-segment idiom
- *  as the sidebar's world switcher. */
+/** Compact → Extra large segmented control — same raised-segment idiom as
+ *  the sidebar's world switcher. */
 function SizeSegments({ value, onChange, ariaLabel }: SizeSegmentsProps) {
   return (
     <div

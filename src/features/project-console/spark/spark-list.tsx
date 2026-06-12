@@ -3,14 +3,14 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
-import { Tag } from 'primereact/tag';
 import { Toast } from 'primereact/toast';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { sparkApi } from '../../../core/api/spark-api';
 import { applyListEvent } from '../../../core/api/sse';
 import type { SparkAppInstance, SparkUIInfo } from '../../../core/models/spark.model';
 import { apiErrorMessage, formatMediumDate } from '../services/service-utils';
-import { getStatusSeverity, isTerminalStatus } from './spark-utils';
+import { StatusTag } from '../../../shared/components/status-tag';
+import { getStatusTone, isTerminalStatus } from './spark-utils';
 import SearchFilter from '../../../shared/components/search-filter';
 
 function shortenImage(image: string): string {
@@ -184,7 +184,11 @@ export function SparkList() {
             field="status"
             style={{ width: '12%' }}
             body={(app: SparkAppInstance) => (
-              <Tag value={app.status} severity={getStatusSeverity(app.status)} />
+              <StatusTag
+                value={app.status}
+                tone={getStatusTone(app.status)}
+                pulse={app.status === 'RUNNING'}
+              />
             )}
           />
           <Column

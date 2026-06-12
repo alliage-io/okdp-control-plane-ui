@@ -10,9 +10,11 @@ import {
   apiErrorMessage,
   areaBasePath,
   formatMediumDateTime,
+  isTransitioning,
   parentLabel,
-  tagClass,
+  statusTone,
 } from './service-utils';
+import { StatusTag } from '../../../shared/components/status-tag';
 
 type Tab = 'overview' | 'pods' | 'logs' | 'parameters';
 
@@ -280,12 +282,11 @@ export default function ServiceDetailPage() {
               <div className="header-text">
                 <div className="header-title-row">
                   <h2>{instance.name}</h2>
-                  <span className={`okdp-tag ${tagClass(instance.status)}`}>
-                    {(instance.status === 'Installing' || instance.status === 'Updating') && (
-                      <span className="okdp-tag-dot"></span>
-                    )}
-                    {instance.status}
-                  </span>
+                  <StatusTag
+                    value={instance.status}
+                    tone={statusTone(instance.status)}
+                    pulse={isTransitioning(instance.status)}
+                  />
                 </div>
                 <p className="page-desc">
                   {instance.service} · <span className="mono">{instance.serviceTag}</span>

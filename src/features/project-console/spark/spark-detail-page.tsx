@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from 'primereact/button';
-import { Tag } from 'primereact/tag';
 import { Toast } from 'primereact/toast';
 import { InputSwitch } from 'primereact/inputswitch';
 import { sparkApi } from '../../../core/api/spark-api';
 import type { SparkAppInstance } from '../../../core/models/spark.model';
 import { formatMediumDateTime } from '../services/service-utils';
-import { getExecutorSeverity, getStatusSeverity, isTerminalStatus } from './spark-utils';
+import { StatusTag } from '../../../shared/components/status-tag';
+import { getExecutorTone, getStatusTone, isTerminalStatus } from './spark-utils';
 
 export default function SparkDetailPage() {
   const navigate = useNavigate();
@@ -141,7 +141,13 @@ export default function SparkDetailPage() {
                 <h2 className="m-0 text-[28px] leading-[1.2] font-extrabold tracking-[-0.03em] text-fg">
                   {app?.name}
                 </h2>
-                {app && <Tag value={app.status} severity={getStatusSeverity(app.status)} />}
+                {app && (
+                  <StatusTag
+                    value={app.status}
+                    tone={getStatusTone(app.status)}
+                    pulse={app.status === 'RUNNING'}
+                  />
+                )}
               </div>
               <p className="mt-1.5 mb-0 text-[15px] text-fg-secondary">
                 {app?.type} · {app?.mode}
@@ -269,7 +275,11 @@ export default function SparkDetailPage() {
                       <span className="text-[13px] font-medium text-fg mono">
                         {key}
                       </span>
-                      <Tag value={executors[key]} severity={getExecutorSeverity(executors[key])} />
+                      <StatusTag
+                        value={executors[key]}
+                        tone={getExecutorTone(executors[key])}
+                        pulse={executors[key] === 'RUNNING'}
+                      />
                     </div>
                   ))}
                 </div>

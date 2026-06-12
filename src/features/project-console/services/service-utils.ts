@@ -1,21 +1,27 @@
 import { HttpError } from '../../../core/api/http';
+import type { StatusTone } from '../../../shared/components/status-tag';
 
-/** Map an instance/pod status to the okdp tag color class. */
-export function tagClass(status: string): string {
+/** Map an instance status to its StatusTag tone. */
+export function statusTone(status: string): StatusTone {
   switch (status) {
     case 'Ready':
     case 'Running':
-      return 'okdp-tag-success';
+      return 'success';
     case 'Installing':
     case 'Updating':
-      return 'okdp-tag-warn';
+      return 'warning';
     case 'Error':
     case 'CrashLoopBackOff':
     case 'Failed':
-      return 'okdp-tag-danger';
+      return 'danger';
     default:
-      return 'okdp-tag-info';
+      return 'info';
   }
+}
+
+/** In-flight instance states — rendered with the animated activity dot. */
+export function isTransitioning(status: string): boolean {
+  return status === 'Installing' || status === 'Updating';
 }
 
 export interface ServiceArea {

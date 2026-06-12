@@ -11,10 +11,12 @@ import {
   apiErrorMessage,
   areaBasePath,
   hasProfileEditorWidget,
+  isTransitioning,
   parentLabel,
+  statusTone,
   stripProfileEditorFields,
-  tagClass,
 } from './service-utils';
+import { StatusTag } from '../../../shared/components/status-tag';
 
 export default function ServiceEditPage() {
   const navigate = useNavigate();
@@ -227,12 +229,11 @@ export default function ServiceEditPage() {
                       {instance.name}
                     </span>
                   </h2>
-                  <span className={`okdp-tag ${tagClass(instance.status)}`}>
-                    {(instance.status === 'Installing' || instance.status === 'Updating') && (
-                      <span className="okdp-tag-dot"></span>
-                    )}
-                    {instance.status}
-                  </span>
+                  <StatusTag
+                    value={instance.status}
+                    tone={statusTone(instance.status)}
+                    pulse={isTransitioning(instance.status)}
+                  />
                 </div>
                 <p className="page-desc">
                   Change version, parameters or profiles. Saving will trigger a rolling restart.

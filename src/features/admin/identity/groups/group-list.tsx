@@ -150,7 +150,7 @@ export function GroupList() {
             header="Name"
             field="name"
             style={{ width: '30%' }}
-            body={(g: Group) => <span className="group-name">{g.name}</span>}
+            body={(g: Group) => <span className="font-medium">{g.name}</span>}
           />
           <Column
             header="Description"

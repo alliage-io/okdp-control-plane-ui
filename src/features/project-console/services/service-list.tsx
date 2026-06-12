@@ -7,7 +7,8 @@ import { serviceApi } from '../../../core/api/service-api';
 import { applyListEvent } from '../../../core/api/sse';
 import { readUiCache, writeUiCache } from '../../../core/api/ui-cache';
 import type { ServiceInstance } from '../../../core/models/service.model';
-import { apiErrorMessage, formatMediumDate, tagClass } from './service-utils';
+import { apiErrorMessage, formatMediumDate, isTransitioning, statusTone } from './service-utils';
+import { StatusTag } from '../../../shared/components/status-tag';
 
 type StatusFilter = 'All' | 'Ready' | 'Installing' | 'Updating' | 'Error';
 
@@ -299,12 +300,11 @@ export function ServiceList({
                           Deleting…
                         </span>
                       ) : (
-                        <span className={`okdp-tag ${tagClass(svc.status)}`}>
-                          {(svc.status === 'Installing' || svc.status === 'Updating') && (
-                            <span className="okdp-tag-dot"></span>
-                          )}
-                          {svc.status}
-                        </span>
+                        <StatusTag
+                          value={svc.status}
+                          tone={statusTone(svc.status)}
+                          pulse={isTransitioning(svc.status)}
+                        />
                       )}
                     </td>
                     <td>

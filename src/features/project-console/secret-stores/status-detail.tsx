@@ -1,8 +1,7 @@
 import type { ReactNode } from 'react';
-import { Tag } from 'primereact/tag';
 import { formatMediumDateTime } from '../services/service-utils';
 import { getConditionIcon } from './secret-status';
-import type { StatusSeverity } from './secret-status';
+import { StatusTag, type StatusTone } from '../../../shared/components/status-tag';
 
 interface ConditionLike {
   type: string;
@@ -21,7 +20,7 @@ interface StatusDetailLike {
 interface StatusDetailContentProps {
   loading: boolean;
   detail: StatusDetailLike | null;
-  severity: StatusSeverity;
+  tone: StatusTone;
   /** Label for the timestamp row ("Last checked" / "Last synced"). */
   checkedLabel: string;
   /** Timestamp shown next to checkedLabel (lastCheckedAt / lastSyncedAt). */
@@ -46,7 +45,7 @@ function StatusRow({ label, children }: { label: string; children: ReactNode }) 
 export function StatusDetailContent({
   loading,
   detail,
-  severity,
+  tone,
   checkedLabel,
   checkedAt,
   extraRows,
@@ -63,7 +62,7 @@ export function StatusDetailContent({
           <>
             <div className="flex flex-col gap-3">
               <StatusRow label="Status">
-                <Tag value={detail.status} severity={severity} />
+                <StatusTag value={detail.status} tone={tone} />
               </StatusRow>
               {checkedAt && (
                 <StatusRow label={checkedLabel}>

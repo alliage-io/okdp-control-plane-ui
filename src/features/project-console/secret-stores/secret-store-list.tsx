@@ -7,7 +7,6 @@ import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Checkbox } from 'primereact/checkbox';
-import { Tag } from 'primereact/tag';
 import { Menu } from 'primereact/menu';
 import { Toast } from 'primereact/toast';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
@@ -20,7 +19,8 @@ import {
   type VaultAuthType,
 } from '../../../core/api/secret-store-api';
 import { apiErrorMessage, formatMediumDateTime } from '../services/service-utils';
-import { statusSeverity } from './secret-status';
+import { statusTone } from './secret-status';
+import { StatusTag } from '../../../shared/components/status-tag';
 import { StatusDetailContent } from './status-detail';
 import SearchFilter from '../../../shared/components/search-filter';
 
@@ -70,7 +70,7 @@ const EMPTY_FORM: StoreForm = {
   isDefault: false,
 };
 
-const getStatusSeverity = (status: string) => statusSeverity(status, 'Ready');
+const getStatusTone = (status: string) => statusTone(status, 'Ready');
 
 export function SecretStoreList() {
   const { projectId = '' } = useParams<{ projectId: string }>();
@@ -493,7 +493,11 @@ export function SecretStoreList() {
             style={{ width: '10%' }}
             body={(store: SecretStore) => (
               <span title={store.lastError || ''}>
-                <Tag value={store.status} severity={getStatusSeverity(store.status)} />
+                <StatusTag
+                  value={store.status}
+                  tone={getStatusTone(store.status)}
+                  pulse={store.status === 'Pending'}
+                />
               </span>
             )}
           />
@@ -724,7 +728,7 @@ export function SecretStoreList() {
         <StatusDetailContent
           loading={statusLoading}
           detail={statusDetail}
-          severity={statusDetail ? getStatusSeverity(statusDetail.status) : 'info'}
+          tone={statusDetail ? getStatusTone(statusDetail.status) : 'info'}
           checkedLabel="Last checked"
           checkedAt={statusDetail?.lastCheckedAt}
         />

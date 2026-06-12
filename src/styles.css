@@ -2147,22 +2147,6 @@ h1 {
     border-color: var(--db-border-light);
   }
 
-  /* ===== Tag ===== */
-  body.dark-mode .p-tag.p-tag-success {
-    background: rgba(5, 150, 105, 0.18);
-    color: #34d399;
-  }
-
-  body.dark-mode .p-tag.p-tag-warning {
-    background: rgba(217, 119, 6, 0.18);
-    color: #fbbf24;
-  }
-
-  body.dark-mode .p-tag.p-tag-danger {
-    background: rgba(220, 38, 38, 0.18);
-    color: #f87171;
-  }
-
   /* ===== Secondary / text buttons ===== */
   body.dark-mode .p-button.p-button-secondary.p-button-outlined,
   body.dark-mode .p-button.p-button-secondary.p-button-text {

@@ -13,6 +13,7 @@ import { Toast } from 'primereact/toast';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import type { MenuItem } from 'primereact/menuitem';
 import { identityApi, type User } from '../../../../core/api/identity-api';
+import { StatusTag } from '../../../../shared/components/status-tag';
 import { useIdentityGroups, useIdentityUsers } from '../use-identity';
 import SearchFilter from '../../../../shared/components/search-filter';
 
@@ -166,11 +167,7 @@ export function UserList() {
             header="Name"
             field="name"
             style={{ width: '20%' }}
-            body={(u: User) => (
-              <div className="user-info">
-                <span className="user-name">{u.name}</span>
-              </div>
-            )}
+            body={(u: User) => <span className="font-medium">{u.name}</span>}
           />
           <Column
             header="Email"
@@ -182,14 +179,14 @@ export function UserList() {
             header="Groups"
             style={{ width: '25%' }}
             body={(u: User) => (
-              <div className="groups-list">
+              <div className="flex flex-wrap items-center gap-1.5">
                 {u.groups?.slice(0, 3).map((group) => (
-                  <span key={group} className="group-badge">
+                  <span key={group} className="okdp-tag">
                     {group}
                   </span>
                 ))}
                 {(u.groups?.length ?? 0) > 3 && (
-                  <span className="group-more">+{u.groups!.length - 3}</span>
+                  <span className="text-xs text-fg-muted">+{u.groups!.length - 3}</span>
                 )}
               </div>
             )}
@@ -199,9 +196,9 @@ export function UserList() {
             style={{ width: '15%' }}
             body={(u: User) =>
               u.disabled ? (
-                <span className="status-badge disabled">Disabled</span>
+                <StatusTag value="Disabled" tone="neutral" />
               ) : (
-                <span className="status-badge active">Active</span>
+                <StatusTag value="Active" tone="success" />
               )
             }
           />

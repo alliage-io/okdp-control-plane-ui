@@ -6,7 +6,6 @@ import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
-import { Tag } from 'primereact/tag';
 import { Menu } from 'primereact/menu';
 import { Toast } from 'primereact/toast';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
@@ -20,7 +19,8 @@ import {
 } from '../../../core/api/external-secret-api';
 import { secretStoreApi, type SecretStore } from '../../../core/api/secret-store-api';
 import { apiErrorMessage, formatMediumDateTime } from '../services/service-utils';
-import { statusSeverity } from './secret-status';
+import { statusTone } from './secret-status';
+import { StatusTag } from '../../../shared/components/status-tag';
 import { StatusDetailContent } from './status-detail';
 import SearchFilter from '../../../shared/components/search-filter';
 
@@ -45,7 +45,7 @@ const EMPTY_MAPPING = (): ExternalSecretDataRef => ({
   remoteRef: { key: '', property: '' },
 });
 
-const getStatusSeverity = (status: string) => statusSeverity(status, 'Synced');
+const getStatusTone = (status: string) => statusTone(status, 'Synced');
 
 export function ExternalSecretList() {
   const { projectId = '' } = useParams<{ projectId: string }>();
@@ -468,9 +468,7 @@ export function ExternalSecretList() {
             header="Target Secret"
             style={{ width: '20%' }}
             body={(es: ExternalSecret) => (
-              <span className="text-[13px] text-fg-secondary mono">
-                {es.target?.name || '-'}
-              </span>
+              <span className="text-[13px] text-fg-secondary mono">{es.target?.name || '-'}</span>
             )}
           />
           <Column
@@ -479,7 +477,11 @@ export function ExternalSecretList() {
             style={{ width: '10%' }}
             body={(es: ExternalSecret) => (
               <span title={es.lastError || ''}>
-                <Tag value={es.status} severity={getStatusSeverity(es.status)} />
+                <StatusTag
+                  value={es.status}
+                  tone={getStatusTone(es.status)}
+                  pulse={es.status === 'Pending'}
+                />
               </span>
             )}
           />
@@ -722,7 +724,7 @@ export function ExternalSecretList() {
         <StatusDetailContent
           loading={statusLoading}
           detail={statusDetail}
-          severity={statusDetail ? getStatusSeverity(statusDetail.status) : 'info'}
+          tone={statusDetail ? getStatusTone(statusDetail.status) : 'info'}
           checkedLabel="Last synced"
           checkedAt={statusDetail?.lastSyncedAt}
         />

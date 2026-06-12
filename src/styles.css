@@ -608,7 +608,9 @@ h1 {
 @utility page-heading {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  /* Center the action button on the block: with breadcrumb above and
+     subtitle below, the center line is the title row. */
+  align-items: center;
   gap: 24px;
   margin-bottom: 20px;
 }

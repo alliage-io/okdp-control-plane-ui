@@ -24,11 +24,13 @@ import { StatusTag } from '../../../shared/components/status-tag';
 import { StatusDetailContent } from './status-detail';
 import SearchFilter from '../../../shared/components/search-filter';
 import { PageHeader } from '../../../shared/components/page-header';
+import { useToastMessages } from '../../../shared/hooks/use-toast-messages';
+import { k8sNameError } from '../../../shared/utils/k8s-names';
+import { DialogFooter } from '../../../shared/components/dialog-footer';
 
 const SECTION_TITLE_CLASS = 'm-0 mb-3 text-[14px] font-semibold text-fg';
 const DIVIDER_CLASS = 'my-4 border-0 border-t border-t-border';
 
-const NAME_PATTERN = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/;
 const POLL_INTERVAL_MS = 10_000;
 
 const REFRESH_OPTIONS = [
@@ -50,7 +52,7 @@ const getStatusTone = (status: string) => statusTone(status, 'Synced');
 
 export function ExternalSecretList() {
   const { projectId = '' } = useParams<{ projectId: string }>();
-  const toast = useRef<Toast>(null);
+  const { toast, showSuccess, showError } = useToastMessages();
   const menuRef = useRef<Menu>(null);
   const selectedSecretRef = useRef<ExternalSecret | null>(null);
 
@@ -80,10 +82,6 @@ export function ExternalSecretList() {
   const statusLoadingRef = useRef(false);
   statusLoadingRef.current = statusLoading;
 
-  const showSuccess = (detail: string) =>
-    toast.current?.show({ severity: 'success', summary: 'Success', detail, life: 3000 });
-  const showError = (detail: string) =>
-    toast.current?.show({ severity: 'error', summary: 'Error', detail, life: 5000 });
 
   const mergeSecrets = useCallback((incoming: ExternalSecret[]) => {
     setSecrets((current) => {
@@ -116,7 +114,7 @@ export function ExternalSecretList() {
         showError('Failed to load external secrets');
         setLoading(false);
       });
-  }, [projectId]);
+  }, [projectId, showError]);
 
   const loadReadyStores = useCallback(() => {
     if (!projectId) return;
@@ -141,14 +139,7 @@ export function ExternalSecretList() {
   }, [projectId, loadSecrets, loadReadyStores, mergeSecrets]);
 
   // --- Name validation ---
-  const nameError = (() => {
-    if (!secretName) return '';
-    if (secretName.length > 63) return 'Maximum 63 characters';
-    if (!NAME_PATTERN.test(secretName)) {
-      return 'Lowercase letters, numbers and hyphens only (must start/end with alphanumeric)';
-    }
-    return '';
-  })();
+  const nameError = k8sNameError(secretName);
 
   const formValid = (() => {
     if (!secretName || !selectedStoreRefName) return false;
@@ -367,32 +358,17 @@ export function ExternalSecretList() {
   ];
 
   const dialogFooter = (
-    <div
-      className="dialog-actions"
-      style={{ display: 'flex', gap: 'var(--db-space-sm)', alignItems: 'center', width: '100%' }}
-    >
-      <div className="spacer" style={{ flex: 1 }}></div>
-      <Button
-        severity="secondary"
-        outlined
-        label="Cancel"
-        onClick={() => setDialogVisible(false)}
-        disabled={saving}
-      />
-      <Button
-        icon={saving ? 'pi pi-spin pi-spinner' : undefined}
-        label={editMode ? 'Save' : 'Create'}
-        disabled={saving || !formValid}
-        onClick={saveSecret}
-      />
-    </div>
+    <DialogFooter
+      onCancel={() => setDialogVisible(false)}
+      onConfirm={saveSecret}
+      confirmLabel={editMode ? 'Save' : 'Create'}
+      confirmDisabled={!formValid}
+      busy={saving}
+    />
   );
 
   const statusDialogFooter = (
-    <div
-      className="dialog-actions"
-      style={{ display: 'flex', gap: 'var(--db-space-sm)', alignItems: 'center', width: '100%' }}
-    >
+    <div className="dialog-actions items-center">
       <Button
         severity="secondary"
         outlined
@@ -401,7 +377,7 @@ export function ExternalSecretList() {
         onClick={refreshStatus}
         disabled={statusLoading}
       />
-      <div className="spacer" style={{ flex: 1 }}></div>
+      <div className="flex-1"></div>
       <Button
         severity="secondary"
         outlined

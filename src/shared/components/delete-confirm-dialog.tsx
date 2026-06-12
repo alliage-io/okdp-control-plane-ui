@@ -1,8 +1,8 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { useConfirmPrefs } from '../../core/preferences/confirm-prefs-context';
+import { DialogFooter } from './dialog-footer';
 
 interface DeleteConfirmDialogProps {
   /** Name of the resource being deleted; null hides the dialog. */
@@ -52,10 +52,13 @@ export default function DeleteConfirmDialog({
       className="db-dialog"
       onHide={onHide}
       footer={
-        <div className="dialog-actions">
-          <Button severity="secondary" outlined label="Cancel" onClick={onHide} />
-          <Button severity="danger" label="Delete" disabled={!armed} onClick={confirm} />
-        </div>
+        <DialogFooter
+          onCancel={onHide}
+          onConfirm={confirm}
+          confirmLabel="Delete"
+          confirmDanger
+          confirmDisabled={!armed}
+        />
       }
     >
       <div className="dialog-content">

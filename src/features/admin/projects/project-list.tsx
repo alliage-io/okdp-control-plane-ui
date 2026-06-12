@@ -26,6 +26,8 @@ import type { MetricValue } from '../../../core/models/service.model';
 import { formatCpuCores, formatMemoryBytes } from '../../project-console/services/service-utils';
 import { useProjectStats, type ProjectStats } from './use-project-stats';
 import { PageHeader } from '../../../shared/components/page-header';
+import { useToastMessages } from '../../../shared/hooks/use-toast-messages';
+import { DialogFooter } from '../../../shared/components/dialog-footer';
 
 type ProjectRow = Project & { stats?: ProjectStats; color: string };
 
@@ -73,7 +75,7 @@ export default function ProjectList() {
   const auth = useAuth();
   const isAdmin = auth.hasRole('admins');
   const { currentProjectId } = useProjectContext();
-  const toast = useRef<Toast>(null);
+  const { toast, showSuccess, showError } = useToastMessages();
   // Row dots follow color edits live (other tab, or Project Settings).
   const colorsVersion = useProjectColorsVersion();
 
@@ -90,11 +92,6 @@ export default function ProjectList() {
   const [newProject, setNewProject] = useState<Project>({ name: '', description: '' });
   const [newColor, setNewColor] = useState<string>(PROJECT_COLOR_PALETTE[0]);
 
-  const showSuccess = (detail: string) =>
-    toast.current?.show({ severity: 'success', summary: 'Success', detail, life: 3000 });
-
-  const showError = (detail: string) =>
-    toast.current?.show({ severity: 'error', summary: 'Error', detail, life: 5000 });
 
   const applyProjects = (next: Project[]) => {
     projectsRef.current = next;
@@ -147,7 +144,7 @@ export default function ProjectList() {
       cancelled = true;
       unsubscribe?.();
     };
-  }, [reloadKey]);
+  }, [reloadKey, showSuccess]);
 
   const showDialog = () => {
     setNewProject({ name: '', description: '' });
@@ -170,10 +167,12 @@ export default function ProjectList() {
   };
 
   const dialogFooter = (
-    <div className="dialog-actions">
-      <Button severity="secondary" outlined label="Cancel" onClick={() => setVisible(false)} />
-      <Button disabled={!newProject.name} onClick={createProject} label="Create" />
-    </div>
+    <DialogFooter
+      onCancel={() => setVisible(false)}
+      onConfirm={createProject}
+      confirmLabel="Create"
+      confirmDisabled={!newProject.name}
+    />
   );
 
   // Four distinct states: loading (placeholder), error (panel + retry),

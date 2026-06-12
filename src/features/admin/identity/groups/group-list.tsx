@@ -13,9 +13,11 @@ import { identityApi, type Group } from '../../../../core/api/identity-api';
 import { useIdentityGroups } from '../use-identity';
 import SearchFilter from '../../../../shared/components/search-filter';
 import { PageHeader } from '../../../../shared/components/page-header';
+import { useToastMessages } from '../../../../shared/hooks/use-toast-messages';
+import { DialogFooter } from '../../../../shared/components/dialog-footer';
 
 export function GroupList() {
-  const toast = useRef<Toast>(null);
+  const { toast, showSuccess, showError } = useToastMessages();
   const menuRef = useRef<Menu>(null);
   const selectedGroupRef = useRef<Group | null>(null);
 
@@ -26,10 +28,6 @@ export function GroupList() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [group, setGroup] = useState<Group>({ name: '' });
 
-  const showSuccess = (detail: string) =>
-    toast.current?.show({ severity: 'success', summary: 'Success', detail });
-  const showError = (detail: string) =>
-    toast.current?.show({ severity: 'error', summary: 'Error', detail });
 
   const openNew = () => {
     setGroup({ name: '' });
@@ -105,10 +103,12 @@ export function GroupList() {
   ];
 
   const dialogFooter = (
-    <div className="dialog-actions">
-      <Button severity="secondary" outlined label="Cancel" onClick={hideDialog} />
-      <Button disabled={!group.name} onClick={saveGroup} label={isEditMode ? 'Save' : 'Create'} />
-    </div>
+    <DialogFooter
+      onCancel={hideDialog}
+      onConfirm={saveGroup}
+      confirmLabel={isEditMode ? 'Save' : 'Create'}
+      confirmDisabled={!group.name}
+    />
   );
 
   return (

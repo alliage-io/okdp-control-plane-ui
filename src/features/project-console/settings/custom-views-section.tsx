@@ -8,6 +8,7 @@ import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { useCustomViews, type CustomView } from '../../../core/preferences/custom-views-context';
 import SectionHeading from '../../../shared/components/section-heading';
 import { NAV_CATEGORIES } from '../nav-config';
+import { DialogFooter } from '../../../shared/components/dialog-footer';
 
 /** Curated primeicons palette for the tile icon picker. */
 const ICON_CHOICES = [
@@ -94,10 +95,12 @@ export default function CustomViewsSection({ projectName }: { projectName: strin
     });
 
   const dialogFooter = (
-    <div className="dialog-actions">
-      <Button severity="secondary" outlined label="Cancel" onClick={() => setDraft(null)} />
-      <Button disabled={!valid} onClick={save} label={draft?.id ? 'Save' : 'Create'} />
-    </div>
+    <DialogFooter
+      onCancel={() => setDraft(null)}
+      onConfirm={save}
+      confirmLabel={draft?.id ? 'Save' : 'Create'}
+      confirmDisabled={!valid}
+    />
   );
 
   return (

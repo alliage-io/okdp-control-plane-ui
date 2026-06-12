@@ -17,9 +17,11 @@ import { StatusTag } from '../../../../shared/components/status-tag';
 import { useIdentityGroups, useIdentityUsers } from '../use-identity';
 import SearchFilter from '../../../../shared/components/search-filter';
 import { PageHeader } from '../../../../shared/components/page-header';
+import { useToastMessages } from '../../../../shared/hooks/use-toast-messages';
+import { DialogFooter } from '../../../../shared/components/dialog-footer';
 
 export function UserList() {
-  const toast = useRef<Toast>(null);
+  const { toast, showSuccess, showError } = useToastMessages();
   const menuRef = useRef<Menu>(null);
   const selectedUserRef = useRef<User | null>(null);
 
@@ -33,10 +35,6 @@ export function UserList() {
   const [emailInput, setEmailInput] = useState('');
   const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
 
-  const showSuccess = (detail: string) =>
-    toast.current?.show({ severity: 'success', summary: 'Success', detail });
-  const showError = (detail: string) =>
-    toast.current?.show({ severity: 'error', summary: 'Error', detail });
 
   const openNew = () => {
     setUser({ username: '', name: '', disabled: false });
@@ -122,14 +120,12 @@ export function UserList() {
   ];
 
   const dialogFooter = (
-    <div className="dialog-actions">
-      <Button severity="secondary" outlined label="Cancel" onClick={hideDialog} />
-      <Button
-        disabled={!user.name || !user.username}
-        onClick={saveUser}
-        label={isEditMode ? 'Save' : 'Create'}
-      />
-    </div>
+    <DialogFooter
+      onCancel={hideDialog}
+      onConfirm={saveUser}
+      confirmLabel={isEditMode ? 'Save' : 'Create'}
+      confirmDisabled={!user.name || !user.username}
+    />
   );
 
   return (

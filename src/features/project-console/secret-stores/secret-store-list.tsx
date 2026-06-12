@@ -24,6 +24,9 @@ import { StatusTag } from '../../../shared/components/status-tag';
 import { StatusDetailContent } from './status-detail';
 import SearchFilter from '../../../shared/components/search-filter';
 import { PageHeader } from '../../../shared/components/page-header';
+import { useToastMessages } from '../../../shared/hooks/use-toast-messages';
+import { k8sNameError } from '../../../shared/utils/k8s-names';
+import { DialogFooter } from '../../../shared/components/dialog-footer';
 
 const SECTION_TITLE_CLASS = 'm-0 mb-3 text-[14px] font-semibold text-fg';
 const DIVIDER_CLASS = 'my-4 border-0 border-t border-t-border';
@@ -37,7 +40,6 @@ const MODE_BTN_IDLE_CLASS = 'bg-transparent font-medium text-fg-secondary';
 const modeBtnClass = (active: boolean) =>
   `${MODE_BTN_CLASS} ${active ? MODE_BTN_ACTIVE_CLASS : MODE_BTN_IDLE_CLASS}`;
 
-const NAME_PATTERN = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/;
 const POLL_INTERVAL_MS = 10_000;
 
 const AUTH_TYPE_OPTIONS: { label: string; value: VaultAuthType }[] = [
@@ -75,7 +77,7 @@ const getStatusTone = (status: string) => statusTone(status, 'Ready');
 
 export function SecretStoreList() {
   const { projectId = '' } = useParams<{ projectId: string }>();
-  const toast = useRef<Toast>(null);
+  const { toast, showSuccess, showError } = useToastMessages();
   const menuRef = useRef<Menu>(null);
   const selectedStoreRef = useRef<SecretStore | null>(null);
 
@@ -100,10 +102,6 @@ export function SecretStoreList() {
 
   const patchForm = (patch: Partial<StoreForm>) => setForm((f) => ({ ...f, ...patch }));
 
-  const showSuccess = (detail: string) =>
-    toast.current?.show({ severity: 'success', summary: 'Success', detail, life: 3000 });
-  const showError = (detail: string) =>
-    toast.current?.show({ severity: 'error', summary: 'Error', detail, life: 5000 });
 
   const mergeStores = useCallback((incoming: SecretStore[]) => {
     setStores((current) => {
@@ -137,7 +135,7 @@ export function SecretStoreList() {
         showError('Failed to load secret stores');
         setLoading(false);
       });
-  }, [projectId]);
+  }, [projectId, showError]);
 
   // Initial load + 10s polling while a project is selected
   useEffect(() => {
@@ -153,14 +151,7 @@ export function SecretStoreList() {
   }, [projectId, loadStores, mergeStores]);
 
   // --- Name validation ---
-  const nameError = (() => {
-    if (!form.storeName) return '';
-    if (form.storeName.length > 63) return 'Maximum 63 characters';
-    if (!NAME_PATTERN.test(form.storeName)) {
-      return 'Lowercase letters, numbers and hyphens only (must start/end with alphanumeric)';
-    }
-    return '';
-  })();
+  const nameError = k8sNameError(form.storeName);
 
   const formValid = (() => {
     if (!form.storeName || !form.vaultServer || !form.vaultPath) return false;
@@ -370,40 +361,28 @@ export function SecretStoreList() {
   ];
 
   const dialogFooter = (
-    <div
-      className="dialog-actions"
-      style={{ display: 'flex', gap: 'var(--db-space-sm)', alignItems: 'center', width: '100%' }}
-    >
-      <Button
-        severity="secondary"
-        outlined
-        icon={testing ? 'pi pi-spin pi-spinner' : 'pi pi-check-circle'}
-        label="Test Connection"
-        onClick={testConnection}
-        disabled={testing || saving || !form.vaultServer}
-      />
-      <div className="spacer" style={{ flex: 1 }}></div>
-      <Button
-        severity="secondary"
-        outlined
-        label="Cancel"
-        onClick={() => setDialogVisible(false)}
-        disabled={testing || saving}
-      />
-      <Button
-        icon={saving ? 'pi pi-spin pi-spinner' : undefined}
-        label={editMode ? 'Save' : 'Create'}
-        disabled={testing || saving || !formValid}
-        onClick={saveStore}
-      />
-    </div>
+    <DialogFooter
+      onCancel={() => setDialogVisible(false)}
+      onConfirm={saveStore}
+      confirmLabel={editMode ? 'Save' : 'Create'}
+      confirmDisabled={testing || !formValid}
+      cancelDisabled={testing}
+      busy={saving}
+      leading={
+        <Button
+          severity="secondary"
+          outlined
+          icon={testing ? 'pi pi-spin pi-spinner' : 'pi pi-check-circle'}
+          label="Test Connection"
+          onClick={testConnection}
+          disabled={testing || saving || !form.vaultServer}
+        />
+      }
+    />
   );
 
   const statusDialogFooter = (
-    <div
-      className="dialog-actions"
-      style={{ display: 'flex', gap: 'var(--db-space-sm)', alignItems: 'center', width: '100%' }}
-    >
+    <div className="dialog-actions items-center">
       <Button
         severity="secondary"
         outlined
@@ -412,7 +391,7 @@ export function SecretStoreList() {
         onClick={refreshStatus}
         disabled={statusLoading}
       />
-      <div className="spacer" style={{ flex: 1 }}></div>
+      <div className="flex-1"></div>
       <Button
         severity="secondary"
         outlined

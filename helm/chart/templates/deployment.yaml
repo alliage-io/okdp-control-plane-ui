@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: okdp-console
+  labels:
+    app: okdp-console
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: okdp-console
+  template:
+    metadata:
+      labels:
+        app: okdp-console
+    spec:
+      containers:
+        - name: okdp-console
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.targetPort }}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.service.targetPort }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.service.targetPort }}
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            limits:
+              memory: {{ .Values.resources.limits.memory }}
+              cpu: {{ .Values.resources.limits.cpu }}
+            requests:
+              memory: {{ .Values.resources.requests.memory }}
+              cpu: {{ .Values.resources.requests.cpu }}

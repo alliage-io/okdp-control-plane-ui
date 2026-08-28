@@ -36,7 +36,7 @@ export interface SchemaField {
   items?: any;
   additionalProperties?: any;
   properties?: any;
-  'x-kubocd-connection-ref'?: { contract: string };
+  'x-okdp-connection-ref'?: { contract: string };
   'x-ui-order'?: number;
   'x-ui-group'?: string;
   'x-ui-widget'?: string;
@@ -56,8 +56,9 @@ export interface FieldGroup {
 
 export interface DynamicSchemaFormProps {
   schema: any;
-  /** Needed to offer the project's connections on nested connectionRef fields
-   *  (a datasource naming a trino connection). Omitted, those stay text. */
+  /** Needed to offer the project's connections on connection-ref fields,
+   *  including those inside list items (trino `hiveCatalogs[].metastore`).
+   *  Omitted, those stay text. */
   projectId?: string;
   initialValues?: Record<string, any>;
   onParametersChange: (params: Record<string, any>) => void;
@@ -112,7 +113,6 @@ function JsonField({
   const focused = useRef(false);
   useEffect(() => {
     if (!focused.current) setText(serialize(value));
-
   }, [value]);
 
   const commit = (next: string) => {
@@ -163,7 +163,10 @@ function KeyValueField({
 }) {
   const asText = (v: unknown) => (Array.isArray(v) ? v.join(', ') : String(v ?? ''));
   const asValue = (text: string, previous: unknown) => {
-    const parts = text.split(',').map((p) => p.trim()).filter(Boolean);
+    const parts = text
+      .split(',')
+      .map((p) => p.trim())
+      .filter(Boolean);
     return Array.isArray(previous) || parts.length > 1 ? parts : text.trim();
   };
 
@@ -233,6 +236,108 @@ function KeyValueField({
   );
 }
 
+/** Root keys of a chart's values schema that are never user parameters: the
+ *  platform values, the external connections layered in by the GitOps engine,
+ *  and the values slot Helm creates for a library dependency. The server strips
+ *  them from the schema it serves; the form drops them too in case it did not. */
+const RESERVED_ROOT_KEYS: ReadonlySet<string> = new Set([
+  'global',
+  'connections',
+  'okdp-lib',
+]);
+
+/** The contract a property references, when it carries the connection marker. */
+function connectionRefContract(def: any): string | undefined {
+  const contract = def?.['x-okdp-connection-ref']?.contract;
+  return typeof contract === 'string' && contract ? contract : undefined;
+}
+
+/** The project's connections offered for each contract, one lookup per contract.
+ *  Keyed on the sorted contract list rather than on the field, so a schema
+ *  swapped under the same field (a version change) refreshes the options. */
+function useSelectableConnections(
+  projectId: string | undefined,
+  contracts: string[],
+): Record<string, SelectableConnection[]> {
+  const [connections, setConnections] = useState<Record<string, SelectableConnection[]>>({});
+  const key = contracts.join(',');
+  useEffect(() => {
+    if (!projectId || !key) return;
+    key.split(',').forEach((contract) => {
+      connectionApi
+        .selectable(projectId, contract)
+        .then((found) => setConnections((c) => ({ ...c, [contract]: found })))
+        .catch(() => setConnections((c) => ({ ...c, [contract]: [] })));
+    });
+  }, [projectId, key]);
+  return connections;
+}
+
+/** A dropdown of the project's connections satisfying a contract. A value that
+ *  is not (or no longer) offered is kept as an option, so an edit form does not
+ *  silently blank a reference it cannot resolve. */
+function ConnectionRefDropdown({
+  inputId,
+  contract,
+  value,
+  options,
+  onChange,
+}: {
+  inputId?: string;
+  contract: string;
+  value: string | undefined;
+  options: SelectableConnection[] | undefined;
+  onChange: (next: string | undefined) => void;
+}) {
+  const names = (options ?? []).map((c) => c.name);
+  if (value && !names.includes(value)) names.push(value);
+  return (
+    <Dropdown
+      inputId={inputId}
+      value={value || null}
+      options={names.map((name) => ({ label: name, value: name }))}
+      optionLabel="label"
+      optionValue="value"
+      placeholder={
+        options && options.length === 0 && !value
+          ? `No ${contract} connection in this project`
+          : `Select a ${contract} connection`
+      }
+      showClear
+      appendTo={document.body}
+      className="w-full"
+      onChange={(e) => onChange(e.value ?? undefined)}
+    />
+  );
+}
+
+/** A string parameter at the root of the schema carrying the connection marker.
+ *  The deploy and edit pages normally claim these for their dedicated picker;
+ *  this is the fallback when they did not (inputs unreadable, older server). */
+function ConnectionRefField({
+  field,
+  value,
+  projectId,
+  onChange,
+}: {
+  field: SchemaField;
+  value: string | undefined;
+  projectId?: string;
+  onChange: (next: string | undefined) => void;
+}) {
+  const contract = connectionRefContract(field)!;
+  const connections = useSelectableConnections(projectId, [contract]);
+  return (
+    <ConnectionRefDropdown
+      inputId={field.name}
+      contract={contract}
+      value={value}
+      options={connections[contract]}
+      onChange={onChange}
+    />
+  );
+}
+
 /** A list of objects whose shape the schema knows: one row per entry, one
  *  column per property. A property carrying a connection marker gets the
  *  project's connections of that contract rather than a free-text field, which
@@ -250,64 +355,65 @@ function ObjectListField({
 }) {
   const props: Record<string, any> = field.items?.properties || {};
   const columns = Object.keys(props);
-  const [connections, setConnections] = useState<Record<string, SelectableConnection[]>>({});
+  const requiredColumns = new Set<string>(field.items?.required || []);
 
-  // The contracts the columns point at. Keying the lookup on them rather than on
-  // the field name matters when the schema is swapped under the same field, as
-  // a version change does: the options would otherwise stay those of the
-  // previous schema.
+  // The contracts the columns point at, sorted so the lookup key is stable.
   const contracts = useMemo(
     () =>
       [
         ...new Set(
-          columns
-            .map((c) => props[c]?.['x-kubocd-connection-ref']?.contract)
-            .filter((i): i is string => !!i)
+          columns.map((c) => connectionRefContract(props[c])).filter((i): i is string => !!i),
         ),
       ].sort(),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [JSON.stringify(field.items?.properties ?? {})]
+    [JSON.stringify(field.items?.properties ?? {})],
   );
+  const connections = useSelectableConnections(projectId, contracts);
 
-  // One lookup per contract used by the row, not per row.
-  useEffect(() => {
-    if (!projectId) return;
-    contracts.forEach((contract) => {
-      connectionApi
-        .selectable(projectId, contract)
-        .then((found) => setConnections((c) => ({ ...c, [contract]: found })))
-        .catch(() => setConnections((c) => ({ ...c, [contract]: [] })));
-    });
-  }, [projectId, contracts]);
-
+  // An emptied cell is removed rather than kept blank: the chart default (or
+  // the instance-level fallback, e.g. s3SecretRef) applies to what is not set.
   const patch = (index: number, column: string, columnValue: any) =>
-    onChange(value.map((row, i) => (i === index ? { ...row, [column]: columnValue } : row)));
+    onChange(
+      value.map((row, i) => {
+        if (i !== index) return row;
+        const next = { ...row };
+        if (columnValue === undefined || columnValue === null || columnValue === '') {
+          delete next[column];
+        } else {
+          next[column] = columnValue;
+        }
+        return next;
+      }),
+    );
 
   return (
     <div className="flex flex-col gap-2">
       {value.map((row, index) => (
         <div key={index} className="flex items-end gap-2">
           {columns.map((column) => {
-            const contract = props[column]?.['x-kubocd-connection-ref']?.contract;
+            const contract = connectionRefContract(props[column]);
+            const cellId = `${field.name}-${index}-${column}`;
             return (
               <div key={column} className="flex-1">
-                <label className="text-[12px] text-fg-secondary">{formatLabel(column)}</label>
+                <label htmlFor={cellId} className="text-[12px] text-fg-secondary">
+                  {props[column]?.title || formatLabel(column)}
+                  {requiredColumns.has(column) && (
+                    <span className="text-danger" aria-hidden="true">
+                      {' *'}
+                    </span>
+                  )}
+                </label>
                 {contract ? (
-                  <Dropdown
-                    value={row[column] ?? null}
-                    options={(connections[contract] || []).map((c) => ({
-                      label: c.name,
-                      value: c.name,
-                    }))}
-                    optionLabel="label"
-                    optionValue="value"
-                    placeholder={`Select a ${contract} connection`}
-                    appendTo={document.body}
-                    className="w-full"
-                    onChange={(e) => patch(index, column, e.value)}
+                  <ConnectionRefDropdown
+                    inputId={cellId}
+                    contract={contract}
+                    value={row[column]}
+                    options={connections[contract]}
+                    onChange={(next) => patch(index, column, next)}
                   />
                 ) : (
                   <InputText
+                    id={cellId}
                     className="w-full"
                     value={row[column] ?? ''}
                     placeholder={props[column]?.default ?? ''}
@@ -344,12 +450,14 @@ function resolveWidget(field: SchemaField): string {
   if (widget) return widget;
 
   if (field.enum && field.enum.length > 0) return 'select';
+  if (field.type === 'string' && connectionRefContract(field)) return 'connection-ref';
   if (field.type === 'boolean') return 'toggle';
   if (field.type === 'integer' || field.type === 'number') return 'number';
   // A structured value in a text input renders as [object Object], and editing
   // it would replace the structure by that string.
   if (field.type === 'array' && field.items?.properties) return 'object-list';
-  if (field.type === 'object' && Object.keys(field.properties || {}).length === 0) return 'key-value';
+  if (field.type === 'object' && Object.keys(field.properties || {}).length === 0)
+    return 'key-value';
   if (field.type === 'object' || field.type === 'array') return 'yaml';
   return 'text';
 }
@@ -375,33 +483,35 @@ function buildFields(schema: any): SchemaField[] {
   const properties = schema?.properties || {};
   const required = new Set<string>(schema?.required || []);
 
-  const fields: SchemaField[] = Object.entries(properties).map(([name, def]: [string, any]) => ({
-    name,
-    type: def.type || 'string',
-    default: def.default,
-    description: def.description,
-    title: def.title,
-    enum: def.enum,
-    required: required.has(name),
-    minimum: def.minimum,
-    maximum: def.maximum,
-    minLength: def.minLength,
-    maxLength: def.maxLength,
-    pattern: def.pattern,
-    multipleOf: def.multipleOf,
-    items: def.items,
-    additionalProperties: def.additionalProperties,
-    properties: def.properties,
-    'x-kubocd-connection-ref': def['x-kubocd-connection-ref'],
-    'x-ui-order': def['x-ui-order'] ?? 999,
-    'x-ui-group': def['x-ui-group'] || 'General',
-    'x-ui-widget': def['x-ui-widget'],
-    'x-ui-condition': def['x-ui-condition'],
-    'x-ui-advanced': def['x-ui-advanced'] || false,
-    'x-ui-columns': def['x-ui-columns'],
-    'x-ui-col-span': def['x-ui-col-span'],
-    'x-ui-placeholder': def['x-ui-placeholder'],
-  }));
+  const fields: SchemaField[] = Object.entries(properties)
+    .filter(([name]) => !RESERVED_ROOT_KEYS.has(name))
+    .map(([name, def]: [string, any]) => ({
+      name,
+      type: def.type || 'string',
+      default: def.default,
+      description: def.description,
+      title: def.title,
+      enum: def.enum,
+      required: required.has(name),
+      minimum: def.minimum,
+      maximum: def.maximum,
+      minLength: def.minLength,
+      maxLength: def.maxLength,
+      pattern: def.pattern,
+      multipleOf: def.multipleOf,
+      items: def.items,
+      additionalProperties: def.additionalProperties,
+      properties: def.properties,
+      'x-okdp-connection-ref': def['x-okdp-connection-ref'],
+      'x-ui-order': def['x-ui-order'] ?? 999,
+      'x-ui-group': def['x-ui-group'] || 'General',
+      'x-ui-widget': def['x-ui-widget'],
+      'x-ui-condition': def['x-ui-condition'],
+      'x-ui-advanced': def['x-ui-advanced'] || false,
+      'x-ui-columns': def['x-ui-columns'],
+      'x-ui-col-span': def['x-ui-col-span'],
+      'x-ui-placeholder': def['x-ui-placeholder'],
+    }));
 
   const visibleFields = fields.filter((f) => f['x-ui-widget'] !== 'profile-editor');
   visibleFields.sort((a, b) => a['x-ui-order']! - b['x-ui-order']!);
@@ -533,132 +643,141 @@ const FieldWidget = memo(function FieldWidget({
   projectId?: string;
   setValue: (name: string, value: any) => void;
 }) {
-      switch (resolveWidget(field)) {
-        case 'password':
-          return (
-            <Password
-              inputId={field.name}
-              value={value ?? ''}
-              placeholder={field['x-ui-placeholder'] || ''}
-              feedback={false}
-              toggleMask
-              className="w-full"
-              inputClassName={invalid ? 'field-invalid' : undefined}
-              onChange={(e) => setValue(field.name, e.target.value)}
-            />
-          );
-        case 'object-list':
-          return (
-            <ObjectListField
-              field={field}
-              value={Array.isArray(value) ? value : []}
-              projectId={projectId}
-              onChange={(next) => setValue(field.name, next)}
-            />
-          );
-        case 'key-value-scalar':
-          return (
-            <ScalarKeyValueField
-              value={value && typeof value === 'object' ? (value as Record<string, unknown>) : {}}
-              placeholder={field['x-ui-placeholder']}
-              onChange={(next) => setValue(field.name, next)}
-            />
-          );
-        case 'key-value':
-          return (
-            <KeyValueField
-              value={value && typeof value === 'object' ? (value as Record<string, unknown>) : {}}
-              onChange={(next) => setValue(field.name, next)}
-            />
-          );
-        case 'yaml':
-          return (
-            <JsonField
-              field={field}
-              value={value}
-              invalid={hasError}
-              onChange={(parsed) => setValue(field.name, parsed)}
-            />
-          );
-        case 'textarea':
-          return (
-            <InputTextarea
-              id={field.name}
-              value={value ?? ''}
-              placeholder={field['x-ui-placeholder'] || ''}
-              rows={3}
-              className={`w-full${invalid}`}
-              onChange={(e) => setValue(field.name, e.target.value)}
-            />
-          );
-        case 'select':
-          return (
-            <Dropdown
-              inputId={field.name}
-              value={value}
-              options={toOptions(field.enum!)}
-              optionLabel="label"
-              optionValue="value"
-              placeholder={field['x-ui-placeholder'] || 'Select...'}
-              className={`w-full${invalid}`}
-              onChange={(e) => setValue(field.name, e.value)}
-            />
-          );
-        case 'stepper':
-          return (
-            <InputNumber
-              inputId={field.name}
-              value={value ?? null}
-              showButtons
-              buttonLayout="horizontal"
-              step={field.multipleOf || 1}
-              min={field.minimum}
-              max={field.maximum}
-              {...fractionProps(field)}
-              incrementButtonIcon="pi pi-plus"
-              decrementButtonIcon="pi pi-minus"
-              className="w-full"
-              onValueChange={(e) => setValue(field.name, e.value)}
-            />
-          );
-        case 'number':
-          return (
-            <InputNumber
-              inputId={field.name}
-              value={value ?? null}
-              min={field.minimum}
-              max={field.maximum}
-              step={field.multipleOf || 1}
-              {...fractionProps(field)}
-              className="w-full"
-              onValueChange={(e) => setValue(field.name, e.value)}
-            />
-          );
-        case 'toggle':
-          return <InputSwitch checked={!!value} onChange={(e) => setValue(field.name, e.value)} />;
-        case 'url':
-          return (
-            <InputText
-              id={field.name}
-              type="url"
-              value={value ?? ''}
-              placeholder={field['x-ui-placeholder'] || ''}
-              className={`w-full${invalid}`}
-              onChange={(e) => setValue(field.name, e.target.value)}
-            />
-          );
-        default:
-          return (
-            <InputText
-              id={field.name}
-              type="text"
-              value={value ?? ''}
-              placeholder={field['x-ui-placeholder'] || ''}
-              className={`w-full${invalid}`}
-              onChange={(e) => setValue(field.name, e.target.value)}
-            />
-          );
-      }
+  switch (resolveWidget(field)) {
+    case 'password':
+      return (
+        <Password
+          inputId={field.name}
+          value={value ?? ''}
+          placeholder={field['x-ui-placeholder'] || ''}
+          feedback={false}
+          toggleMask
+          className="w-full"
+          inputClassName={invalid ? 'field-invalid' : undefined}
+          onChange={(e) => setValue(field.name, e.target.value)}
+        />
+      );
+    case 'connection-ref':
+      return (
+        <ConnectionRefField
+          field={field}
+          value={typeof value === 'string' ? value : undefined}
+          projectId={projectId}
+          onChange={(next) => setValue(field.name, next ?? '')}
+        />
+      );
+    case 'object-list':
+      return (
+        <ObjectListField
+          field={field}
+          value={Array.isArray(value) ? value : []}
+          projectId={projectId}
+          onChange={(next) => setValue(field.name, next)}
+        />
+      );
+    case 'key-value-scalar':
+      return (
+        <ScalarKeyValueField
+          value={value && typeof value === 'object' ? (value as Record<string, unknown>) : {}}
+          placeholder={field['x-ui-placeholder']}
+          onChange={(next) => setValue(field.name, next)}
+        />
+      );
+    case 'key-value':
+      return (
+        <KeyValueField
+          value={value && typeof value === 'object' ? (value as Record<string, unknown>) : {}}
+          onChange={(next) => setValue(field.name, next)}
+        />
+      );
+    case 'yaml':
+      return (
+        <JsonField
+          field={field}
+          value={value}
+          invalid={hasError}
+          onChange={(parsed) => setValue(field.name, parsed)}
+        />
+      );
+    case 'textarea':
+      return (
+        <InputTextarea
+          id={field.name}
+          value={value ?? ''}
+          placeholder={field['x-ui-placeholder'] || ''}
+          rows={3}
+          className={`w-full${invalid}`}
+          onChange={(e) => setValue(field.name, e.target.value)}
+        />
+      );
+    case 'select':
+      return (
+        <Dropdown
+          inputId={field.name}
+          value={value}
+          options={toOptions(field.enum!)}
+          optionLabel="label"
+          optionValue="value"
+          placeholder={field['x-ui-placeholder'] || 'Select...'}
+          className={`w-full${invalid}`}
+          onChange={(e) => setValue(field.name, e.value)}
+        />
+      );
+    case 'stepper':
+      return (
+        <InputNumber
+          inputId={field.name}
+          value={value ?? null}
+          showButtons
+          buttonLayout="horizontal"
+          step={field.multipleOf || 1}
+          min={field.minimum}
+          max={field.maximum}
+          {...fractionProps(field)}
+          incrementButtonIcon="pi pi-plus"
+          decrementButtonIcon="pi pi-minus"
+          className="w-full"
+          onValueChange={(e) => setValue(field.name, e.value)}
+        />
+      );
+    case 'number':
+      return (
+        <InputNumber
+          inputId={field.name}
+          value={value ?? null}
+          min={field.minimum}
+          max={field.maximum}
+          step={field.multipleOf || 1}
+          {...fractionProps(field)}
+          className="w-full"
+          onValueChange={(e) => setValue(field.name, e.value)}
+        />
+      );
+    case 'toggle':
+      return <InputSwitch checked={!!value} onChange={(e) => setValue(field.name, e.value)} />;
+    case 'url':
+      return (
+        <InputText
+          id={field.name}
+          type="url"
+          value={value ?? ''}
+          placeholder={field['x-ui-placeholder'] || ''}
+          className={`w-full${invalid}`}
+          onChange={(e) => setValue(field.name, e.target.value)}
+        />
+      );
+    default:
+      return (
+        <InputText
+          id={field.name}
+          type="text"
+          value={value ?? ''}
+          placeholder={field['x-ui-placeholder'] || ''}
+          className={`w-full${invalid}`}
+          onChange={(e) => setValue(field.name, e.target.value)}
+        />
+      );
+  }
 });
 
 /** A free-form parameter map whose values keep the type they are typed as

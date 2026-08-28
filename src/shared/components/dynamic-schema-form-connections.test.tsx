@@ -155,3 +155,21 @@ describe('DynamicSchemaForm connection references', () => {
     expect(selectable).not.toHaveBeenCalled();
   });
 });
+
+describe('DynamicSchemaForm list items', () => {
+  it('reports a list item missing a required column', async () => {
+    selectable.mockResolvedValue([]);
+    const onValidityChange = vi.fn();
+    render(
+      <DynamicSchemaForm
+        schema={TRINO_SCHEMA}
+        projectId="demo"
+        initialValues={{ hiveCatalogs: [{ name: 'lake' }] }}
+        onParametersChange={vi.fn()}
+        onValidityChange={onValidityChange}
+      />,
+    );
+    expect(await screen.findByText('Entry 1: Metastore is required.')).toBeInTheDocument();
+    expect(onValidityChange).toHaveBeenLastCalledWith(false);
+  });
+});

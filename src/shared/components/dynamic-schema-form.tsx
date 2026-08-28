@@ -671,7 +671,25 @@ function isQuantityField(field: SchemaField): boolean {
   return /\b(cpu|memory|mem)\b/.test(hay) || /request|limit/.test(field.name.toLowerCase());
 }
 
+/** A list item missing a column its schema requires (a trino catalog without a
+ *  metastore) would only be refused by the server, or fail at render time. */
+function missingItemColumns(field: SchemaField, value: unknown): string {
+  if (field.type !== 'array' || !Array.isArray(value)) return '';
+  const required: string[] = field.items?.required || [];
+  const props = field.items?.properties || {};
+  for (let i = 0; i < value.length; i++) {
+    const row = value[i] ?? {};
+    const missing = required.find((c) => row[c] === undefined || row[c] === null || row[c] === '');
+    if (missing) {
+      return `Entry ${i + 1}: ${props[missing]?.title || formatLabel(missing)} is required.`;
+    }
+  }
+  return '';
+}
+
 function validateField(field: SchemaField, value: unknown): string {
+  const itemError = missingItemColumns(field, value);
+  if (itemError) return itemError;
   if (value === undefined || value === null || value === '') return '';
   if (!isQuantityField(field)) return '';
   const v = String(value).trim();

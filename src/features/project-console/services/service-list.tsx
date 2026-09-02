@@ -9,16 +9,19 @@ import { applyListEvent } from '../../../core/api/sse';
 import { readUiCache, writeUiCache } from '../../../core/api/ui-cache';
 import type { ServiceInstance } from '../../../core/models/service.model';
 import { useToastMessages } from '../../../shared/hooks/use-toast-messages';
-import {
-  apiErrorMessage,
-  formatMediumDate,
-  isTransitioning,
-  openInNewTab,
-  statusTone,
-} from './service-utils';
+import { apiErrorMessage, formatMediumDate, openInNewTab } from './service-utils';
 import { StatusTag } from '../../../shared/components/status-tag';
+import { ServiceStatusTag } from './service-status-tag';
 
-type StatusFilter = 'All' | 'Ready' | 'Installing' | 'Updating' | 'Error';
+type StatusFilter = 'All' | 'Ready' | 'Pending' | 'Installing' | 'Error';
+
+/** Filter chips: `Installing` groups the engine rolling out (Installing and
+ *  Updating); `Pending` is the change committed but not yet picked up. */
+function matchesStatus(filter: StatusFilter, status: string): boolean {
+  if (filter === 'All') return true;
+  if (filter === 'Installing') return status === 'Installing' || status === 'Updating';
+  return status === filter;
+}
 
 export interface ServiceListProps {
   serviceFilter?: string;
@@ -82,7 +85,9 @@ export function ServiceList({
 
     const unsubscribe = serviceApi.subscribeServices(projectName, {
       next: (event) => {
-        if (!matchesFilter(event.object)) return;
+        // A DELETED object only carries its names, not its service: filtering
+        // it by service would drop it and leave a ghost row.
+        if (event.type !== 'DELETED' && !matchesFilter(event.object)) return;
         if (event.type === 'DELETED') {
           setDeletingNames((names) => {
             if (!names.has(event.object.name)) return names;
@@ -102,38 +107,24 @@ export function ServiceList({
   }, [projectName, serviceFilter, showError]);
 
   const statChips = useMemo(
-    () => [
-      { key: 'All' as StatusFilter, count: services.length, tone: 'neutral' as const },
-      {
-        key: 'Ready' as StatusFilter,
-        count: services.filter((s) => s.status === 'Ready').length,
-        tone: 'success' as const,
-      },
-      {
-        key: 'Installing' as StatusFilter,
-        count: services.filter((s) => s.status === 'Installing' || s.status === 'Updating').length,
-        tone: 'warn' as const,
-      },
-      {
-        key: 'Error' as StatusFilter,
-        count: services.filter((s) => s.status === 'Error').length,
-        tone: 'danger' as const,
-      },
-    ],
+    () =>
+      [
+        { key: 'All' as StatusFilter, tone: 'neutral' as const },
+        { key: 'Ready' as StatusFilter, tone: 'success' as const },
+        { key: 'Pending' as StatusFilter, tone: 'info' as const },
+        { key: 'Installing' as StatusFilter, tone: 'warn' as const },
+        { key: 'Error' as StatusFilter, tone: 'danger' as const },
+      ].map((chip) => ({
+        ...chip,
+        count: services.filter((s) => matchesStatus(chip.key, s.status)).length,
+      })),
     [services],
   );
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return services.filter((s) => {
-      if (filterStatus !== 'All') {
-        // "Installing" tab groups Installing + Updating (in-progress reconciliation)
-        const matches =
-          filterStatus === 'Installing'
-            ? s.status === 'Installing' || s.status === 'Updating'
-            : s.status === filterStatus;
-        if (!matches) return false;
-      }
+      if (!matchesStatus(filterStatus, s.status)) return false;
       if (!q) return true;
       const hay = `${s.name} ${s.service} ${s.serviceTag} ${s.targetNamespace ?? ''}`.toLowerCase();
       return hay.includes(q);
@@ -293,11 +284,7 @@ export function ServiceList({
                           icon={<i className="pi pi-spin pi-spinner text-[0.7rem]" />}
                         />
                       ) : (
-                        <StatusTag
-                          value={svc.status}
-                          tone={statusTone(svc.status)}
-                          pulse={isTransitioning(svc.status)}
-                        />
+                        <ServiceStatusTag status={svc.status} statusMessage={svc.statusMessage} />
                       )}
                     </td>
                     <td>
@@ -305,7 +292,11 @@ export function ServiceList({
                     </td>
                     <td>
                       <span className="muted-text">
-                        {svc.createdAt ? formatMediumDate(svc.createdAt) : '—'}
+                        {svc.createdAt
+                          ? formatMediumDate(svc.createdAt)
+                          : svc.status === 'Pending'
+                            ? 'Not yet'
+                            : '—'}
                       </span>
                     </td>
                     <td onClick={(e) => e.stopPropagation()}>

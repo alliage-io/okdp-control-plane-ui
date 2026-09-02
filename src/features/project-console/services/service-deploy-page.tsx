@@ -11,13 +11,14 @@ import { DynamicSchemaForm } from '../../../shared/components/dynamic-schema-for
 import EmptyState from '../../../shared/components/empty-state';
 import { ProfileListEditor, type Profile } from '../../../shared/components/profile-list-editor';
 import { useToastMessages } from '../../../shared/hooks/use-toast-messages';
-import { k8sNameError } from '../../../shared/utils/k8s-names';
+import { instanceNameError } from '../../../shared/utils/k8s-names';
 import { flattenReviewParams } from '../../../shared/utils/format-review-value';
 import {
-  apiErrorMessage,
   areaBasePath,
+  deployErrorMessage,
   hasProfileEditorWidget,
   parentLabel,
+  savedMessage,
   useServiceSchema,
   versionOptionsFor,
 } from './service-utils';
@@ -31,9 +32,9 @@ interface WizardStep {
 
 const PROGRESS_STAGES = [
   { label: 'Validating parameters' },
-  { label: 'Creating release' },
-  { label: 'Scheduling pod' },
-  { label: 'Waiting for readiness' },
+  { label: 'Writing the instance files' },
+  { label: 'Committing to Git' },
+  { label: 'Pushing to the deployments repository' },
 ];
 
 export default function ServiceDeployPage() {
@@ -143,7 +144,10 @@ export default function ServiceDeployPage() {
   const isInputAnswered = (input: PackageInput) =>
     input.optional || Boolean(input.default) || !!connectionChoices[input.parameter!];
 
-  const nameError = useMemo(() => k8sNameError(instanceName), [instanceName]);
+  const nameError = useMemo(
+    () => instanceNameError(projectId ?? '', instanceName),
+    [projectId, instanceName],
+  );
 
   const isFormValid = useMemo(() => {
     // The last gate before Deploy, so it repeats the connection check rather
@@ -299,10 +303,9 @@ export default function ServiceDeployPage() {
         mergedParams[input.parameter] = chosen;
         continue;
       }
-      // Writing an empty string here is not the same as writing nothing: KuboCD
-      // merges the submitted parameters over the package defaults, so the empty
-      // value wins and the default, a template the Environment answers, never
-      // renders. A choice not made is left out.
+      // Writing an empty string here is not the same as writing nothing: the
+      // server writes the submitted parameters to values.yaml, so the empty
+      // value would win over the chart default. A choice not made is left out.
       delete mergedParams[input.parameter];
     }
 
@@ -320,10 +323,10 @@ export default function ServiceDeployPage() {
         instanceName,
         parameters: mergedParams,
       })
-      .then(() => {
+      .then((created) => {
         clearProgressTick();
         setDeployProgress(PROGRESS_STAGES.length);
-        showSuccess(`${instanceName} is being provisioned.`, 'Deploying instance');
+        showSuccess(savedMessage(instanceName, created?.revision), 'Instance committed');
         navTimerRef.current = setTimeout(() => {
           setDeploying(false);
           const returnTo = searchParams.get('returnTo');
@@ -336,7 +339,7 @@ export default function ServiceDeployPage() {
       })
       .catch((err) => {
         clearProgressTick();
-        showError(apiErrorMessage(err, 'Deployment failed'));
+        showError(deployErrorMessage(err, projectId, instanceName));
         setDeploying(false);
       });
   };

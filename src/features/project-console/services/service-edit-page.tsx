@@ -14,13 +14,12 @@ import {
   apiErrorMessage,
   areaBasePath,
   hasProfileEditorWidget,
-  isTransitioning,
   parentLabel,
-  statusTone,
+  savedMessage,
   useServiceSchema,
   versionOptionsFor,
 } from './service-utils';
-import { StatusTag } from '../../../shared/components/status-tag';
+import { ServiceStatusTag } from './service-status-tag';
 
 export default function ServiceEditPage() {
   const navigate = useNavigate();
@@ -172,8 +171,8 @@ export default function ServiceEditPage() {
     // have `additionalProperties: false` and reject unknown keys.
     const mergedParams: Record<string, any> = { ...parametersRef.current };
     // The pickers own their parameters, and the schema form no longer sees
-    // them. An empty choice is left out rather than written blank, so a package
-    // default resolved against the Environment keeps applying.
+    // them. An empty choice is left out rather than written blank: only
+    // submitted parameters reach values.yaml, and chart defaults apply.
     for (const input of packageInputs) {
       const chosen = connectionChoices[input.parameter!];
       if (chosen) {
@@ -191,8 +190,8 @@ export default function ServiceEditPage() {
     }
     serviceApi
       .updateServiceParameters(projectName, instance.name, body)
-      .then(() => {
-        showSuccess(`${instance.name} has been updated.`, 'Changes saved');
+      .then((updated) => {
+        showSuccess(savedMessage(instance.name, updated?.revision), 'Changes committed');
         setSaving(false);
         navigateBack(projectName);
       })
@@ -239,14 +238,14 @@ export default function ServiceEditPage() {
                       {instance.name}
                     </span>
                   </h2>
-                  <StatusTag
-                    value={instance.status}
-                    tone={statusTone(instance.status)}
-                    pulse={isTransitioning(instance.status)}
+                  <ServiceStatusTag
+                    status={instance.status}
+                    statusMessage={instance.statusMessage}
                   />
                 </div>
                 <p className="page-desc">
-                  Change version, parameters or profiles. Saving will trigger a rolling restart.
+                  Change version, parameters or profiles. Saving commits the change to Git; the
+                  GitOps engine then rolls it out.
                 </p>
               </div>
             </div>

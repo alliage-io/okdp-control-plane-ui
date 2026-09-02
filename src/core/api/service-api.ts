@@ -14,17 +14,22 @@ import type {
 const baseUrl = environment.apiBaseUrl;
 const seg = encodeURIComponent;
 
-/** One connection a service's package declares it needs. The deploy form
- *  offers a choice for each entry carrying a parameter. */
+/** One connection reference a service's chart schema declares, at any depth.
+ *  The deploy form offers a picker for each entry carrying a root `parameter`;
+ *  nested references (inside list items) are picked in the list item itself. */
 export interface PackageInput {
+  /** JSON path of the reference: `metastore` at the root,
+   *  `hiveCatalogs[].metastore` inside list items. */
+  path?: string;
+  /** Same as `path`. */
   alias: string;
   contract: string;
-  /** Package parameter carrying the chosen connection name. Absent when the
-   *  package binds some other way, nothing to choose then. */
+  /** Root parameter carrying the chosen connection name. Empty for a nested
+   *  reference. */
   parameter?: string;
   optional: boolean;
-  /** Template the package falls back to, rendered against the Environment. Its
-   *  presence means "not choosing" is a real answer, not an empty one. */
+  /** A value the chart falls back to. Its presence means "not choosing" is a
+   *  real answer, not an empty one. */
   default?: string;
   description?: string;
 }

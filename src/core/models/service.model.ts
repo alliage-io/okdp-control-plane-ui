@@ -65,32 +65,44 @@ export interface DeployServiceRequest {
 
 export interface ServiceInstance {
   name: string;
+  /** Helm release name, `<project>-<instance>`. */
   releaseName: string;
   service: string;
+  /** Chart version. */
   serviceTag: string;
+  /**
+   * `Pending` (committed to Git, the GitOps engine has no HelmRelease or
+   * Application for it yet), `Installing`, `Updating`, `Ready` or `Error`.
+   */
   status: string;
   /**
    * Human-readable explanation set by the backend when status is not
-   * "Ready". Typically the latest K8s Warning event in the namespace
-   * (e.g. a Helm upgrade failure or an invalid resource parameter).
+   * "Ready": the GitOps engine's condition message (Flux Ready/Stalled, Argo
+   * CD conditions or health), else the latest Warning event.
    */
   statusMessage?: string;
   targetNamespace: string;
+  /** From the instance descriptor; empty until the chart has rendered it. */
   url?: string;
+  /** Markdown usage notes from the instance descriptor. */
+  usage?: string;
   parameters: Record<string, unknown>;
-  /** What the release is actually wired to, published by the controller,
-   *  as opposed to what the service asked for. */
+  /** The connections the instance is bound to. */
   connections?: ServiceConnection[];
+  /** Creation of the engine object; empty while `Pending`. */
   createdAt?: string;
+  /** Git commit SHA of the change. Only set on deploy and edit responses. */
+  revision?: string;
 }
 
 /** One connection a deployed service is bound to. */
 export interface ServiceConnection {
   name: string;
   namespace?: string;
-  /** Connection or ClusterConnection: the two may share a name. */
-  kind: string;
-  /** False while the release is still waiting for it. */
+  /** `Connection`: an external connection file the instance layers in.
+   *  `Instance`: an output of another instance of the project. */
+  kind: 'Connection' | 'Instance' | string;
+  /** False while the connection file the instance layers in is missing. */
   resolved: boolean;
 }
 

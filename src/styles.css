@@ -1360,6 +1360,13 @@ h1 {
   color: #92400e;
 }
 
+/* Waiting, not wrong: a change committed to Git before the engine takes it. */
+@utility alert-info {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1e40af;
+}
+
 /* ========== Log viewer (terminal surface) ========== */
 /* Deliberately dark in BOTH themes — a terminal, not a themed panel. One
    definition shared by the pod log viewer and the spark executor logs so
@@ -2234,6 +2241,12 @@ body.dark-mode .alert-warn {
   background: rgba(217, 119, 6, 0.12);
   border-color: rgba(217, 119, 6, 0.35);
   color: #fcd34d;
+}
+
+body.dark-mode .alert-info {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.35);
+  color: #93c5fd;
 }
 
 body.dark-mode .stat-chip.chip-warn.active {

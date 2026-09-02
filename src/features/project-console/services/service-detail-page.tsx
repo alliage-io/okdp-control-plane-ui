@@ -12,12 +12,12 @@ import {
   apiErrorMessage,
   areaBasePath,
   formatMediumDateTime,
-  isTransitioning,
   openInNewTab,
   parentLabel,
-  statusTone,
 } from './service-utils';
 import { StatusTag } from '../../../shared/components/status-tag';
+import { MarkdownText } from '../../../shared/components/markdown-text';
+import { ServiceStatusTag } from './service-status-tag';
 
 type Tab = 'overview' | 'pods' | 'logs' | 'parameters';
 
@@ -167,6 +167,27 @@ export default function ServiceDetailPage() {
     loadAll();
   }, [loadAll]);
 
+  // Live status: a deploy or an edit lands as Pending (committed to Git) and
+  // moves on as the GitOps engine reconciles it; the page follows it rather
+  // than waiting for a manual refresh. Pods are re-read when the status moves.
+  useEffect(() => {
+    if (!projectId || !serviceName) return;
+    return serviceApi.subscribeServices(projectId, {
+      next: (event) => {
+        if (event.type === 'DELETED' || event.object.name !== serviceName) return;
+        setInstance((current) => {
+          if (current && current.status !== event.object.status) {
+            serviceApi
+              .getPods(projectId, serviceName)
+              .then(setPods)
+              .catch(() => undefined);
+          }
+          return event.object;
+        });
+      },
+    });
+  }, [projectId, serviceName]);
+
   // Metrics: fetch immediately then every 10s.
   useEffect(() => {
     if (!projectId || !serviceName) return;
@@ -282,10 +303,9 @@ export default function ServiceDetailPage() {
               <div className="header-text">
                 <div className="header-title-row">
                   <h2>{instance.name}</h2>
-                  <StatusTag
-                    value={instance.status}
-                    tone={statusTone(instance.status)}
-                    pulse={isTransitioning(instance.status)}
+                  <ServiceStatusTag
+                    status={instance.status}
+                    statusMessage={instance.statusMessage}
                   />
                 </div>
                 <p className="page-desc">
@@ -356,6 +376,18 @@ export default function ServiceDetailPage() {
                     </div>
                   </div>
                 )}
+                {instance.status === 'Pending' && (
+                  <div className="alert alert-info">
+                    <i className="pi pi-clock"></i>
+                    <div>
+                      <strong>Committed to Git</strong>
+                      <p>
+                        {instance.statusMessage ||
+                          'The change is in the deployments repository, waiting for the GitOps engine to reconcile it.'}
+                      </p>
+                    </div>
+                  </div>
+                )}
                 {instance.status === 'Updating' && (
                   <div className="alert alert-warn">
                     <i className="pi pi-spin pi-spinner"></i>
@@ -364,7 +396,7 @@ export default function ServiceDetailPage() {
                       {instance.statusMessage ? (
                         <p className="mono">{instance.statusMessage}</p>
                       ) : (
-                        <p>KuboCD is rolling out the new configuration.</p>
+                        <p>The GitOps engine is rolling out the new configuration.</p>
                       )}
                     </div>
                   </div>
@@ -377,7 +409,7 @@ export default function ServiceDetailPage() {
                       {instance.statusMessage ? (
                         <p className="mono">{instance.statusMessage}</p>
                       ) : (
-                        <p>Pulling image and scheduling pod. This usually takes ~30s.</p>
+                        <p>The GitOps engine is installing the release.</p>
                       )}
                     </div>
                   </div>
@@ -408,7 +440,11 @@ export default function ServiceDetailPage() {
                     <div className="info-item">
                       <span className="info-label">Created</span>
                       <span className="info-value">
-                        {instance.createdAt ? formatMediumDateTime(instance.createdAt) : '—'}
+                        {instance.createdAt
+                          ? formatMediumDateTime(instance.createdAt)
+                          : instance.status === 'Pending'
+                            ? 'Not yet'
+                            : '—'}
                       </span>
                     </div>
                     {instance.url && (
@@ -427,6 +463,18 @@ export default function ServiceDetailPage() {
                     )}
                   </div>
                 </div>
+
+                {instance.usage?.trim() && (
+                  <div className="section-card">
+                    <div className="section-header">
+                      <div className="section-icon-badge">
+                        <i className="pi pi-book"></i>
+                      </div>
+                      <h3 className="section-title">Usage</h3>
+                    </div>
+                    <MarkdownText source={instance.usage} />
+                  </div>
+                )}
 
                 <div className="section-card">
                   <div className="section-header">
@@ -462,9 +510,9 @@ export default function ServiceDetailPage() {
                           className="flex items-center gap-2 py-1.5 text-[13px]"
                         >
                           <span className="mono flex-1 break-all">{connection.name}</span>
-                          {connection.kind === 'ClusterConnection' && (
-                            <span className="muted-text small">platform</span>
-                          )}
+                          <span className="muted-text small">
+                            {connection.kind === 'Instance' ? 'instance' : 'connection'}
+                          </span>
                           <StatusTag
                             value={connection.resolved ? 'Resolved' : 'Waiting'}
                             tone={connection.resolved ? 'success' : 'warning'}

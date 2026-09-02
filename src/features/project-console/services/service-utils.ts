@@ -1,7 +1,15 @@
 import { useCallback, useState } from 'react';
 import { serviceApi } from '../../../core/api/service-api';
+import { apiErrorMessage, HttpError } from '../../../core/api/http';
 import type { PlatformService } from '../../../core/models/service.model';
 import type { StatusTone } from '../../../shared/components/status-tag';
+
+/**
+ * Instance statuses reported by the server. `Pending`: the change is committed
+ * to Git and the GitOps engine (Flux or Argo CD) has not picked it up yet.
+ * `Installing` / `Updating`: the engine is rolling it out.
+ */
+export const SERVICE_STATUSES = ['Pending', 'Installing', 'Updating', 'Ready', 'Error'] as const;
 
 /** Map an instance status to its StatusTag tone. */
 export function statusTone(status: string): StatusTone {
@@ -9,6 +17,8 @@ export function statusTone(status: string): StatusTone {
     case 'Ready':
     case 'Running':
       return 'success';
+    case 'Pending':
+      return 'info';
     case 'Installing':
     case 'Updating':
       return 'warning';
@@ -17,13 +27,39 @@ export function statusTone(status: string): StatusTone {
     case 'Failed':
       return 'danger';
     default:
-      return 'info';
+      return 'neutral';
   }
 }
 
 /** In-flight instance states — rendered with the animated activity dot. */
 export function isTransitioning(status: string): boolean {
-  return status === 'Installing' || status === 'Updating';
+  return status === 'Pending' || status === 'Installing' || status === 'Updating';
+}
+
+/** What a status means, for a tooltip when the server gives no message. */
+export function statusHint(status: string): string {
+  switch (status) {
+    case 'Pending':
+      return 'Committed to Git, waiting for the GitOps engine to reconcile it.';
+    case 'Installing':
+      return 'The GitOps engine is installing the release.';
+    case 'Updating':
+      return 'The GitOps engine is rolling out the new configuration.';
+    default:
+      return '';
+  }
+}
+
+/** A Git commit SHA shortened the way git prints it. */
+export function shortRevision(revision: string | undefined | null): string {
+  return revision ? revision.slice(0, 7) : '';
+}
+
+/** Toast text after a deploy or an edit: the change is a Git commit, which the
+ *  GitOps engine picks up afterwards. */
+export function savedMessage(instanceName: string, revision: string | undefined | null): string {
+  const commit = shortRevision(revision);
+  return `${instanceName} was committed to Git${commit ? ` (${commit})` : ''}. It will roll out once the GitOps engine reconciles it.`;
 }
 
 export interface ServiceArea {
@@ -73,6 +109,18 @@ export function versionOptionsFor(svc: PlatformService): { label: string; value:
     label: v === svc.defaultVersion ? `${v} (recommended)` : v,
     value: v,
   }));
+}
+
+/** The message of a failed deploy. The server answers 409 both for an
+ *  instance of the same name and for a release name `<project>-<instance>`
+ *  another project already produces (project `a-b` + `c` vs `a` + `b-c`), with
+ *  the same wording: say so, or the second case reads as nonsense. */
+export function deployErrorMessage(err: unknown, project: string, instance: string): string {
+  const message = apiErrorMessage(err, 'Deployment failed');
+  if (err instanceof HttpError && err.status === 409) {
+    return `${message}. The release name "${project}-${instance}" must also be unique across projects: pick another instance name.`;
+  }
+  return message;
 }
 
 // Lives in core/api/http (next to HttpError) so non-project-console features

@@ -10,3 +10,18 @@ export function k8sNameError(name: string): string {
   }
   return '';
 }
+
+/** Longest Helm release name: Helm refuses more than 53 characters. */
+export const MAX_RELEASE_NAME = 53;
+
+/** The instance name of a project service, whose Helm release is
+ *  `<project>-<instance>`. Returns '' when valid. */
+export function instanceNameError(project: string, name: string): string {
+  const base = k8sNameError(name);
+  if (base || !name || !project) return base;
+  const release = `${project}-${name}`;
+  if (release.length > MAX_RELEASE_NAME) {
+    return `Too long: the release name "${release}" exceeds ${MAX_RELEASE_NAME} characters (at most ${Math.max(0, MAX_RELEASE_NAME - project.length - 1)} for this project)`;
+  }
+  return '';
+}

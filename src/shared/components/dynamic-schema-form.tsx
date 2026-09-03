@@ -12,6 +12,7 @@ import { Button } from 'primereact/button';
 import { connectionApi, type SelectableConnection } from '../../core/api/connection-api';
 import { formatLabel } from '../utils/format-label';
 import { parseScalarValue, scalarValueToText } from '../utils/scalar-value';
+import { isUnset, sameValue } from '../utils/parameter-patch';
 
 /* The dsf-root class scopes the .field-invalid PrimeReact-input override in
    the PrimeReact overrides section of styles.css. */
@@ -70,6 +71,16 @@ export interface DynamicSchemaFormProps {
    * to disable the Save/Deploy button.
    */
   onValidityChange?: (valid: boolean) => void;
+  /**
+   * What `onParametersChange` receives. `all` (default): every visible field
+   * holding a value, schema defaults included, as a connection form needs.
+   * `explicit`: only what someone chose, as a service's values.yaml must hold:
+   * the `initialValues` (all of their keys, form fields or not) plus every field
+   * the user changed, except a change that empties it or sets it to its schema
+   * default. Displayed defaults are then never sent, and keep following the
+   * chart.
+   */
+  emit?: 'all' | 'explicit';
 }
 
 const GROUP_ICONS: Record<string, string> = {
@@ -970,16 +981,20 @@ export function DynamicSchemaForm({
   initialValues = EMPTY_VALUES,
   onParametersChange,
   onValidityChange,
+  emit = 'all',
 }: DynamicSchemaFormProps) {
   const fields = useMemo(() => (schema ? buildFields(schema) : []), [schema]);
   const groups = useMemo(() => buildGroups(fields), [fields]);
 
   const [values, setValues] = useState<Record<string, any>>({});
   const [advancedOpen, setAdvancedOpen] = useState<Record<string, boolean>>({});
+  // Fields the user changed since the values were last rebuilt.
+  const touchedRef = useRef<Set<string>>(new Set());
 
   // Rebuild values when the schema or the initial values change
   useEffect(() => {
     if (schema) {
+      touchedRef.current = new Set();
       setValues(initialFormValues(fields, initialValues));
     }
   }, [schema, fields, initialValues]);
@@ -1016,6 +1031,21 @@ export function DynamicSchemaForm({
   useEffect(() => {
     onValidityChangeRef.current?.(Object.keys(fieldErrors).length === 0);
 
+    if (emit === 'explicit') {
+      const explicit: Record<string, any> = { ...initialValues };
+      for (const name of touchedRef.current) {
+        const field = fieldsByName.get(name);
+        if (!field) continue;
+        const val = values[name];
+        delete explicit[name];
+        if (!isVisible(field, values) || isUnset(val)) continue;
+        if (field.default !== undefined && sameValue(val, field.default)) continue;
+        explicit[name] = val;
+      }
+      onParametersChangeRef.current(explicit);
+      return;
+    }
+
     const filtered: Record<string, any> = {};
     for (const [key, val] of Object.entries(values)) {
       // Unknown keys (no matching field) are treated as visible.
@@ -1026,10 +1056,16 @@ export function DynamicSchemaForm({
       }
     }
     onParametersChangeRef.current(filtered);
-  }, [values, fieldErrors, fieldsByName]);
+  }, [values, fieldErrors, fieldsByName, emit, initialValues]);
 
   const setValue = useCallback((name: string, value: any) => {
-    setValues((v) => ({ ...v, [name]: value }));
+    // A widget echoing the value it already shows (some do on mount) is not a
+    // user change: only a different value marks the field as touched.
+    setValues((v) => {
+      if (sameValue(v[name], value)) return v;
+      touchedRef.current.add(name);
+      return { ...v, [name]: value };
+    });
   }, []);
 
   const isFieldVisible = (field: SchemaField): boolean => isVisible(field, values);

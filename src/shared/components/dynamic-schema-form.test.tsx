@@ -256,3 +256,69 @@ describe('the key-value-scalar widget', () => {
     expect(last.dagsGitSync).toEqual({ k: expected });
   });
 });
+
+describe('the explicit emit mode (service values.yaml)', () => {
+  const SERVICE_SCHEMA = {
+    properties: {
+      name: { type: 'string', default: 'demo' },
+      replicas: { type: 'integer', default: 2 },
+      debug: { type: 'boolean' },
+      note: { type: 'string' },
+    },
+  };
+
+  it('sends nothing the user did not set, defaults included', () => {
+    const onParametersChange = vi.fn();
+    render(
+      <DynamicSchemaForm
+        schema={SERVICE_SCHEMA}
+        onParametersChange={onParametersChange}
+        emit="explicit"
+      />,
+    );
+    expect(onParametersChange).toHaveBeenLastCalledWith({});
+  });
+
+  it('sends a changed field, but not one set back to its default or emptied', () => {
+    const onParametersChange = vi.fn();
+    const { container } = render(
+      <DynamicSchemaForm
+        schema={SERVICE_SCHEMA}
+        onParametersChange={onParametersChange}
+        emit="explicit"
+      />,
+    );
+    const name = container.querySelector('#name') as HTMLInputElement;
+    const note = container.querySelector('#note') as HTMLInputElement;
+
+    fireEvent.change(name, { target: { value: 'custom' } });
+    fireEvent.change(note, { target: { value: 'hello' } });
+    expect(onParametersChange).toHaveBeenLastCalledWith({ name: 'custom', note: 'hello' });
+
+    fireEvent.change(name, { target: { value: 'demo' } });
+    fireEvent.change(note, { target: { value: '' } });
+    expect(onParametersChange).toHaveBeenLastCalledWith({});
+  });
+
+  it('keeps the loaded values, form fields or not, and drops a cleared one', () => {
+    const onParametersChange = vi.fn();
+    const { container } = render(
+      <DynamicSchemaForm
+        schema={SERVICE_SCHEMA}
+        initialValues={{ note: 'kept', replicas: 2, unknownKey: { a: 1 } }}
+        onParametersChange={onParametersChange}
+        emit="explicit"
+      />,
+    );
+    expect(onParametersChange).toHaveBeenLastCalledWith({
+      note: 'kept',
+      replicas: 2,
+      unknownKey: { a: 1 },
+    });
+
+    fireEvent.change(container.querySelector('#note') as HTMLInputElement, {
+      target: { value: '' },
+    });
+    expect(onParametersChange).toHaveBeenLastCalledWith({ replicas: 2, unknownKey: { a: 1 } });
+  });
+});

@@ -139,7 +139,7 @@ export default function ServiceDeployPage() {
   const currentStepKey: StepKey = steps[currentStep]?.key ?? 'basics';
 
   // An input is answered by a pick, by the package tolerating none, or by the
-  // Environment answering for it through the package default. The last one used
+  // chart through its schema default. The last one used
   // to block the wizard on a service that needed no choice at all.
   const isInputAnswered = (input: PackageInput) =>
     input.optional || Boolean(input.default) || !!connectionChoices[input.parameter!];

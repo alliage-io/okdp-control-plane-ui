@@ -492,7 +492,7 @@ export default function ServiceDetailPage() {
 
                 {/* What the service actually runs against. The page showed the
                     parameters it was deployed with, never the connections the
-                    controller resolved, so "which database is my Superset on"
+                    server resolved, so "which database is my Superset on"
                     had no answer here. An unresolved one is the case a reader
                     opens this page for, so it is listed too. */}
                 {instance.connections && instance.connections.length > 0 && (

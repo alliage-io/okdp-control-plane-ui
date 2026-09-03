@@ -35,7 +35,7 @@ export interface ConnectionField {
 }
 
 export interface ContractDescriptor {
-  /** Also the KuboCD Contract this descriptor produces. A package asking for
+  /** The contract name (`x-okdp-connection-ref` contract). A chart asking for
    *  `database-server` is answered by the contract of the same name, whose
    *  engine field says whether it is PostgreSQL or MySQL. */
   name: string;
@@ -46,14 +46,17 @@ export interface ContractDescriptor {
   /** Whether a user may declare this contract by hand. Contracts that only ever
    *  come from a deployed service (Trino, ...) appear in the internal tab only. */
   external: boolean;
+  /** An instance of the project can provide it (hive, iceberg-catalog,
+   *  trino); the others are only ever external connections. */
+  internal?: boolean;
   fields: ConnectionField[];
 }
 
 export interface ConnectionCatalog {
   types: ContractDescriptor[];
-  /** False while the KuboCD connection CRDs are not installed: external
-   *  connections cannot be persisted yet, internal ones still work. */
-  crdAvailable: boolean;
+  /** Always true since connections are files in the deployments repository.
+   *  Kept by the server for compatibility; the console no longer reads it. */
+  crdAvailable?: boolean;
 }
 
 // --- Connections ---
@@ -120,8 +123,7 @@ export interface InternalConnection {
   host: string;
   port: number;
   values: ConnectionValues;
-  /** True once the entry comes from a Connection owned by the release
-   *  controller rather than being derived from the deployed service. */
+  /** True: read from the providing instance's descriptor outputs. */
   managed: boolean;
   createdAt?: string;
 }
@@ -140,7 +142,7 @@ export interface SelectableConnection {
   providedBy?: string;
 }
 
-/** A service bound to a connection, as the release controller published it. */
+/** An instance bound to a connection: its status is the instance status. */
 export interface ConnectionConsumer {
   service: string;
   releaseName: string;

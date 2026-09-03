@@ -46,7 +46,7 @@ export function InternalConnectionList() {
 
       <p className="mb-4 text-[13px] text-fg-secondary">
         Connections published by the services deployed in this project. Pick one when deploying a
-        service that needs it: the controller wires it, nothing has to be copied by hand. A service
+        service that needs it: the chart wires it, nothing has to be copied by hand. A service
         that publishes no connection does not appear here.
       </p>
 

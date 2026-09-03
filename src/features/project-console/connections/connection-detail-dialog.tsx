@@ -62,7 +62,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 /**
  * What a connection actually holds, opened from either list: its values, its
  * state when it is not ready, and where its credentials live. Consuming it is
- * the controller's job, so this panel describes and never instructs.
+ * the chart's job, so this panel describes and never instructs.
  */
 export function ConnectionDetailDialog({
   detail,

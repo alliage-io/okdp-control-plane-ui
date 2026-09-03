@@ -80,9 +80,9 @@ export function ConnectionInputPicker({
       .catalog()
       .then((catalog) => {
         const found = catalog.types.find((type) => type.name === input.contract);
-        // Without the connection CRDs nothing can be persisted, so offering the
-        // creation form here would end on a 501 the picker cannot explain.
-        setCreatableType(found && found.external && catalog.crdAvailable ? found : null);
+        // Only contracts a user may declare by hand can be created from here;
+        // s3 and database-server are always external connections.
+        setCreatableType(found && found.external ? found : null);
       })
       .catch(() => setCreatableType(null));
   }, [reload, input.contract]);
@@ -98,16 +98,15 @@ export function ConnectionInputPicker({
         ? `Provided by ${connection.providedBy || 'a deployed service'}`
         : connection.description,
     }));
-    // "Nothing chosen" is not always "no connection". When the package carries
-    // a default, it is a template rendered against the Environment, which is
-    // how an Environment says "here, the database is that one". Calling that
-    // None, and writing an empty parameter for it, destroyed the inheritance in
-    // silence.
+    // "Nothing chosen" is not always "no connection". When the chart schema
+    // carries a default, leaving the parameter out lets the chart use it.
+    // Calling that None, and writing an empty parameter for it, would replace
+    // the default with nothing in silence.
     if (input.default) {
       choices.unshift({
-        label: 'Inherited from the Environment',
+        label: `Chart default (${input.default})`,
         value: NONE,
-        description: 'The Environment decides which connection this service gets',
+        description: 'The chart uses this connection unless another is picked',
       });
     } else if (input.optional) {
       choices.unshift({ label: 'None', value: NONE, description: 'Deploy without this connection' });
@@ -115,7 +114,7 @@ export function ConnectionInputPicker({
     return choices;
   }, [selectable, input.optional, input.default]);
 
-  // An optional input, or one the Environment answers for, starts (and stays,
+  // An optional input, or one the chart defaults, starts (and stays,
   // unless picked) on that first entry.
   const hasFallback = input.optional || Boolean(input.default);
   const displayedValue = hasFallback ? value || NONE : value || undefined;
@@ -142,7 +141,7 @@ export function ConnectionInputPicker({
       <small className="field-hint" style={{ marginTop: 0, marginBottom: '10px' }}>
         {input.description ||
           (input.default
-            ? 'The Environment provides one by default. Pick another to override it.'
+            ? `The chart uses ${input.default} by default. Pick another to override it.`
             : input.optional
               ? 'Optional: pick an existing connection, or leave it to None.'
               : 'Required: this service needs a connection of this type.')}

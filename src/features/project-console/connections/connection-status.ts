@@ -1,9 +1,10 @@
 import type { StatusTone } from '../../../shared/components/status-tag';
 import type { ConnectionTestReason, ConnectionTestResult } from '../../../core/api/connection-api';
 
-/** Tone of a connection status pill. Connections carry the KuboCD phase when
- *  they exist as CRDs, and the release status when they are derived from a
- *  deployed service, so both vocabularies are handled here. */
+/** Tone of a connection status pill. Connections are always `Ready` (they are
+ *  files in the deployments repository); consumers carry the status of the
+ *  instance using them (Pending, Installing, Updating, Ready, Error). The
+ *  upper-case words are kept for older servers. */
 export function connectionStatusTone(status: string): StatusTone {
   switch (status) {
     case 'Ready':
@@ -14,7 +15,9 @@ export function connectionStatusTone(status: string): StatusTone {
     case 'FAILED':
       return 'danger';
     case 'Pending':
+      return 'info';
     case 'Installing':
+    case 'Updating':
       return 'warning';
     default:
       return 'info';

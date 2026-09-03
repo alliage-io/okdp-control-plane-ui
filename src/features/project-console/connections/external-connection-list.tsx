@@ -8,7 +8,6 @@ import { Toast } from 'primereact/toast';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Dropdown } from 'primereact/dropdown';
-import { Message } from 'primereact/message';
 import {
   connectionApi,
   type Connection,
@@ -129,7 +128,6 @@ export function ExternalConnectionList() {
   // changes, so handing it a fresh object each render would loop.
   const schema = useMemo(() => (selectedType ? toDynamicSchema(selectedType) : null), [selectedType]);
 
-  const crdAvailable = catalog?.crdAvailable ?? true;
   const nameError = k8sNameError(name);
   const missingFields = selectedType ? missingRequiredFields(selectedType, values) : [];
   const credentialFields = selectedType?.fields.filter((field) => field.secret) ?? [];
@@ -254,7 +252,12 @@ export function ExternalConnectionList() {
         showSuccess(`Connection "${connection.name}" deleted successfully`);
         reload();
       })
-      .catch((err) => showError(apiErrorMessage(err, 'Failed to delete connection')));
+      .catch((err) =>
+        showError(
+          apiErrorMessage(err, 'Failed to delete connection'),
+          'Connection not deleted',
+        ),
+      );
   };
 
   const askDelete = (connection: Connection) => {
@@ -309,23 +312,12 @@ export function ExternalConnectionList() {
       <PageHeader
         title="External connections"
         actions={
-          <button className="create-btn" onClick={openCreateDialog} disabled={!crdAvailable}>
+          <button className="create-btn" onClick={openCreateDialog}>
             <i className="pi pi-plus"></i>
             <span>Add connection</span>
           </button>
         }
       />
-
-      {!crdAvailable && (
-        // The CRDs ship with a KuboCD version the platform does not run yet.
-        // Say so plainly rather than letting the user fill a form that cannot
-        // be saved.
-        <Message
-          severity="info"
-          className="mb-4 w-full justify-start"
-          text="External connections need the KuboCD connection CRDs, which are not installed on this cluster yet. Internal connections are unaffected."
-        />
-      )}
 
       <SearchFilter
         value={globalFilter}
@@ -525,28 +517,27 @@ export function ExternalConnectionList() {
         resourceKind="connection"
         message={
           <>
-            {/* The credentials Secret goes with the connection, so the pods
-                mounting it fail at their next restart, not right away. Saying
-                which services those are is the whole point of this dialog. */}
+            {/* The server refuses to delete a connection an instance still
+                layers in (400 naming them), so saying which ones is the whole
+                point of this dialog. */}
             {consumers === 'loading' ? (
               <span>Checking which services use this connection...</span>
             ) : consumers === null ? (
               <span>
-                Could not check which services use this connection. Deleting it removes its
-                credentials secret, and any service mounting that secret will fail to restart.
+                Could not check which services use this connection. It cannot be deleted while
+                a service still uses it.
               </span>
             ) : consumers.length === 0 ? (
               <span>
-                No service of this project is bound to it. Deleting it also removes its
-                credentials secret.
+                No service of this project is bound to it. Deleting it also removes the
+                credentials secret the console created for it.
               </span>
             ) : (
               <>
                 <span>
                   {consumers.length === 1 ? 'This service uses it' : 'These services use it'}:{' '}
-                  <strong>{consumers.map((c) => c.service).join(', ')}</strong>. Deleting the
-                  connection removes its credentials secret too, so they will fail to start at
-                  their next restart.
+                  <strong>{consumers.map((c) => c.service).join(', ')}</strong>. The connection
+                  cannot be deleted while they do: point them to another connection first.
                 </span>
               </>
             )}

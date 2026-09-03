@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import type { Connection, ConnectionCatalog } from '../../../core/api/connection-api';
+import { HttpError } from '../../../core/api/http';
 
 const catalog = vi.fn();
 const consumers = vi.fn();
@@ -107,20 +108,15 @@ describe('ExternalConnectionList', () => {
     expect(screen.getByText('Corporate warehouse')).toBeInTheDocument();
   });
 
-  it('explains the situation and blocks creation while the CRDs are missing', async () => {
+  // Connections are files in the deployments repository: nothing to install,
+  // and crdAvailable is no longer read.
+  it('never blocks creation on the former CRD flag', async () => {
     catalog.mockResolvedValue({ ...CATALOG, crdAvailable: false });
-
-    renderList();
-
-    expect(await screen.findByText(/connection CRDs, which are not installed/)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Add connection/ })).toBeDisabled();
-  });
-
-  it('offers no such warning once the CRDs are installed', async () => {
     renderList();
     await screen.findByText('warehouse');
 
     expect(screen.queryByText(/not installed/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/KuboCD/)).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Add connection/ })).toBeEnabled();
   });
 
@@ -232,7 +228,28 @@ describe('ExternalConnectionList', () => {
     fireEvent.click(await screen.findByText('Delete'));
 
     expect(await screen.findByText(/hms, superset/)).toBeInTheDocument();
-    expect(screen.getByText(/fail to start at their next restart/)).toBeInTheDocument();
+    expect(screen.getByText(/cannot be deleted while they do/)).toBeInTheDocument();
+  });
+
+  it('shows why the server refused to delete a connection still in use', async () => {
+    remove.mockRejectedValue(
+      new HttpError(
+        400,
+        'Bad Request',
+        JSON.stringify({ error: 'connection warehouse is still used by demo/superset' }),
+        '/api/projects/demo/connections/warehouse',
+      ),
+    );
+    renderList();
+    await screen.findByText('warehouse');
+    fireEvent.click(screen.getByLabelText('Actions for warehouse'));
+    fireEvent.click(await screen.findByText('Delete'));
+    await screen.findByText(/No service of this project is bound to it/);
+    fireEvent.click(screen.getByRole('button', { name: /^Delete$/ }));
+
+    expect(
+      await screen.findByText('connection warehouse is still used by demo/superset'),
+    ).toBeInTheDocument();
   });
 
   it('says so plainly when nothing is bound to it', async () => {

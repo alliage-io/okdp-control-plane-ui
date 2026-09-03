@@ -161,25 +161,24 @@ describe('ConnectionInputPicker', () => {
   });
 
 
-  // KuboCD forbids a literal default on a connectionRef: it is always a
-  // template rendered against the Context, which is how an Environment says
-  // "here, the database is that one". Showing None for it, and writing an empty
-  // parameter, destroyed the inheritance in silence.
-  it('says a binding is inherited rather than calling it None', async () => {
+  // A chart default on a connection ref applies when the parameter is left
+  // out. Showing None for it, and writing an empty parameter, would replace
+  // the default with nothing in silence.
+  it('names the chart default rather than calling it None', async () => {
     renderPicker({
       alias: 'db',
       contract: 'database-server',
       parameter: 'db',
       optional: false,
-      default: '{{ .Context.defaultDatabase }}',
+      default: 'platform-db',
     });
 
     await waitFor(() => expect(selectable).toHaveBeenCalled());
 
-    expect(screen.getByText(/The Environment provides one by default/)).toBeInTheDocument();
+    expect(screen.getByText(/The chart uses platform-db by default/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole('combobox'));
     // Once as the selected value, once as the open option.
-    expect(await screen.findAllByText('Inherited from the Environment')).not.toHaveLength(0);
+    expect(await screen.findAllByText('Chart default (platform-db)')).not.toHaveLength(0);
     expect(screen.queryByText('None')).not.toBeInTheDocument();
   });
 });

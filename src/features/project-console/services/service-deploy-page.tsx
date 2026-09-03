@@ -15,7 +15,7 @@ import { instanceNameError } from '../../../shared/utils/k8s-names';
 import { flattenReviewParams } from '../../../shared/utils/format-review-value';
 import {
   areaBasePath,
-  deployErrorMessage,
+  deployError,
   hasProfileEditorWidget,
   parentLabel,
   savedMessage,
@@ -339,7 +339,8 @@ export default function ServiceDeployPage() {
       })
       .catch((err) => {
         clearProgressTick();
-        showError(deployErrorMessage(err, projectId, instanceName));
+        const { summary, detail } = deployError(err, projectId, instanceName);
+        showError(detail, summary);
         setDeploying(false);
       });
   };
@@ -538,6 +539,7 @@ export default function ServiceDeployPage() {
                         projectId={projectId}
                         onParametersChange={setParameters}
                         onValidityChange={setParamsValid}
+                        emit="explicit"
                       />
                     ) : packageInputs.length === 0 ? (
                       <p className="muted-text">No configurable parameters for this version.</p>

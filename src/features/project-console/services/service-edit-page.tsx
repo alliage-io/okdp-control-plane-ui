@@ -20,6 +20,7 @@ import {
   versionOptionsFor,
 } from './service-utils';
 import { ServiceStatusTag } from './service-status-tag';
+import { mergePatch } from '../../../shared/utils/parameter-patch';
 
 export default function ServiceEditPage() {
   const navigate = useNavigate();
@@ -57,6 +58,8 @@ export default function ServiceEditPage() {
   const [selectedTag, setSelectedTag] = useState('');
 
   const originalTagRef = useRef('');
+  // The instance's values.yaml as loaded: the base of the merge patch Save sends.
+  const originalParamsRef = useRef<Record<string, any>>({});
   const parametersRef = useRef<Record<string, any>>({});
   const profilesRef = useRef<Profile[]>([]);
 
@@ -102,6 +105,7 @@ export default function ServiceEditPage() {
           setVersionOptions(versionOptionsFor(svc));
         }
 
+        originalParamsRef.current = inst.parameters || {};
         const { profiles, ...params } = inst.parameters || {};
         setParameterValues(params);
         parametersRef.current = { ...params };
@@ -166,24 +170,29 @@ export default function ServiceEditPage() {
     if (!projectName || !instance) return;
 
     setSaving(true);
-    // Only include `profiles` when the service schema actually expects it
-    // (e.g. JupyterHub). Other services (Trino, Polaris, Superset, Airflow)
-    // have `additionalProperties: false` and reject unknown keys.
-    const mergedParams: Record<string, any> = { ...parametersRef.current };
-    // The pickers own their parameters, and the schema form no longer sees
-    // them. An empty choice is left out rather than written blank: only
-    // submitted parameters reach values.yaml, and chart defaults apply.
+    // The values as they should now read: what the form holds (the loaded
+    // values plus the user's changes), the picker choices, and the profiles.
+    const original = originalParamsRef.current;
+    const nextParams: Record<string, any> = { ...parametersRef.current };
+    // The pickers own their parameters. An empty choice is left out, so the
+    // patch below deletes the key and the chart default applies again.
     for (const input of packageInputs) {
       const chosen = connectionChoices[input.parameter!];
       if (chosen) {
-        mergedParams[input.parameter!] = chosen;
+        nextParams[input.parameter!] = chosen;
       } else {
-        delete mergedParams[input.parameter!];
+        delete nextParams[input.parameter!];
       }
     }
+    // Only services whose schema expects `profiles` (e.g. JupyterHub) edit
+    // them; others keep whatever is stored.
     if (hasProfileEditorWidget(rawSchema)) {
-      mergedParams['profiles'] = profilesRef.current;
+      nextParams['profiles'] = profilesRef.current;
+    } else if (original.profiles !== undefined) {
+      nextParams['profiles'] = original.profiles;
     }
+    // JSON Merge Patch: only what changed is sent, null deletes a key.
+    const mergedParams = mergePatch(original, nextParams);
     const body: { tag?: string; parameters: Record<string, any> } = { parameters: mergedParams };
     if (selectedTag && selectedTag !== originalTagRef.current) {
       body.tag = selectedTag;
@@ -344,6 +353,7 @@ export default function ServiceEditPage() {
                       parametersRef.current = params;
                     }}
                     onValidityChange={setParamsValid}
+                    emit="explicit"
                   />
                 </div>
               ) : null}

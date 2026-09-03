@@ -106,6 +106,19 @@ export function apiErrorMessage(err: unknown, fallback: string): string {
   return fallback;
 }
 
+/** The machine-readable `code` the server puts next to `error` on some
+ *  answers (409 `instance-exists`, `release-name-taken`), or null. Branch on
+ *  it rather than on the wording of the message. */
+export function apiErrorCode(err: unknown): string | null {
+  if (!(err instanceof HttpError) || !err.body) return null;
+  try {
+    const parsed = JSON.parse(err.body);
+    return parsed && typeof parsed.code === 'string' && parsed.code ? parsed.code : null;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * A feature the server does not implement on this cluster, because the CRDs it
  * rests on are not installed: kubauth for identity, external-secrets for the

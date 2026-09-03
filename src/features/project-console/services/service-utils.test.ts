@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { HttpError } from '../../../core/api/http';
 import {
   areaBasePath,
-  deployErrorMessage,
+  deployError,
   isTransitioning,
   parentLabel,
   SERVICE_AREAS,
@@ -68,27 +68,40 @@ describe('instance statuses', () => {
   });
 });
 
-describe('deployErrorMessage', () => {
+describe('deployError', () => {
   const error = (status: number, body: object) =>
     new HttpError(status, 'x', JSON.stringify(body), '/api/projects/a/services');
 
   it('surfaces a 400 as the server wrote it', () => {
     expect(
-      deployErrorMessage(error(400, { error: 'version "1.0" is not an exact semver' }), 'a', 'b'),
-    ).toBe('version "1.0" is not an exact semver');
+      deployError(error(400, { error: 'version "1.0" is not an exact semver' }), 'a', 'b'),
+    ).toEqual({ summary: 'Deployment failed', detail: 'version "1.0" is not an exact semver' });
   });
 
-  it('explains that a 409 may be a release-name collision', () => {
-    const message = deployErrorMessage(
-      error(409, { error: "Instance 'c' already exists in project 'a-b'" }),
-      'a-b',
-      'c',
+  it('titles a 409 from its code and keeps the server message as is', () => {
+    const text = "release name 'a-b-c' is already used by instance 'c' of project 'a-b'";
+    expect(
+      deployError(error(409, { error: text, code: 'release-name-taken' }), 'a', 'b-c'),
+    ).toEqual({ summary: 'Release name taken', detail: text });
+    expect(
+      deployError(
+        error(409, {
+          error: "Instance 'c' already exists in project 'a'",
+          code: 'instance-exists',
+        }),
+        'a',
+        'c',
+      ).summary,
+    ).toBe('Instance already exists');
+  });
+
+  it('falls back on the code when the server gave no message', () => {
+    expect(deployError(error(409, { code: 'release-name-taken' }), 'a', 'b-c').detail).toMatch(
+      /"a-b-c" is already used/,
     );
-    expect(message).toMatch(/^Instance 'c' already exists/);
-    expect(message).toMatch(/"a-b-c" must also be unique across projects/);
   });
 
   it('falls back when the body is not JSON', () => {
-    expect(deployErrorMessage(new Error('boom'), 'a', 'b')).toBe('Deployment failed');
+    expect(deployError(new Error('boom'), 'a', 'b').detail).toBe('Deployment failed');
   });
 });

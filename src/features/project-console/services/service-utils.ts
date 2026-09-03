@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { serviceApi } from '../../../core/api/service-api';
-import { apiErrorMessage, HttpError } from '../../../core/api/http';
+import { apiErrorCode, apiErrorMessage } from '../../../core/api/http';
 import type { PlatformService } from '../../../core/models/service.model';
 import type { StatusTone } from '../../../shared/components/status-tag';
 
@@ -111,16 +111,31 @@ export function versionOptionsFor(svc: PlatformService): { label: string; value:
   }));
 }
 
-/** The message of a failed deploy. The server answers 409 both for an
- *  instance of the same name and for a release name `<project>-<instance>`
- *  another project already produces (project `a-b` + `c` vs `a` + `b-c`), with
- *  the same wording: say so, or the second case reads as nonsense. */
-export function deployErrorMessage(err: unknown, project: string, instance: string): string {
-  const message = apiErrorMessage(err, 'Deployment failed');
-  if (err instanceof HttpError && err.status === 409) {
-    return `${message}. The release name "${project}-${instance}" must also be unique across projects: pick another instance name.`;
+/** The toast of a failed deploy. The detail is the server's own message (400
+ *  invalid name, version or parameters; 409 naming what holds the name); the
+ *  409 `code` picks the title, and a fallback text when there is no message. */
+export function deployError(
+  err: unknown,
+  project: string,
+  instance: string,
+): { summary: string; detail: string } {
+  const message = apiErrorMessage(err, '');
+  switch (apiErrorCode(err)) {
+    case 'instance-exists':
+      return {
+        summary: 'Instance already exists',
+        detail: message || `The project already has an instance "${instance}".`,
+      };
+    case 'release-name-taken':
+      return {
+        summary: 'Release name taken',
+        detail:
+          message ||
+          `The release name "${project}-${instance}" is already used elsewhere: pick another instance name.`,
+      };
+    default:
+      return { summary: 'Deployment failed', detail: message || 'Deployment failed' };
   }
-  return message;
 }
 
 // Lives in core/api/http (next to HttpError) so non-project-console features

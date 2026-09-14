@@ -4,7 +4,7 @@ import { capabilitiesApi, type Capabilities } from '../api/capabilities-api';
 // Servers without /api/capabilities always exposed the identity API, so an
 // unreachable endpoint must keep the previous behaviour.
 const legacyCapabilities: Capabilities = {
-  identity: { provider: 'kubauth', userManagement: true },
+  identity: { userManagement: true },
   oidcProvisioning: { provider: 'none' },
 };
 

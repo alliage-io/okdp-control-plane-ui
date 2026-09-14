@@ -9,12 +9,13 @@ export interface IdentityOidcConfig {
 
 export interface Capabilities {
   identity: {
-    provider: string; // "external" (default) or "kubauth"
-    userManagement: boolean;
+    provider?: string; // "keycloak" when the server manages users in Keycloak
+    /** Whether the server serves the users and groups API (Keycloak Admin API). */
+    userManagement?: boolean;
     oidc?: IdentityOidcConfig;
   };
   oidcProvisioning: {
-    provider: string; // "none" (default), "kubauth" or "keycloak"
+    provider: string; // "none" (default) or "keycloak"
   };
 }
 

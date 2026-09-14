@@ -35,7 +35,7 @@ export const UI_SERVICE_VIEWS: UiServiceView[] = [
     label: 'Airflow',
     icon: 'pi pi-sitemap',
     tone: 'blue',
-    categoryKey: 'data-engineering',
+    categoryKey: 'workflows',
     navSegment: 'airflow',
   },
   {
@@ -59,7 +59,7 @@ export const UI_SERVICE_VIEWS: UiServiceView[] = [
     label: 'Superset',
     icon: 'pi pi-chart-line',
     tone: 'primary',
-    categoryKey: 'sql-bi',
+    categoryKey: 'bi-dataviz',
     navSegment: 'superset',
   },
   {
@@ -70,7 +70,7 @@ export const UI_SERVICE_VIEWS: UiServiceView[] = [
     urlPath: '/sqllab/',
     description: 'Ad-hoc SQL queries in Superset',
     tone: 'primary',
-    categoryKey: 'sql-bi',
+    categoryKey: 'bi-dataviz',
     navSegment: 'superset',
   },
 ];

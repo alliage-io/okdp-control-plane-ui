@@ -4,7 +4,7 @@ import { useCapabilities } from '../../core/context/capabilities-context';
 /** /admin — control plane administration zone. Tiles fan out to the
  *  individual administration areas. */
 export default function AdminPage() {
-  // Identity is served by kubauth only.
+  // Identity is served only when the server can reach the Keycloak Admin API.
   const { userManagement } = useCapabilities();
 
   return (

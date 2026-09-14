@@ -6,14 +6,14 @@ function httpError(status: number, body: string): HttpError {
 }
 
 const notInstalled = JSON.stringify({
-  error: 'Identity management is not available on this cluster: the kubauth CRDs are not installed.',
+  error: 'Identity management is not available on this cluster: the Keycloak Admin API is not configured.',
   reason: 'feature-not-installed',
-  feature: 'kubauth identity',
+  feature: 'Keycloak identity',
 });
 
 describe('unavailableFeature', () => {
   it('names the feature the cluster does not carry', () => {
-    expect(unavailableFeature(httpError(501, notInstalled))).toBe('kubauth identity');
+    expect(unavailableFeature(httpError(501, notInstalled))).toBe('Keycloak identity');
   });
 
   // The whole point of the lot: a screen must be able to tell "never installed"

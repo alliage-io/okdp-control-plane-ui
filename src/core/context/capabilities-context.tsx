@@ -7,7 +7,7 @@ export interface CapabilitiesContextValue {
   capabilities: Capabilities | null;
   /** True while the platform has not answered yet. */
   loading: boolean;
-  /** Whether the kubauth user and group management screens are worth showing. */
+  /** Whether the Keycloak-backed user and group management screens are worth showing. */
   userManagement: boolean;
 }
 
@@ -43,7 +43,7 @@ export function CapabilitiesProvider({ children }: { children: ReactNode }) {
     () => ({
       capabilities,
       loading,
-      userManagement: capabilities ? capabilities.identity.userManagement : true,
+      userManagement: capabilities ? capabilities.identity.userManagement === true : true,
     }),
     [capabilities, loading],
   );

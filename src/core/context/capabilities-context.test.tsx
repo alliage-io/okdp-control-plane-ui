@@ -25,17 +25,26 @@ describe('CapabilitiesProvider', () => {
   beforeEach(() => vi.clearAllMocks());
 
   it('follows the platform when it serves user management', async () => {
-    get.mockResolvedValue(caps(true, 'kubauth'));
+    get.mockResolvedValue(caps(true, 'keycloak'));
 
     const { result } = renderHook(() => useCapabilities(), { wrapper });
 
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.userManagement).toBe(true);
-    expect(result.current.capabilities?.identity.provider).toBe('kubauth');
+    expect(result.current.capabilities?.identity.provider).toBe('keycloak');
   });
 
-  it('reports no user management on an external provider', async () => {
-    get.mockResolvedValue(caps(false, 'external'));
+  it('reports no user management when the platform serves none', async () => {
+    get.mockResolvedValue(caps(false, 'keycloak'));
+
+    const { result } = renderHook(() => useCapabilities(), { wrapper });
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.userManagement).toBe(false);
+  });
+
+  it('hides the area when the platform does not advertise user management', async () => {
+    get.mockResolvedValue({ identity: {}, oidcProvisioning: { provider: 'none' } });
 
     const { result } = renderHook(() => useCapabilities(), { wrapper });
 
@@ -54,7 +63,7 @@ describe('CapabilitiesProvider', () => {
   });
 
   it('is read once, not per consumer', async () => {
-    get.mockResolvedValue(caps(true, 'kubauth'));
+    get.mockResolvedValue(caps(true, 'keycloak'));
 
     const { result, rerender } = renderHook(() => useCapabilities(), { wrapper });
     await waitFor(() => expect(result.current.loading).toBe(false));

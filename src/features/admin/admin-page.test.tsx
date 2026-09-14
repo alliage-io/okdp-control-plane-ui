@@ -13,7 +13,7 @@ const get = vi.mocked(capabilitiesApi.get);
 
 function caps(userManagement: boolean): Capabilities {
   return {
-    identity: { provider: userManagement ? 'kubauth' : 'external', userManagement },
+    identity: { provider: 'keycloak', userManagement },
     oidcProvisioning: { provider: 'none' },
   };
 }
@@ -31,7 +31,7 @@ function renderAdmin() {
 describe('AdminPage', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('offers Identity on a kubauth platform', async () => {
+  it('offers Identity when the platform serves user management', async () => {
     get.mockResolvedValue(caps(true));
 
     renderAdmin();

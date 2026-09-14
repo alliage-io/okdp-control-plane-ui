@@ -121,10 +121,11 @@ export function apiErrorCode(err: unknown): string | null {
 
 /**
  * A feature the server does not implement on this cluster, because the CRDs it
- * rests on are not installed: kubauth for identity, external-secrets for the
- * vault integration. The server answers 501 and names the feature, so a screen
- * can say "not installed here" instead of the red panel it shows for a server
- * that actually broke. Returns the feature name, or null for any other error.
+ * rests on are not installed (external-secrets for the vault integration) or
+ * the backend it needs is not configured (the Keycloak Admin API for identity).
+ * The server answers 501 and names the feature, so a screen can say "not
+ * installed here" instead of the red panel it shows for a server that actually
+ * broke. Returns the feature name, or null for any other error.
  */
 export function unavailableFeature(err: unknown): string | null {
   if (!(err instanceof HttpError) || err.status !== 501 || !err.body) {

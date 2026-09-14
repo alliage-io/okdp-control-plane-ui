@@ -98,7 +98,7 @@ export function ConsoleShell({
             icon: 'pi pi-shield',
             command: () => navigate('/admin'),
           },
-          // Identity is served by kubauth only.
+          // Identity is served only when the server can reach the Keycloak Admin API.
           ...(userManagement
             ? [
                 {

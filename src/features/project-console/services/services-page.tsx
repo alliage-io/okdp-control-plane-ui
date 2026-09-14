@@ -32,7 +32,7 @@ function areaCopy(serviceFilter: string): ServiceAreaCopy {
       };
     case 'spark-history-server':
       return {
-        breadcrumbParent: 'Spark',
+        breadcrumbParent: 'Data Engineering',
         subtitle: 'Browse completed Spark applications and stream live job monitoring UIs.',
         emptyTitle: 'Deploy a Spark History Server',
       };
@@ -57,13 +57,13 @@ function areaCopy(serviceFilter: string): ServiceAreaCopy {
       };
     case 'superset':
       return {
-        breadcrumbParent: 'SQL & BI',
+        breadcrumbParent: 'BI & Dataviz',
         subtitle: 'Open-source dashboarding and ad-hoc data exploration.',
         emptyTitle: 'Deploy Superset',
       };
     case 'airflow':
       return {
-        breadcrumbParent: 'Data Engineering',
+        breadcrumbParent: 'Workflows',
         subtitle: 'Workflow orchestrator. Schedule and monitor data pipelines as DAGs.',
         emptyTitle: 'Deploy Airflow',
       };

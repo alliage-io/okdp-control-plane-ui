@@ -83,7 +83,7 @@ function NavSection({ icon, label, expanded, collapsed, onToggle, children }: Na
           className={`pi ${expanded ? 'pi-chevron-down' : 'pi-chevron-right'} ml-auto text-[length:calc(0.6rem*var(--nav-item-scale,1))] text-fg-muted transition-transform duration-250 ease-smooth`}
         ></i>
       </button>
-      {/* Bumped from 200px — Data Engineering holds 4 sub-items and Machine
+      {/* Bumped from 200px — a section may hold 4 sub-items and Machine
           Learning 3, all of which need to fit when expanded. */}
       <div
         className={`overflow-hidden [transition:max-height_0.25s_ease] ${

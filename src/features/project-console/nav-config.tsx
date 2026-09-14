@@ -109,8 +109,8 @@ export const NAV_CATEGORIES: NavCategory[] = [
     ],
   },
   {
-    key: 'data-engineering',
-    label: 'Data Engineering',
+    key: 'workflows',
+    label: 'Workflows',
     icon: 'pi-cog',
     defaultExpanded: true,
     items: [
@@ -120,6 +120,14 @@ export const NAV_CATEGORIES: NavCategory[] = [
         brand: siteApacheairflow,
         label: 'Airflow',
       },
+    ],
+  },
+  {
+    key: 'data-engineering',
+    label: 'Data Engineering',
+    icon: 'pi-microchip',
+    defaultExpanded: true,
+    items: [
       // Single service entry like every other technology: the instance list.
       // The richer Spark Applications view lives in the views world
       // (/projects/:projectId/views), reachable from the sidebar switcher
@@ -153,8 +161,8 @@ export const NAV_CATEGORIES: NavCategory[] = [
     ],
   },
   {
-    key: 'sql-bi',
-    label: 'SQL & BI',
+    key: 'bi-dataviz',
+    label: 'BI & Dataviz',
     icon: 'pi-chart-bar',
     defaultExpanded: true,
     items: [
@@ -170,8 +178,8 @@ export const NAV_CATEGORIES: NavCategory[] = [
   },
   {
     key: 'machine-learning',
-    label: 'Machine Learning',
-    icon: 'pi-microchip',
+    label: 'ML & AI',
+    icon: 'pi-microchip-ai',
     defaultExpanded: false,
     items: [
       {

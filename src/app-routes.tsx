@@ -181,7 +181,7 @@ export function AppRoutes() {
                 emptyMessage: 'No Hive Metastore instances deployed yet.',
               })}
 
-              {/* Airflow (Data Engineering / orchestration) — chart: airflow */}
+              {/* Airflow (Workflows / orchestration) — chart: airflow */}
               {serviceRoutes('airflow', {
                 title: 'Airflow',
                 deployLabel: 'Deploy',
@@ -189,7 +189,7 @@ export function AppRoutes() {
                 emptyMessage: 'No Airflow instances deployed yet.',
               })}
 
-              {/* Superset (SQL & BI / data-visualization) — chart: superset */}
+              {/* Superset (BI & Dataviz / data-visualization) — chart: superset */}
               {serviceRoutes('superset', {
                 title: 'Superset',
                 deployLabel: 'Deploy',

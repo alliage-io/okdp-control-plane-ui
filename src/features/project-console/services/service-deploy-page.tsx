@@ -13,6 +13,7 @@ import { ProfileListEditor, type Profile } from '../../../shared/components/prof
 import { useToastMessages } from '../../../shared/hooks/use-toast-messages';
 import { instanceNameError } from '../../../shared/utils/k8s-names';
 import { flattenReviewParams } from '../../../shared/utils/format-review-value';
+import { safeReturnTo } from '../../../shared/utils/safe-return-to';
 import {
   areaBasePath,
   deployError,
@@ -276,7 +277,7 @@ export default function ServiceDeployPage() {
   const goBack = () => {
     if (!projectId) return;
 
-    const returnTo = searchParams.get('returnTo');
+    const returnTo = safeReturnTo(searchParams.get('returnTo'));
     if (returnTo) {
       navigate(returnTo);
     } else {
@@ -329,7 +330,7 @@ export default function ServiceDeployPage() {
         showSuccess(savedMessage(instanceName, created?.revision), 'Instance committed');
         navTimerRef.current = setTimeout(() => {
           setDeploying(false);
-          const returnTo = searchParams.get('returnTo');
+          const returnTo = safeReturnTo(searchParams.get('returnTo'));
           if (returnTo) {
             navigate(returnTo);
           } else {

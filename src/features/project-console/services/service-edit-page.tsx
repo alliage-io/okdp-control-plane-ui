@@ -21,6 +21,7 @@ import {
 } from './service-utils';
 import { ServiceStatusTag } from './service-status-tag';
 import { mergePatch } from '../../../shared/utils/parameter-patch';
+import { safeReturnTo } from '../../../shared/utils/safe-return-to';
 
 export default function ServiceEditPage() {
   const navigate = useNavigate();
@@ -152,7 +153,7 @@ export default function ServiceEditPage() {
   };
 
   const navigateBack = (project: string) => {
-    const returnTo = searchParams.get('returnTo');
+    const returnTo = safeReturnTo(searchParams.get('returnTo'));
     if (returnTo) {
       navigate(returnTo);
     } else {

@@ -17,6 +17,7 @@ import {
 } from './service-utils';
 import { StatusTag } from '../../../shared/components/status-tag';
 import { MarkdownText } from '../../../shared/components/markdown-text';
+import { safeReturnTo } from '../../../shared/utils/safe-return-to';
 import { ServiceStatusTag } from './service-status-tag';
 
 type Tab = 'overview' | 'pods' | 'logs' | 'parameters';
@@ -216,7 +217,7 @@ export default function ServiceDetailPage() {
 
   const goBack = () => {
     if (!projectId) return;
-    const returnTo = searchParams.get('returnTo');
+    const returnTo = safeReturnTo(searchParams.get('returnTo'));
     if (returnTo) {
       navigate(returnTo);
     } else {

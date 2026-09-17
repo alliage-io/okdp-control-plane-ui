@@ -410,7 +410,11 @@ under `src/core/`, reusable presentational pieces under
   authority, client id, the claim carrying the roles, and the role granting
   administration. One image therefore runs against any
   cluster. The values in `src/config/environment.ts` are only the fallback for
-  `npm run dev`, and point at okdp-sandbox.
+  `npm run dev`, and point at okdp-sandbox. `/config.js` is authoritative:
+  the unauthenticated `/api/capabilities` answer (`applyRuntimeOidc`, called
+  by `main.tsx`) only fills an authority or client id `/config.js` left
+  empty, takes a client id only for the authority in use, and never sets the
+  scope.
 - **Production API base path.** `environment.apiBaseUrl` is `/api` in
   production while every client appends `/api/...`, so requests leave the
   browser as `/api/api/...`. This assumes the fronting ingress strips the first

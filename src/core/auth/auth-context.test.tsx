@@ -9,6 +9,7 @@ const mocks = vi.hoisted(() => ({
   removeUser: vi.fn(),
   revokeTokens: vi.fn(),
   signinRedirectCallback: vi.fn(),
+  clearApiCache: vi.fn(),
   settings: undefined as Record<string, unknown> | undefined,
   events: {
     addUserLoaded: vi.fn(),
@@ -42,7 +43,13 @@ vi.mock('oidc-client-ts', () => {
   return { UserManager, WebStorageStateStore, Log, User: class {} };
 });
 
+vi.mock('../api/http', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../api/http')>()),
+  clearApiCache: mocks.clearApiCache,
+}));
+
 import { AuthProvider, useAuth } from './auth-context';
+import { readUiCache, writeUiCache } from '../api/ui-cache';
 
 function wrapper({ children }: { children: ReactNode }) {
   return <AuthProvider>{children}</AuthProvider>;
@@ -168,6 +175,18 @@ describe('AuthProvider', () => {
       expect(sessionStorage.getItem('auth_return_url')).toBeNull();
       expect(sessionStorage.getItem('okdp-selected-projectId')).toBeNull();
       expect(sessionStorage.getItem('okdp-sql-query:proj-a')).toBeNull();
+    });
+
+    it('should clear the API and UI caches on forceLogout', async () => {
+      writeUiCache('services:proj-a', ['trino']);
+
+      const { result } = renderHook(() => useAuth(), { wrapper });
+      await waitFor(() => expect(result.current.ready).toBe(true));
+
+      act(() => result.current.forceLogout());
+
+      expect(mocks.clearApiCache).toHaveBeenCalled();
+      expect(readUiCache('services:proj-a')).toBeUndefined();
     });
 
     it('should revoke the refresh token before removing the user on forceLogout', async () => {

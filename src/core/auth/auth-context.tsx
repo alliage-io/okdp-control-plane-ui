@@ -12,7 +12,8 @@ import {
 import { Log, User, UserManager, WebStorageStateStore } from 'oidc-client-ts';
 import { environment } from '../../config/environment';
 import { logger } from '../services/logger';
-import { setAuthTokenProvider } from '../api/http';
+import { clearApiCache, setAuthTokenProvider } from '../api/http';
+import { clearUiCache } from '../api/ui-cache';
 import {
   AUTH_RETURN_URL_KEY,
   OIDC_USER_KEY_PREFIX,
@@ -164,6 +165,9 @@ function AuthProviderInner({ children }: { children: ReactNode }) {
 
   const clearLocalState = useCallback(() => {
     setState((s) => ({ ...s, isAuthenticated: false, profile: null, roles: [] }));
+    // Responses fetched as this user must not paint for the next one.
+    clearApiCache();
+    clearUiCache();
     sessionStorage.removeItem(AUTH_RETURN_URL_KEY);
     sessionStorage.removeItem(PROJECT_STORAGE_KEY);
     // SQL drafts are keyed per project under this prefix and may embed

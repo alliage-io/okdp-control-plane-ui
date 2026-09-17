@@ -30,9 +30,13 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Run as a non-root user. nginx.conf already listens on the unprivileged
 # port 4200, so only the master 'user' directive needs silencing and the
-# runtime directories need to be writable by the unprivileged user.
+# runtime directories need to be writable by the unprivileged user. The
+# configuration and the bundle stay root-owned: at runtime the user writes only
+# config.js (docker-entrypoint.sh), so only that file is handed over.
 RUN sed -i 's/^\(\s*user\s\+.*\)$/# \1/' /etc/nginx/nginx.conf \
-    && chown -R ${OKDP_UI_UID}:root /usr/share/nginx/html /var/cache/nginx /etc/nginx /run /var/run
+    && touch /usr/share/nginx/html/config.js \
+    && chown ${OKDP_UI_UID}:root /usr/share/nginx/html/config.js \
+    && chown -R ${OKDP_UI_UID}:root /var/cache/nginx /run /var/run
 
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 

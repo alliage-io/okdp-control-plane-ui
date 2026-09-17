@@ -48,6 +48,23 @@ ingress:
 
 resources: {}
 
+# The console only serves static files: it never calls the Kubernetes API.
+automountServiceAccountToken: false
+
+# The image runs nginx as UID 1001 on port 4200, so no root and no capability
+# is needed. readOnlyRootFilesystem is left off: the entrypoint writes
+# config.js into the web root at startup, and nginx writes its cache and pid.
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1001
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop: [ALL]
+
 env: []
 
 envFrom: []

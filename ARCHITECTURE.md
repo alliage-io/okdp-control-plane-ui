@@ -356,6 +356,10 @@ render with line/column info, transport errors separately.
   included at server level **and in every `location` that sets its own
   `add_header`** (nginx drops inherited headers there). No full CSP yet: it
   needs the inline theme script hashed and the fonts `onload` handler removed.
+  The image runs as UID 1001; only `config.js`, the nginx cache and `/run` are
+  writable by it. The chart sets a non-root pod `securityContext`, drops all
+  capabilities and does not mount the ServiceAccount token (all overridable in
+  `values.yaml`); the root filesystem stays writable for `config.js`.
 
 ## Directory layout
 

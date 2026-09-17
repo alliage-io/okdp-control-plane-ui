@@ -129,7 +129,7 @@ Everything lives in `src/core/auth/`; configuration in
    access token.
 6. **401/403.** `http.ts` fires the unauthorized handler registered by
    `AuthRedirector`: forced logout (local state cleared, including the
-   project selection and per-project SQL drafts; the
+   project selection, per-project SQL drafts and the API and UI caches; the
    refresh token is revoked best effort before the user is removed), the interrupted location is
    re-saved, and the user lands on `/login?sessionExpired=true` — the landing
    page shows a session-expired notice and the deep link is restored after

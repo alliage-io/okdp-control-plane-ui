@@ -137,7 +137,8 @@ authority the console shows a configuration screen instead of signing users in
 somewhere else.
 
 Authentication uses the OIDC authorization-code flow (`oidc-client-ts`) with
-silent renew, and tokens live in `sessionStorage`. Roles are read from the claim
+silent renew, and tokens live in `sessionStorage`. The console does not request
+`offline_access`. Roles are read from the claim
 named by `identity.rolesClaim` (default `groups`, dotted paths supported), and
 the administration pages are granted by `identity.adminRole` (default
 `platform_admin`).

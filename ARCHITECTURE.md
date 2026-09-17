@@ -99,8 +99,10 @@ Everything lives in `src/core/auth/`; configuration in
 
 1. **Init.** `AuthProvider` creates a single `UserManager` (held in a ref):
    authorization-code flow, tokens stored in **sessionStorage**
-   (`WebStorageStateStore`), `automaticSilentRenew` enabled, `offline_access`
-   in scope.
+   (`WebStorageStateStore`; a user an earlier version left in localStorage is
+   dropped), `automaticSilentRenew` enabled, and **no** `offline_access` in
+   scope: silent renew uses the refresh token Keycloak binds to the SSO
+   session, which ends with it.
 2. **One-shot callback.** The init effect redeems the OIDC redirect callback
    **exactly once** via a ref-held promise. StrictMode double-invokes effects
    in dev; without this guard the single-use authorization code would be
@@ -239,7 +241,7 @@ there so writers and the logout cleaner cannot drift.
 | `okdp-custom-views` | user-created launchers per project (local-only) | local |
 
 `oidc-client-ts` additionally persists the OIDC user/tokens in sessionStorage
-under library-managed keys.
+under library-managed keys (`oidc.user:…`, prefix in `storage-keys.ts`).
 
 ## Dynamic schema forms
 

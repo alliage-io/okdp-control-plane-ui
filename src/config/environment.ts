@@ -63,7 +63,10 @@ const development: Environment = {
     clientId: runtime.clientId || fromEnv.clientId || 'okdp-ui',
     redirectUri: window.location.origin,
     postLogoutRedirectUri: window.location.origin,
-    scope: 'openid profile email groups offline_access',
+    // No offline_access: the refresh token Keycloak issues without it is bound
+    // to the SSO session, which is all silent renew needs, and it dies with
+    // that session instead of outliving it.
+    scope: 'openid profile email groups',
     responseType: 'code',
     silentRenew: true,
     logLevel: 'Debug',

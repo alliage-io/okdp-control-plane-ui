@@ -3,6 +3,7 @@ import { serviceApi } from '../../../core/api/service-api';
 import { apiErrorCode, apiErrorMessage } from '../../../core/api/http';
 import type { PlatformService } from '../../../core/models/service.model';
 import type { StatusTone } from '../../../shared/components/status-tag';
+import { logger } from '../../../core/services/logger';
 
 /**
  * Instance statuses reported by the server. `Pending`: the change is committed
@@ -98,8 +99,14 @@ export function areaBasePath(service: string | undefined | null): string[] {
   return SERVICE_AREAS[service]?.basePath ?? ['services', service];
 }
 
-/** Open an external (cluster-workload) URL without handing it window.opener. */
+/** Open an external (cluster-workload) URL without handing it window.opener.
+ *  The URL comes from the server (ingress hosts, Spark UI links), so only
+ *  http(s) is opened: a `javascript:` or `data:` URL would run in a new tab. */
 export function openInNewTab(url: string): void {
+  if (!/^https?:\/\//i.test(url)) {
+    logger.warn(`Refusing to open a non-http(s) URL: ${url}`);
+    return;
+  }
   window.open(url, '_blank', 'noopener,noreferrer');
 }
 

@@ -1,9 +1,10 @@
-import { describe, it, expect } from 'vitest';
+import { afterEach, describe, it, expect, vi } from 'vitest';
 import { HttpError } from '../../../core/api/http';
 import {
   areaBasePath,
   deployError,
   isTransitioning,
+  openInNewTab,
   parentLabel,
   SERVICE_AREAS,
   shortRevision,
@@ -103,5 +104,38 @@ describe('deployError', () => {
 
   it('falls back when the body is not JSON', () => {
     expect(deployError(new Error('boom'), 'a', 'b').detail).toBe('Deployment failed');
+  });
+});
+
+describe('openInNewTab', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('opens http(s) URLs without an opener', () => {
+    const open = vi.spyOn(window, 'open').mockReturnValue(null);
+    openInNewTab('https://trino.example.com/ui');
+    openInNewTab('http://spark-ui.local:4040');
+    expect(open).toHaveBeenNthCalledWith(
+      1,
+      'https://trino.example.com/ui',
+      '_blank',
+      'noopener,noreferrer',
+    );
+    expect(open).toHaveBeenNthCalledWith(
+      2,
+      'http://spark-ui.local:4040',
+      '_blank',
+      'noopener,noreferrer',
+    );
+  });
+
+  it('refuses any other scheme', () => {
+    const open = vi.spyOn(window, 'open').mockReturnValue(null);
+    openInNewTab('javascript:alert(1)');
+    openInNewTab('data:text/html,<script>alert(1)</script>');
+    openInNewTab('//evil.example');
+    openInNewTab(' https://leading-space.example');
+    expect(open).not.toHaveBeenCalled();
   });
 });

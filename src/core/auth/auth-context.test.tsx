@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => ({
   signoutRedirect: vi.fn(),
   removeUser: vi.fn(),
   signinRedirectCallback: vi.fn(),
+  settings: undefined as Record<string, unknown> | undefined,
   events: {
     addUserLoaded: vi.fn(),
     addUserUnloaded: vi.fn(),
@@ -22,6 +23,9 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('oidc-client-ts', () => {
   class UserManager {
+    constructor(settings: Record<string, unknown>) {
+      mocks.settings = settings;
+    }
     getUser = mocks.getUser;
     signinRedirect = mocks.signinRedirect;
     signoutRedirect = mocks.signoutRedirect;
@@ -29,7 +33,9 @@ vi.mock('oidc-client-ts', () => {
     signinRedirectCallback = mocks.signinRedirectCallback;
     events = mocks.events;
   }
-  class WebStorageStateStore {}
+  class WebStorageStateStore {
+    constructor(public args: { store: Storage }) {}
+  }
   const Log = { setLogger: vi.fn(), setLevel: vi.fn(), DEBUG: 4 };
   return { UserManager, WebStorageStateStore, Log, User: class {} };
 });
@@ -52,6 +58,44 @@ describe('AuthProvider', () => {
     mocks.signinRedirect.mockResolvedValue(undefined);
     mocks.signoutRedirect.mockResolvedValue(undefined);
     mocks.removeUser.mockResolvedValue(undefined);
+  });
+
+  describe('UserManager settings', () => {
+    it('keeps the tokens in sessionStorage and never asks for offline_access', async () => {
+      const { result } = renderHook(() => useAuth(), { wrapper });
+      await waitFor(() => expect(result.current.ready).toBe(true));
+
+      const store = mocks.settings?.userStore as { args: { store: Storage } };
+      expect(store.args.store).toBe(window.sessionStorage);
+      expect(String(mocks.settings?.scope).split(' ')).not.toContain('offline_access');
+    });
+
+    it('drops a user an earlier version left in localStorage', async () => {
+      // Node's experimental localStorage global shadows jsdom's with a stub
+      // that stores nothing; replace it with a real in-memory implementation.
+      const store = new Map<string, string>();
+      vi.stubGlobal('localStorage', {
+        get length() {
+          return store.size;
+        },
+        key: (i: number) => [...store.keys()][i] ?? null,
+        getItem: (key: string) => store.get(key) ?? null,
+        setItem: (key: string, value: string) => store.set(key, value),
+        removeItem: (key: string) => store.delete(key),
+      });
+      localStorage.setItem(
+        'oidc.user:https://idp.example/realms/okdp:okdp-ui',
+        '{"refresh_token":"x"}',
+      );
+      localStorage.setItem('okdp-theme', 'dark');
+
+      const { result } = renderHook(() => useAuth(), { wrapper });
+      await waitFor(() => expect(result.current.ready).toBe(true));
+
+      expect(localStorage.getItem('oidc.user:https://idp.example/realms/okdp:okdp-ui')).toBeNull();
+      expect(localStorage.getItem('okdp-theme')).toBe('dark');
+      vi.unstubAllGlobals();
+    });
   });
 
   describe('Initialization', () => {

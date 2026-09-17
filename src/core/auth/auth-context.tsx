@@ -13,7 +13,12 @@ import { Log, User, UserManager, WebStorageStateStore } from 'oidc-client-ts';
 import { environment } from '../../config/environment';
 import { logger } from '../services/logger';
 import { setAuthTokenProvider } from '../api/http';
-import { AUTH_RETURN_URL_KEY, PROJECT_STORAGE_KEY, SQL_QUERY_KEY } from '../storage-keys';
+import {
+  AUTH_RETURN_URL_KEY,
+  OIDC_USER_KEY_PREFIX,
+  PROJECT_STORAGE_KEY,
+  SQL_QUERY_KEY,
+} from '../storage-keys';
 import type { UserProfile } from './user-profile';
 
 export interface AuthState {
@@ -51,6 +56,14 @@ function createUserManager(): UserManager {
     Log.setLevel(Log.DEBUG);
   }
 
+  // Earlier versions kept the user in localStorage: drop what they left there.
+  const legacyKeys: string[] = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key?.startsWith(OIDC_USER_KEY_PREFIX)) legacyKeys.push(key);
+  }
+  legacyKeys.forEach((key) => localStorage.removeItem(key));
+
   return new UserManager({
     authority: environment.oidc.authority,
     client_id: environment.oidc.clientId,
@@ -59,7 +72,9 @@ function createUserManager(): UserManager {
     scope: environment.oidc.scope,
     response_type: environment.oidc.responseType,
     automaticSilentRenew: environment.oidc.silentRenew,
-    userStore: new WebStorageStateStore({ store: window.localStorage }),
+    // Per tab and gone with it: a token left in localStorage outlives the
+    // browser session and is readable by anything that runs on the origin.
+    userStore: new WebStorageStateStore({ store: window.sessionStorage }),
   });
 }
 

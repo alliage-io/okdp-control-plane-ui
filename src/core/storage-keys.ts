@@ -19,3 +19,6 @@ export const TYPED_DELETE_KEY = 'okdp-typed-delete';
 // Prefix for per-project SQL query drafts (`okdp-sql-query:<projectId>`). May
 // embed sensitive literals, so the logout cleaner sweeps every key under it.
 export const SQL_QUERY_KEY = 'okdp-sql-query';
+// Prefix oidc-client-ts gives the stored user (`oidc.` + `user:<authority>:<client>`).
+// Earlier versions kept it in localStorage; auth sweeps what they left there.
+export const OIDC_USER_KEY_PREFIX = 'oidc.user:';

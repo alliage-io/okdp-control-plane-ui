@@ -102,7 +102,7 @@ Everything lives in `src/core/auth/`; configuration in
    (`WebStorageStateStore`; a user an earlier version left in localStorage is
    dropped), `automaticSilentRenew` enabled, and **no** `offline_access` in
    scope: silent renew uses the refresh token Keycloak binds to the SSO
-   session, which ends with it.
+   session, which ends with it. `revokeTokensOnSignout` is on.
 2. **One-shot callback.** The init effect redeems the OIDC redirect callback
    **exactly once** via a ref-held promise. StrictMode double-invokes effects
    in dev; without this guard the single-use authorization code would be
@@ -129,7 +129,8 @@ Everything lives in `src/core/auth/`; configuration in
    access token.
 6. **401/403.** `http.ts` fires the unauthorized handler registered by
    `AuthRedirector`: forced logout (local state cleared, including the
-   project selection and per-project SQL drafts), the interrupted location is
+   project selection and per-project SQL drafts; the
+   refresh token is revoked best effort before the user is removed), the interrupted location is
    re-saved, and the user lands on `/login?sessionExpired=true` — the landing
    page shows a session-expired notice and the deep link is restored after
    re-login.

@@ -75,6 +75,9 @@ function createUserManager(): UserManager {
     // Per tab and gone with it: a token left in localStorage outlives the
     // browser session and is readable by anything that runs on the origin.
     userStore: new WebStorageStateStore({ store: window.sessionStorage }),
+    // Sign-out also revokes the refresh token at the IdP, so a copy taken
+    // before sign-out cannot mint new access tokens.
+    revokeTokensOnSignout: true,
   });
 }
 
@@ -177,8 +180,14 @@ function AuthProviderInner({ children }: { children: ReactNode }) {
   }, [userManager]);
 
   const forceLogout = useCallback(() => {
-    userManager.removeUser().catch(() => undefined);
     clearLocalState();
+    // Best effort: the IdP may be unreachable (which is often why we are
+    // here). The local session goes away whatever the revocation does.
+    userManager
+      .revokeTokens(['refresh_token'])
+      .catch(() => undefined)
+      .then(() => userManager.removeUser())
+      .catch(() => undefined);
   }, [userManager, clearLocalState]);
 
   const logout = useCallback(() => {

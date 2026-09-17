@@ -7,6 +7,7 @@ const mocks = vi.hoisted(() => ({
   signinRedirect: vi.fn(),
   signoutRedirect: vi.fn(),
   removeUser: vi.fn(),
+  revokeTokens: vi.fn(),
   signinRedirectCallback: vi.fn(),
   settings: undefined as Record<string, unknown> | undefined,
   events: {
@@ -30,6 +31,7 @@ vi.mock('oidc-client-ts', () => {
     signinRedirect = mocks.signinRedirect;
     signoutRedirect = mocks.signoutRedirect;
     removeUser = mocks.removeUser;
+    revokeTokens = mocks.revokeTokens;
     signinRedirectCallback = mocks.signinRedirectCallback;
     events = mocks.events;
   }
@@ -58,15 +60,17 @@ describe('AuthProvider', () => {
     mocks.signinRedirect.mockResolvedValue(undefined);
     mocks.signoutRedirect.mockResolvedValue(undefined);
     mocks.removeUser.mockResolvedValue(undefined);
+    mocks.revokeTokens.mockResolvedValue(undefined);
   });
 
   describe('UserManager settings', () => {
-    it('keeps the tokens in sessionStorage and never asks for offline_access', async () => {
+    it('keeps the tokens in sessionStorage and revokes them on sign-out', async () => {
       const { result } = renderHook(() => useAuth(), { wrapper });
       await waitFor(() => expect(result.current.ready).toBe(true));
 
       const store = mocks.settings?.userStore as { args: { store: Storage } };
       expect(store.args.store).toBe(window.sessionStorage);
+      expect(mocks.settings?.revokeTokensOnSignout).toBe(true);
       expect(String(mocks.settings?.scope).split(' ')).not.toContain('offline_access');
     });
 
@@ -164,6 +168,30 @@ describe('AuthProvider', () => {
       expect(sessionStorage.getItem('auth_return_url')).toBeNull();
       expect(sessionStorage.getItem('okdp-selected-projectId')).toBeNull();
       expect(sessionStorage.getItem('okdp-sql-query:proj-a')).toBeNull();
+    });
+
+    it('should revoke the refresh token before removing the user on forceLogout', async () => {
+      const { result } = renderHook(() => useAuth(), { wrapper });
+      await waitFor(() => expect(result.current.ready).toBe(true));
+
+      act(() => result.current.forceLogout());
+
+      await waitFor(() => expect(mocks.removeUser).toHaveBeenCalled());
+      expect(mocks.revokeTokens).toHaveBeenCalledWith(['refresh_token']);
+      expect(mocks.revokeTokens.mock.invocationCallOrder[0]).toBeLessThan(
+        mocks.removeUser.mock.invocationCallOrder[0],
+      );
+    });
+
+    it('should still remove the user when the revocation fails', async () => {
+      mocks.revokeTokens.mockRejectedValue(new Error('IdP unreachable'));
+      const { result } = renderHook(() => useAuth(), { wrapper });
+      await waitFor(() => expect(result.current.ready).toBe(true));
+
+      act(() => result.current.forceLogout());
+
+      await waitFor(() => expect(mocks.removeUser).toHaveBeenCalled());
+      expect(result.current.isAuthenticated).toBe(false);
     });
   });
 

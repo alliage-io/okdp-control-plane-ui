@@ -97,10 +97,27 @@ const production: Environment = {
 
 export const environment: Environment = import.meta.env.PROD ? production : development;
 
-/** Overrides the build-time OIDC config with the platform's runtime config. */
-export function applyRuntimeOidc(oidc?: { authority: string; clientId: string; scope?: string }) {
+// What /config.js (or .env.local) set. That is the operator's word, which an
+// answer from the API must not override.
+const configured = {
+  authority: runtime.authority || fromEnv.authority || '',
+  clientId: runtime.clientId || fromEnv.clientId || '',
+};
+
+/** Fills in the OIDC settings that /config.js left unset from the platform's
+ *  runtime config (`/api/capabilities`). That endpoint is unauthenticated, so
+ *  it never overrides a configured value, and never sets the scope: the
+ *  console asks for the scopes it needs. The client id is taken only for the
+ *  authority actually used, since a client id belongs to its issuer. */
+export function applyRuntimeOidc(
+  oidc?: { authority: string; clientId: string; scope?: string },
+  config: { authority: string; clientId: string } = configured,
+) {
   if (!oidc?.authority || !oidc.clientId) return;
-  environment.oidc.authority = oidc.authority;
-  environment.oidc.clientId = oidc.clientId;
-  if (oidc.scope) environment.oidc.scope = oidc.scope;
+  if (!config.authority) {
+    environment.oidc.authority = oidc.authority;
+  }
+  if (!config.clientId && environment.oidc.authority === oidc.authority) {
+    environment.oidc.clientId = oidc.clientId;
+  }
 }

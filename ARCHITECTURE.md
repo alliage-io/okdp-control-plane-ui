@@ -350,6 +350,12 @@ render with line/column info, transport errors separately.
   caching for hashed `/assets/`, `no-cache` for `index.html` (so deploys are
   picked up), SPA fallback, and `/api/` answered with 404 — **an ingress in
   front of the container is expected to route `/api` to the control plane**.
+  `server_tokens off`, and the security headers of
+  `nginx-security-headers.conf` (`frame-ancestors 'none'` CSP,
+  `X-Frame-Options`, `nosniff`, `Referrer-Policy`, `Permissions-Policy`) are
+  included at server level **and in every `location` that sets its own
+  `add_header`** (nginx drops inherited headers there). No full CSP yet: it
+  needs the inline theme script hashed and the fonts `onload` handler removed.
 
 ## Directory layout
 

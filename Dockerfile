@@ -25,6 +25,7 @@ LABEL org.opencontainers.image.title="OKDP Control Plane UI" \
     org.opencontainers.image.licenses="Apache-2.0"
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx-security-headers.conf /etc/nginx/snippets/security-headers.conf
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Run as a non-root user. nginx.conf already listens on the unprivileged

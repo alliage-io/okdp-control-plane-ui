@@ -150,8 +150,9 @@ the administration pages are granted by `identity.adminRole` (default
 ## Docker
 
 The production image builds the static bundle and serves it with nginx on
-port `4200` (SPA fallback included, hashed assets cached immutably,
-`index.html` served with `no-cache`):
+port `4200` as UID 1001 (SPA fallback included, hashed assets cached immutably,
+`index.html` served with `no-cache`, anti-framing and other security headers
+from `nginx-security-headers.conf` on every response):
 
 ```bash
 docker build -t okdp-console .

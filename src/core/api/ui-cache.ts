@@ -25,3 +25,9 @@ export function readUiCache<T>(key: string): T | undefined {
 export function writeUiCache<T>(key: string, value: T): void {
   cache.set(key, { value, at: Date.now() });
 }
+
+/** Drops every snapshot: on logout, so one user's data never paints for the
+ *  next one in the same tab. */
+export function clearUiCache(): void {
+  cache.clear();
+}

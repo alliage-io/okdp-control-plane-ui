@@ -20,6 +20,8 @@ jobs:
     permissions: { contents: read, packages: write }
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
       - id: vars
         run: |
           VERSION=$(jq -r '.["."] // "0.1.0"' .release-please-manifest.json)

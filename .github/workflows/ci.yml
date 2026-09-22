@@ -29,6 +29,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # Fail on high/critical advisories in runtime (non-dev) dependencies.
+      - run: npm audit --omit=dev --audit-level=high
       # No --fix in CI: report lint violations instead of silently fixing them.
       - run: npx eslint src
       - run: npm test

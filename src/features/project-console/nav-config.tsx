@@ -4,6 +4,7 @@ import {
   siApachesuperset,
   siJupyter,
   siMlflow,
+  siPostgresql,
   siTrino,
 } from 'simple-icons';
 import { BrandIcon, type BrandGlyph } from '../../shared/components/brand-icon';
@@ -285,6 +286,7 @@ const SERVICE_PRESENTATION: Record<string, ServicePresentation> = {
   jupyterhub: { label: 'JupyterHub', brand: siJupyter },
   superset: { label: 'Superset', brand: siApachesuperset },
   'spark-operator': { brand: siApachespark },
+  'cnpg-postgresql': { label: 'PostgreSQL', brand: siPostgresql },
   seaweedfs: { brand: siteSeaweedfs },
 };
 

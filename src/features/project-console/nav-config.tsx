@@ -1,4 +1,5 @@
 import {
+  siApachehive,
   siApachekafka,
   siApachespark,
   siApachesuperset,
@@ -64,6 +65,10 @@ const siteApachepolaris: BrandGlyph = {
   path: 'M1.77396 5.30235C1.17886 4.57499 0 4.9958 0 5.93559V97.8878C0 99.0543 0.945669 100 2.11221 100H94.0452C94.9854 100 95.4059 98.8203 94.6778 98.2255L51.5956 63.0332C50.769 62.3579 49.5973 62.3044 48.7124 62.9013L23.4326 79.9586C21.4731 81.2806 19.1256 78.933 20.4475 76.9737L37.5039 51.6949C38.1012 50.8094 38.0472 49.6369 37.3709 48.8102L1.77396 5.30235ZM98.2255 94.6778C98.8203 95.4059 100 94.9854 100 94.0452V2.11221C100 0.945669 99.0543 0 97.8878 0H5.93558C4.99579 0 4.57499 1.17886 5.30235 1.77396L48.8102 37.3709C49.6369 38.0472 50.8094 38.1014 51.6949 37.5039L76.9735 20.4475C78.9328 19.1256 81.2805 21.4732 79.9586 23.4325L62.9013 48.7125C62.3043 49.5973 62.3579 50.769 63.0332 51.5957L98.2255 94.6778Z',
 };
 
+/** Apache Hive mark from simple-icons, its brand yellow (#FDEE21) darkened to
+ *  amber: the stock hex is unreadable on the light sidebar. */
+const siteApachehive: BrandGlyph = { ...siApachehive, hex: 'D9A400' };
+
 export interface NavItem {
   /** Stable catalog identity (the service `name`). Keys the user's show/hide
    *  preference, so an admin renaming the display label cannot detach it.
@@ -106,7 +111,7 @@ export const NAV_CATEGORIES: NavCategory[] = [
     items: [
       { segment: 'polaris', icon: 'pi pi-table', brand: siteApachepolaris, label: 'Polaris' },
       { segment: 'trino', icon: 'pi pi-bolt', brand: siTrino, label: 'Trino' },
-      { segment: 'hive-metastore', icon: 'pi pi-table', label: 'Hive Metastore' },
+      { segment: 'hive-metastore', icon: 'pi pi-table', brand: siteApachehive, label: 'Hive Metastore' },
     ],
   },
   {
@@ -288,6 +293,7 @@ const SERVICE_PRESENTATION: Record<string, ServicePresentation> = {
   'spark-operator': { brand: siApachespark },
   'cnpg-postgresql': { label: 'PostgreSQL', brand: siPostgresql },
   seaweedfs: { brand: siteSeaweedfs },
+  'hive-metastore': { label: 'Hive Metastore', brand: siteApachehive },
 };
 
 /** Sidebar entry for a catalog service. Display label precedence: the catalog

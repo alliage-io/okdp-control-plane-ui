@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Toast } from 'primereact/toast';
 import DeleteConfirmDialog from '../../../shared/components/delete-confirm-dialog';
+import { RenderedValuesDialog } from './rendered-values-dialog';
 import EmptyState from '../../../shared/components/empty-state';
 import { serviceApi } from '../../../core/api/service-api';
 import type { Pod, ServiceInstance, ServiceMetrics } from '../../../core/models/service.model';
@@ -121,6 +122,7 @@ export default function ServiceDetailPage() {
   const [metrics, setMetrics] = useState<ServiceMetrics | null>(null);
   // Type-to-confirm deletion dialog visibility.
   const [deleteVisible, setDeleteVisible] = useState(false);
+  const [valuesVisible, setValuesVisible] = useState(false);
 
   const runningPods = useMemo(
     () => pods.filter((p) => p.status === 'Running' || p.status === 'Ready').length,
@@ -279,6 +281,11 @@ export default function ServiceDetailPage() {
         onHide={() => setDeleteVisible(false)}
         onConfirm={deleteInstance}
       />
+      <RenderedValuesDialog
+        projectId={projectId}
+        serviceName={valuesVisible ? (instance?.name ?? serviceName) : null}
+        onHide={() => setValuesVisible(false)}
+      />
 
       <div className="detail-page animate-in">
         <div className="page-header">
@@ -331,6 +338,14 @@ export default function ServiceDetailPage() {
                 <button className="btn-secondary" onClick={editInstance}>
                   <i className="pi pi-pencil"></i>
                   Edit
+                </button>
+                <button
+                  className="btn-secondary"
+                  onClick={() => setValuesVisible(true)}
+                  title="The values each vendored upstream chart was rendered with"
+                >
+                  <i className="pi pi-code"></i>
+                  Values
                 </button>
                 <button className="btn-secondary danger" onClick={confirmDelete}>
                   <i className="pi pi-trash"></i>

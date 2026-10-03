@@ -136,3 +136,25 @@ export interface ServiceMetrics {
   cpu: MetricValue;
   memory: MetricValue;
 }
+
+/** What one vendored upstream chart of an instance was rendered with
+ *  (`GET …/services/:name/values`): the values ConfigMap okdp-lib emits for
+ *  each render, next to the vendored chart's own defaults. */
+export interface RenderedValues {
+  /** The values ConfigMap, `<release>-<chart>-values`. */
+  name: string;
+  /** The vendored chart (its directory under vendor/). */
+  chart: string;
+  /** The vendored chart, `<name>-<version>`. */
+  chartVersion: string;
+  /** Version of the instance's chart that rendered these values. */
+  serviceVersion: string;
+  /** The values.yaml the upstream chart received. */
+  values: string;
+  /** The vendored chart's values.yaml, as published. Absent when it could
+   *  not be read (see `defaultsError`). */
+  defaults?: string;
+  /** 1-based lines of `values` that differ from `defaults`. */
+  changedLines: number[];
+  defaultsError?: string;
+}

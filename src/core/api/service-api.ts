@@ -8,6 +8,7 @@ import type {
   ServiceEvent,
   ServiceInstance,
   Pod,
+  RenderedValues,
   ServiceMetrics,
 } from '../models/service.model';
 
@@ -97,6 +98,14 @@ export const serviceApi = {
     return http.patch<ServiceInstance>(
       `${baseUrl}/api/projects/${seg(projectId)}/services/${seg(serviceName)}/parameters`,
       body,
+    );
+  },
+
+  /** The values each vendored upstream chart of an instance was rendered
+   *  with, and their lines differing from the chart defaults. */
+  getRenderedValues(projectId: string, serviceName: string): Promise<RenderedValues[]> {
+    return http.getList<RenderedValues>(
+      `${baseUrl}/api/projects/${seg(projectId)}/services/${seg(serviceName)}/values`,
     );
   },
 

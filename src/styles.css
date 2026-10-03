@@ -2267,3 +2267,228 @@ body.dark-mode .stat-chip.chip-danger.active {
 body.dark-mode .header-badge:not(.amber) {
   background: linear-gradient(135deg, #41928f, #2d6663);
 }
+
+/* ===== Rendered values viewer (services/rendered-values-dialog.tsx) =====
+   A read-only code view of a values.yaml with git-style additions: lines
+   that differ from the vendored chart's defaults get a green background, a
+   green gutter and a "+" marker. Unlayered, like the dark overrides above. */
+:root {
+  --rv-add-bg: rgba(46, 160, 67, 0.12);
+  --rv-add-gutter: rgba(46, 160, 67, 0.24);
+  --rv-add-fg: #1a7f37;
+  --rv-tok-key: #0b5d8f;
+  --rv-tok-string: #0a3069;
+  --rv-tok-literal: #8250df;
+}
+
+body.dark-mode {
+  --rv-add-bg: rgba(46, 160, 67, 0.16);
+  --rv-add-gutter: rgba(46, 160, 67, 0.32);
+  --rv-add-fg: #3fb950;
+  --rv-tok-key: #79c0ff;
+  --rv-tok-string: #a5d6ff;
+  --rv-tok-literal: #d2a8ff;
+}
+
+.rv-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.rv-meta,
+.rv-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.rv-segmented {
+  display: inline-flex;
+  border: 1px solid var(--db-border-color);
+  border-radius: var(--db-radius-sm);
+  overflow: hidden;
+}
+
+.rv-segmented button,
+.rv-toggle {
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 10px;
+  background: var(--db-bg-primary);
+  color: var(--db-text-secondary);
+  border: none;
+  cursor: pointer;
+  transition:
+    background var(--db-transition-fast),
+    color var(--db-transition-fast);
+}
+
+.rv-segmented button + button {
+  border-left: 1px solid var(--db-border-color);
+}
+
+.rv-segmented button.active,
+.rv-toggle.active {
+  background: var(--db-primary-50);
+  color: var(--db-primary);
+}
+
+.rv-segmented button:disabled,
+.rv-toggle:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.rv-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--db-border-color);
+  border-radius: var(--db-radius-sm);
+}
+
+.rv-toggle i {
+  font-size: 11px;
+}
+
+.rv-count {
+  font-family: var(--db-font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 0 6px;
+  border-radius: var(--db-radius-full);
+  background: var(--rv-add-bg);
+  color: var(--rv-add-fg);
+}
+
+.rv-frame {
+  border: 1px solid var(--db-border-light);
+  border-radius: var(--db-radius-md);
+  overflow: hidden;
+  background: var(--db-bg-primary);
+}
+
+.rv-frame-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 12px;
+  font-size: 12px;
+  background: var(--db-bg-secondary);
+  border-bottom: 1px solid var(--db-border-light);
+}
+
+.rv-legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.rv-swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--rv-add-gutter);
+  border: 1px solid var(--rv-add-fg);
+}
+
+.rv-code {
+  max-height: 60vh;
+  overflow: auto;
+  font-family: var(--db-font-mono);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+.rv-line {
+  display: grid;
+  grid-template-columns: 3.6em 1.6em 1fr;
+  min-width: max-content;
+}
+
+.rv-no {
+  padding: 0 8px;
+  text-align: right;
+  color: var(--db-text-muted);
+  user-select: none;
+  border-right: 1px solid var(--db-border-subtle);
+}
+
+.rv-mark {
+  text-align: center;
+  user-select: none;
+  color: var(--rv-add-fg);
+  font-weight: 700;
+}
+
+.rv-text {
+  white-space: pre;
+  padding-right: 16px;
+  color: var(--db-text-primary);
+}
+
+.rv-changed {
+  background: var(--rv-add-bg);
+}
+
+.rv-changed .rv-no {
+  background: var(--rv-add-gutter);
+  color: var(--rv-add-fg);
+  border-right-color: transparent;
+}
+
+.rv-gap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-width: max-content;
+  padding: 3px 12px 3px calc(3.6em + 8px);
+  font: inherit;
+  font-family: var(--db-font-sans, inherit);
+  font-size: 12px;
+  color: var(--db-text-secondary);
+  background: var(--db-accent-blue-light);
+  border: none;
+  border-top: 1px solid var(--db-border-subtle);
+  border-bottom: 1px solid var(--db-border-subtle);
+  cursor: pointer;
+  text-align: left;
+}
+
+.rv-gap:hover {
+  color: var(--db-primary);
+}
+
+.rv-gap i {
+  font-size: 11px;
+}
+
+.rv-tok-key {
+  color: var(--rv-tok-key);
+}
+
+.rv-tok-string {
+  color: var(--rv-tok-string);
+}
+
+.rv-tok-literal {
+  color: var(--rv-tok-literal);
+}
+
+.rv-tok-comment {
+  color: var(--db-text-muted);
+  font-style: italic;
+}
+
+.rv-tok-dash,
+.rv-tok-punct {
+  color: var(--db-text-secondary);
+}

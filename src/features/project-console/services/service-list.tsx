@@ -12,6 +12,7 @@ import { useToastMessages } from '../../../shared/hooks/use-toast-messages';
 import { apiErrorMessage, formatMediumDate, openInNewTab } from './service-utils';
 import { StatusTag } from '../../../shared/components/status-tag';
 import { ServiceStatusTag } from './service-status-tag';
+import { RenderedValuesDialog } from './rendered-values-dialog';
 
 type StatusFilter = 'All' | 'Ready' | 'Pending' | 'Installing' | 'Error';
 
@@ -54,6 +55,8 @@ export function ServiceList({
   const [deletingNames, setDeletingNames] = useState<Set<string>>(new Set());
   // Instance pending the type-to-confirm deletion dialog.
   const [deleteTarget, setDeleteTarget] = useState<ServiceInstance | null>(null);
+  // Instance whose rendered values are shown.
+  const [valuesTarget, setValuesTarget] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<StatusFilter>('All');
@@ -199,6 +202,14 @@ export function ServiceList({
         onConfirm={() => deleteTarget && deleteInstance(deleteTarget)}
       />
 
+      {projectName && (
+        <RenderedValuesDialog
+          projectId={projectName}
+          serviceName={valuesTarget}
+          onHide={() => setValuesTarget(null)}
+        />
+      )}
+
       <div className="stat-strip">
         {statChips.map((chip) => (
           <button
@@ -315,6 +326,15 @@ export function ServiceList({
                           onClick={() => editService(svc)}
                         >
                           <i className="pi pi-pencil"></i>
+                        </button>
+                        <button
+                          className="icon-btn"
+                          title="Rendered values"
+                          aria-label={`Rendered values of ${svc.name}`}
+                          disabled={deleting}
+                          onClick={() => setValuesTarget(svc.name)}
+                        >
+                          <i className="pi pi-code"></i>
                         </button>
                         {svc.url && (
                           <button

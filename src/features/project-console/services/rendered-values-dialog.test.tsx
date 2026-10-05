@@ -15,7 +15,7 @@ const TRINO_VALUES =
   Array.from({ length: 12 }, (_, i) => `key${i + 1}: v${i + 1}`).join('\n') + '\n';
 
 const TRINO: RenderedValues = {
-  name: 'demo-sql-trino-values',
+  name: 'trino',
   chart: 'trino',
   chartVersion: 'trino-1.42.1',
   serviceVersion: '480.0.0-1.0.2',
@@ -25,7 +25,7 @@ const TRINO: RenderedValues = {
 };
 
 const OPA: RenderedValues = {
-  name: 'demo-sql-opa-kube-mgmt-values',
+  name: 'opa-kube-mgmt',
   chart: 'opa-kube-mgmt',
   chartVersion: 'opa-kube-mgmt-9.2.0',
   serviceVersion: '480.0.0-1.0.2',
@@ -91,10 +91,10 @@ describe('RenderedValuesDialog', () => {
     expect(screen.getByRole('button', { name: /Changes only/ })).toBeDisabled();
   });
 
-  it('explains an instance without rendered values', async () => {
+  it('explains an instance without compiled values', async () => {
     getRenderedValues.mockResolvedValue([]);
     render(<RenderedValuesDialog projectId="demo" serviceName="sql" onHide={vi.fn()} />);
-    expect(await screen.findByText('No rendered values')).toBeInTheDocument();
+    expect(await screen.findByText('No compiled values')).toBeInTheDocument();
   });
 
   it('loads nothing while hidden', () => {

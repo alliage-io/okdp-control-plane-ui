@@ -10,9 +10,11 @@ import { DynamicSchemaForm } from '../../../shared/components/dynamic-schema-for
 import EmptyState from '../../../shared/components/empty-state';
 import { ProfileListEditor, type Profile } from '../../../shared/components/profile-list-editor';
 import { useToastMessages } from '../../../shared/hooks/use-toast-messages';
+import { CompileErrorAlert } from './compile-error-alert';
 import {
   apiErrorMessage,
   areaBasePath,
+  compileErrorMessage,
   hasProfileEditorWidget,
   parentLabel,
   savedMessage,
@@ -35,6 +37,8 @@ export default function ServiceEditPage() {
   const [instance, setInstance] = useState<ServiceInstance | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  // The compiler's refusal of the last save, shown until the next one.
+  const [compileError, setCompileError] = useState<string | null>(null);
   // Mirrors the validity state of the dynamic schema form so Save can be
   // disabled when a CPU/memory quantity is malformed (e.g. "1" instead of
   // "1Gi"). Starts true so an untouched form with valid defaults is saveable.
@@ -171,6 +175,7 @@ export default function ServiceEditPage() {
     if (!projectName || !instance) return;
 
     setSaving(true);
+    setCompileError(null);
     // The values as they should now read: what the form holds (the loaded
     // values plus the user's changes), the picker choices, and the profiles.
     const original = originalParamsRef.current;
@@ -206,7 +211,16 @@ export default function ServiceEditPage() {
         navigateBack(projectName);
       })
       .catch((err) => {
-        showError(apiErrorMessage(err, 'Failed to save changes'));
+        const refused = compileErrorMessage(err);
+        if (refused) {
+          showError(
+            'Nothing was committed: the compiler’s message is shown on the page.',
+            'Does not compile',
+          );
+        } else {
+          showError(apiErrorMessage(err, 'Failed to save changes'));
+        }
+        setCompileError(refused);
         setSaving(false);
       });
   };
@@ -282,6 +296,8 @@ export default function ServiceEditPage() {
                 </div>
               </div>
             )}
+
+            {compileError && <CompileErrorAlert message={compileError} />}
 
             <div className="form-card">
               <div className="form-section">

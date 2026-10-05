@@ -2,6 +2,7 @@ import { afterEach, describe, it, expect, vi } from 'vitest';
 import { HttpError } from '../../../core/api/http';
 import {
   areaBasePath,
+  compileErrorMessage,
   deployError,
   isTransitioning,
   openInNewTab,
@@ -104,6 +105,19 @@ describe('deployError', () => {
 
   it('falls back when the body is not JSON', () => {
     expect(deployError(new Error('boom'), 'a', 'b').detail).toBe('Deployment failed');
+  });
+
+  it('points a compile refusal at the message the page shows', () => {
+    const refused = error(400, {
+      error: 'instance a/b does not compile: replicas: must be >= 1',
+      code: 'does-not-compile',
+    });
+    expect(deployError(refused, 'a', 'b').summary).toBe('Does not compile');
+    expect(compileErrorMessage(refused)).toBe(
+      'instance a/b does not compile: replicas: must be >= 1',
+    );
+    expect(compileErrorMessage(error(400, { error: 'invalid version' }))).toBeNull();
+    expect(compileErrorMessage(new Error('boom'))).toBeNull();
   });
 });
 

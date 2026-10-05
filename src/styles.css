@@ -1348,6 +1348,23 @@ h1 {
   }
 }
 
+/* A server message of several lines (a compile refusal) keeps them. */
+.p-toast .p-toast-message .p-toast-detail {
+  white-space: pre-line;
+}
+
+/* The compiler's refusal of an instance: its message as written, one
+   problem per line. */
+.compile-error {
+  margin-bottom: 14px;
+  & pre {
+    margin: 4px 0 0;
+    font-size: 12px;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+}
+
 @utility alert-danger {
   background: #fef2f2;
   border-color: #fecaca;
@@ -2268,9 +2285,9 @@ body.dark-mode .header-badge:not(.amber) {
   background: linear-gradient(135deg, #41928f, #2d6663);
 }
 
-/* ===== Rendered values viewer (services/rendered-values-dialog.tsx) =====
+/* ===== Compiled values viewer (services/rendered-values-dialog.tsx) =====
    A read-only code view of a values.yaml with git-style additions: lines
-   that differ from the vendored chart's defaults get a green background, a
+   that differ from the chart's defaults get a green background, a
    green gutter and a "+" marker. Unlayered, like the dark overrides above. */
 :root {
   --rv-add-bg: rgba(46, 160, 67, 0.12);

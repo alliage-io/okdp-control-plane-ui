@@ -14,8 +14,10 @@ import { useToastMessages } from '../../../shared/hooks/use-toast-messages';
 import { instanceNameError } from '../../../shared/utils/k8s-names';
 import { flattenReviewParams } from '../../../shared/utils/format-review-value';
 import { safeReturnTo } from '../../../shared/utils/safe-return-to';
+import { CompileErrorAlert } from './compile-error-alert';
 import {
   areaBasePath,
+  compileErrorMessage,
   deployError,
   hasProfileEditorWidget,
   parentLabel,
@@ -51,6 +53,8 @@ export default function ServiceDeployPage() {
   const [service, setService] = useState<PlatformService | null>(null);
   const [loading, setLoading] = useState(true);
   const [deploying, setDeploying] = useState(false);
+  // The compiler's refusal of the last attempt, shown until the next one.
+  const [compileError, setCompileError] = useState<string | null>(null);
   // Track the dynamic schema form validity so Next on the Parameters step
   // is blocked when a CPU/memory quantity field is malformed.
   const [paramsValid, setParamsValid] = useState(true);
@@ -290,6 +294,7 @@ export default function ServiceDeployPage() {
 
     setDeploying(true);
     setDeployProgress(0);
+    setCompileError(null);
 
     const mergedParams: Record<string, any> = profileEditor
       ? { ...parameters, profiles }
@@ -342,6 +347,7 @@ export default function ServiceDeployPage() {
         clearProgressTick();
         const { summary, detail } = deployError(err, projectId, instanceName);
         showError(detail, summary);
+        setCompileError(compileErrorMessage(err));
         setDeploying(false);
       });
   };
@@ -438,6 +444,8 @@ export default function ServiceDeployPage() {
               ))}
             </div>
 
+            {compileError && <CompileErrorAlert message={compileError} />}
+
             <div className="form-card">
               {currentStepKey === 'basics' && (
                 <div className="form-section">
@@ -500,7 +508,9 @@ export default function ServiceDeployPage() {
                         could not be read. Deploying anyway would leave the
                         release waiting on a connection nobody was asked for. */}
                     {inputsState === 'loading' && (
-                      <p className="muted-text small">Reading the connections this service needs…</p>
+                      <p className="muted-text small">
+                        Reading the connections this service needs…
+                      </p>
                     )}
                     {inputsState === 'error' && (
                       <div className="form-field">

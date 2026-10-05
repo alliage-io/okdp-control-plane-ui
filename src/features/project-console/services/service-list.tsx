@@ -55,7 +55,7 @@ export function ServiceList({
   const [deletingNames, setDeletingNames] = useState<Set<string>>(new Set());
   // Instance pending the type-to-confirm deletion dialog.
   const [deleteTarget, setDeleteTarget] = useState<ServiceInstance | null>(null);
-  // Instance whose rendered values are shown.
+  // Instance whose compiled values are shown.
   const [valuesTarget, setValuesTarget] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState('');
@@ -329,8 +329,8 @@ export function ServiceList({
                         </button>
                         <button
                           className="icon-btn"
-                          title="Rendered values"
-                          aria-label={`Rendered values of ${svc.name}`}
+                          title="Compiled values"
+                          aria-label={`Compiled values of ${svc.name}`}
                           disabled={deleting}
                           onClick={() => setValuesTarget(svc.name)}
                         >

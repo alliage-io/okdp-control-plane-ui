@@ -118,9 +118,16 @@ export function versionOptionsFor(svc: PlatformService): { label: string; value:
   }));
 }
 
+/** The compiler's message when a write was refused because the instance
+ *  does not compile (400, code `does-not-compile`), else null. */
+export function compileErrorMessage(err: unknown): string | null {
+  return apiErrorCode(err) === 'does-not-compile' ? apiErrorMessage(err, '') || null : null;
+}
+
 /** The toast of a failed deploy. The detail is the server's own message (400
  *  invalid name, version or parameters; 409 naming what holds the name); the
- *  409 `code` picks the title, and a fallback text when there is no message. */
+ *  `code` picks the title, and a fallback text when there is no message. A
+ *  compile refusal points at the message the page shows in full. */
 export function deployError(
   err: unknown,
   project: string,
@@ -139,6 +146,11 @@ export function deployError(
         detail:
           message ||
           `The release name "${project}-${instance}" is already used elsewhere: pick another instance name.`,
+      };
+    case 'does-not-compile':
+      return {
+        summary: 'Does not compile',
+        detail: 'Nothing was committed: the compiler’s message is shown on the page.',
       };
     default:
       return { summary: 'Deployment failed', detail: message || 'Deployment failed' };

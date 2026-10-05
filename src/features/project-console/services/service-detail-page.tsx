@@ -342,7 +342,7 @@ export default function ServiceDetailPage() {
                 <button
                   className="btn-secondary"
                   onClick={() => setValuesVisible(true)}
-                  title="The values each vendored upstream chart was rendered with"
+                  title="The values each chart of the instance is rendered with"
                 >
                   <i className="pi pi-code"></i>
                   Values

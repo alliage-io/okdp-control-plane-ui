@@ -66,9 +66,11 @@ function ValuesCode({ rows, onExpand }: { rows: ValuesRow[]; onExpand: (from: nu
 }
 
 /**
- * The values each upstream chart vendored by an instance's chart was rendered
- * with (the "final values.yaml" a plain Helm install would have taken), with
- * the lines that differ from the chart's own defaults highlighted, git style.
+ * The values each chart of an instance is rendered with, as compiled into the
+ * deployments repository (the "final values.yaml" a plain Helm install would
+ * take), with the lines that differ from the chart's own defaults
+ * highlighted, git style. They are there as soon as the instance is
+ * committed, before the engine deploys it.
  */
 export function RenderedValuesDialog({
   projectId,
@@ -99,7 +101,7 @@ export function RenderedValuesDialog({
       })
       .catch((err) => {
         if (cancelled) return;
-        setError(apiErrorMessage(err, 'Failed to load the rendered values'));
+        setError(apiErrorMessage(err, 'Failed to load the compiled values'));
         setRenders([]);
       });
     return () => {
@@ -152,7 +154,7 @@ export function RenderedValuesDialog({
       header={
         <span className="inline-flex items-center gap-2">
           <i className="pi pi-code text-primary"></i>
-          Rendered values
+          Compiled values
           <span className="text-[12px] font-normal text-fg-secondary">{serviceName}</span>
         </span>
       }
@@ -166,13 +168,13 @@ export function RenderedValuesDialog({
         <EmptyState
           variant="panel"
           icon="pi pi-spin pi-spinner"
-          title="Loading the rendered values…"
+          title="Loading the compiled values…"
         />
       ) : error ? (
         <div className="alert alert-danger">
           <i className="pi pi-exclamation-circle"></i>
           <div>
-            <strong>Could not load the rendered values</strong>
+            <strong>Could not load the compiled values</strong>
             <p className="mono">{error}</p>
           </div>
         </div>
@@ -180,13 +182,14 @@ export function RenderedValuesDialog({
         <EmptyState
           variant="panel"
           icon="pi pi-file"
-          title="No rendered values"
-          description="This instance's chart renders no vendored upstream chart, or was built before the charts published their rendered values."
+          title="No compiled values"
+          description="This instance has not been compiled yet: it was declared in the deployments repository by hand, and is compiled with its next change."
         />
       ) : (
         <>
           <p className="mb-3 text-[13px] text-fg-secondary">
-            The <span className="mono">values.yaml</span> each upstream chart received, as a plain{' '}
+            The <span className="mono">values.yaml</span> each chart of the instance is rendered
+            with, as compiled into the deployments repository and as a plain{' '}
             <span className="mono">helm install</span> would take it. Lines in green differ from the
             chart&apos;s own defaults: computed by the platform, or set on this instance.
           </p>
@@ -223,7 +226,7 @@ export function RenderedValuesDialog({
                   aria-pressed={view === 'rendered'}
                   onClick={() => setView('rendered')}
                 >
-                  Rendered
+                  Compiled
                 </button>
                 <button
                   className={view === 'defaults' ? 'active' : ''}

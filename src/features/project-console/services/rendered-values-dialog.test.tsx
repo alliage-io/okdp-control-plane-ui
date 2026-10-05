@@ -76,7 +76,7 @@ describe('RenderedValuesDialog', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Chart defaults' }));
     expect(screen.getByText('# upstream defaults')).toBeInTheDocument();
-    expect(screen.getByText('vendor/trino/values.yaml')).toBeInTheDocument();
+    expect(screen.getByText('trino-1.42.1 · values.yaml')).toBeInTheDocument();
     expect(document.querySelectorAll('.rv-changed')).toHaveLength(0);
   });
 
@@ -91,10 +91,44 @@ describe('RenderedValuesDialog', () => {
     expect(screen.getByRole('button', { name: /Changes only/ })).toBeDisabled();
   });
 
+  it('names the tabs by chart key when one chart renders several keys', async () => {
+    const admin: RenderedValues = {
+      name: 'polaris-admin',
+      chart: 'polaris-admin',
+      chartVersion: 'polaris-admin-0.3.0',
+      serviceVersion: '1.2.0-1.0.0',
+      values: 'job: bootstrap\n',
+      defaults: 'job: none\n',
+      changedLines: [1],
+    };
+    const principals: RenderedValues = {
+      ...admin,
+      name: 'polaris-admin-principals',
+      values: 'job: principals\n',
+    };
+    getRenderedValues.mockResolvedValue([admin, principals]);
+    render(<RenderedValuesDialog projectId="demo" serviceName="catalog" onHide={vi.fn()} />);
+    await waitFor(() => expect(line(1)).not.toBeNull());
+
+    const tabs = screen.getAllByRole('tab');
+    expect(tabs.map((t) => t.firstChild?.textContent)).toEqual([
+      'polaris-admin',
+      'polaris-admin-principals',
+    ]);
+    // The chart is named next to a key that differs from it.
+    expect(tabs[0].querySelector('.muted-text')).toBeNull();
+    expect(tabs[1].querySelector('.muted-text')).toHaveTextContent('polaris-admin');
+
+    fireEvent.click(tabs[1]);
+    expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    expect(line(1)).toHaveTextContent('job: principals');
+  });
+
   it('explains an instance without compiled values', async () => {
     getRenderedValues.mockResolvedValue([]);
     render(<RenderedValuesDialog projectId="demo" serviceName="sql" onHide={vi.fn()} />);
     expect(await screen.findByText('No compiled values')).toBeInTheDocument();
+    expect(screen.getByText(/okdp-gitops compile/)).toBeInTheDocument();
   });
 
   it('loads nothing while hidden', () => {

@@ -183,7 +183,7 @@ export function RenderedValuesDialog({
           variant="panel"
           icon="pi pi-file"
           title="No compiled values"
-          description="This instance has not been compiled yet: it was declared in the deployments repository by hand, and is compiled with its next change."
+          description="This instance was declared in the deployments repository by hand and has not been compiled: it is not deployed until okdp-gitops compile runs on the repository, or the console saves a change to it."
         />
       ) : (
         <>
@@ -196,6 +196,8 @@ export function RenderedValuesDialog({
 
           {renders.length > 1 && (
             <div className="okdp-tabs" role="tablist">
+              {/* One tab per chart key: one chart may render several keys
+                  (an alias, the oidc-dcr chart of each OAuth client). */}
               {renders.map((r) => (
                 <button
                   key={r.name}
@@ -203,9 +205,10 @@ export function RenderedValuesDialog({
                   aria-selected={r.name === current.name}
                   className={r.name === current.name ? 'okdp-tab active' : 'okdp-tab'}
                   onClick={() => setSelected(r.name)}
-                  title={r.name}
+                  title={r.chartVersion || r.chart}
                 >
-                  {r.chart}
+                  {r.name}
+                  {r.chart !== r.name && <span className="muted-text small mono">{r.chart}</span>}
                   {r.changedLines.length > 0 && (
                     <span className="rv-count">+{r.changedLines.length}</span>
                   )}
@@ -270,7 +273,9 @@ export function RenderedValuesDialog({
           <div className="rv-frame">
             <div className="rv-frame-head">
               <span className="mono">
-                {view === 'rendered' ? 'values.yaml' : `vendor/${current.chart}/values.yaml`}
+                {view === 'rendered'
+                  ? 'values.yaml'
+                  : `${current.chartVersion || current.chart} · values.yaml`}
               </span>
               <span className="muted-text small">
                 {lineCount} lines

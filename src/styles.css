@@ -2288,11 +2288,14 @@ body.dark-mode .header-badge:not(.amber) {
 /* ===== Compiled values viewer (services/rendered-values-dialog.tsx) =====
    A read-only code view of a values.yaml with git-style additions: lines
    that differ from the chart's defaults get a green background, a
-   green gutter and a "+" marker. Unlayered, like the dark overrides above. */
+   green gutter and a "+" marker; the others, the upstream chart's own
+   defaults, are drawn in a lighter gray. Unlayered, like the dark overrides
+   above. */
 :root {
   --rv-add-bg: rgba(46, 160, 67, 0.12);
   --rv-add-gutter: rgba(46, 160, 67, 0.24);
   --rv-add-fg: #1a7f37;
+  --rv-default-fg: #8c959f;
   --rv-tok-key: #0b5d8f;
   --rv-tok-string: #0a3069;
   --rv-tok-literal: #8250df;
@@ -2302,6 +2305,7 @@ body.dark-mode {
   --rv-add-bg: rgba(46, 160, 67, 0.16);
   --rv-add-gutter: rgba(46, 160, 67, 0.32);
   --rv-add-fg: #3fb950;
+  --rv-default-fg: #6e7681;
   --rv-tok-key: #79c0ff;
   --rv-tok-string: #a5d6ff;
   --rv-tok-literal: #d2a8ff;
@@ -2416,6 +2420,11 @@ body.dark-mode {
   border: 1px solid var(--rv-add-fg);
 }
 
+.rv-swatch-default {
+  background: transparent;
+  border-color: var(--rv-default-fg);
+}
+
 .rv-code {
   max-height: 60vh;
   overflow: auto;
@@ -2459,6 +2468,13 @@ body.dark-mode {
   background: var(--rv-add-gutter);
   color: var(--rv-add-fg);
   border-right-color: transparent;
+}
+
+/* A line from the chart's defaults: the whole line in gray, its YAML
+   colouring included. */
+.rv-default .rv-text,
+.rv-default .rv-text span {
+  color: var(--rv-default-fg);
 }
 
 .rv-gap {

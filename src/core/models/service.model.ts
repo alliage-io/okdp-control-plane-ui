@@ -138,24 +138,28 @@ export interface ServiceMetrics {
 }
 
 /** What one chart of an instance is rendered with
- *  (`GET …/services/:name/values`): its compiled values in the deployments
- *  repository, next to the chart's own defaults. */
+ *  (`GET …/services/:name/values`): the upstream chart's defaults under its
+ *  compiled values in the deployments repository, next to those defaults. */
 export interface RenderedValues {
   /** The chart key of the service chart (or the chart itself, for a chart
    *  without service definition). */
   name: string;
-  /** The chart that renders them. */
+  /** The upstream chart that renders them. */
   chart: string;
   /** That chart, `<name>-<version>`. */
   chartVersion: string;
-  /** Version of the instance's chart the values were compiled for. */
+  /** Version of the instance's package the values were compiled for. */
   serviceVersion: string;
-  /** The values.yaml the chart is rendered with. */
+  /** The values.yaml the chart is rendered with: the chart's defaults
+   *  coalesced under the compiled values. The compiled values only when the
+   *  defaults could not be read (see `defaultsError`). */
   values: string;
-  /** The chart's values.yaml, as published. Absent when it could not be
-   *  read (see `defaultsError`). */
+  /** The upstream chart's own values.yaml, as published. Absent when it
+   *  could not be read (see `defaultsError`). */
   defaults?: string;
-  /** 1-based lines of `values` that differ from `defaults`. */
+  /** 1-based lines of `values` that differ from `defaults`: set by OKDP or
+   *  the instance. The other lines are the chart's defaults. */
   changedLines: number[];
+  /** Why the defaults are missing, or could not be compared. */
   defaultsError?: string;
 }

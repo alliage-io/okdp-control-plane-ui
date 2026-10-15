@@ -101,8 +101,9 @@ export const serviceApi = {
     );
   },
 
-  /** The values each chart of an instance is rendered with (its compiled
-   *  values), and their lines differing from the chart defaults. */
+  /** The values each chart of an instance is rendered with (the chart's
+   *  defaults under its compiled values), and their lines differing from the
+   *  chart's defaults. */
   getRenderedValues(projectId: string, serviceName: string): Promise<RenderedValues[]> {
     return http.getList<RenderedValues>(
       `${baseUrl}/api/projects/${seg(projectId)}/services/${seg(serviceName)}/values`,

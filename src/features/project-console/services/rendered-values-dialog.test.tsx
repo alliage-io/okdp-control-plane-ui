@@ -51,9 +51,29 @@ describe('RenderedValuesDialog', () => {
     expect(line(3)).toHaveClass('rv-changed');
     expect(line(1)).not.toHaveClass('rv-changed');
     expect(screen.getByText('2 differ from the defaults', { exact: false })).toBeInTheDocument();
+    expect(screen.getByText(/Lines in gray are the chart's defaults/)).toBeInTheDocument();
     // One tab per render, with the number of changed lines.
     expect(screen.getByRole('tab', { name: /trino/ })).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByText('+2')).toBeInTheDocument();
+  });
+
+  it('draws the lines from the chart defaults in gray', async () => {
+    getRenderedValues.mockResolvedValue([TRINO]);
+    render(<RenderedValuesDialog projectId="demo" serviceName="sql" onHide={vi.fn()} />);
+    await waitFor(() => expect(line(1)).not.toBeNull());
+
+    // Every line not changed comes from the chart's defaults; a changed line
+    // keeps its green mark only.
+    for (const no of [1, 4, 5, 12]) {
+      expect(line(no)).toHaveClass('rv-default');
+      expect(line(no)?.querySelector('.rv-mark')).toBeEmptyDOMElement();
+    }
+    for (const no of [2, 3]) {
+      expect(line(no)).not.toHaveClass('rv-default');
+      expect(line(no)?.querySelector('.rv-mark')).toHaveTextContent('+');
+    }
+    expect(document.querySelectorAll('.rv-default')).toHaveLength(10);
+    expect(screen.getByText(/10 from the chart's defaults/)).toBeInTheDocument();
   });
 
   it('folds the unchanged lines and unfolds a gap on demand', async () => {
@@ -78,17 +98,45 @@ describe('RenderedValuesDialog', () => {
     expect(screen.getByText('# upstream defaults')).toBeInTheDocument();
     expect(screen.getByText('trino-1.42.1 · values.yaml')).toBeInTheDocument();
     expect(document.querySelectorAll('.rv-changed')).toHaveLength(0);
+    // The chart's own file is shown as is, not grayed.
+    expect(document.querySelectorAll('.rv-default')).toHaveLength(0);
   });
 
-  it('says why changes are not highlighted when the defaults are missing', async () => {
+  it('shows the compiled values only, not grayed, when the defaults are missing', async () => {
     getRenderedValues.mockResolvedValue([TRINO, OPA]);
     render(<RenderedValuesDialog projectId="demo" serviceName="sql" onHide={vi.fn()} />);
     await waitFor(() => expect(line(1)).not.toBeNull());
 
     fireEvent.click(screen.getByRole('tab', { name: /opa-kube-mgmt/ }));
     expect(screen.getByText(/registry down/)).toBeInTheDocument();
+    expect(screen.getByText(/These are the compiled values only/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Chart defaults' })).toBeDisabled();
     expect(screen.getByRole('button', { name: /Changes only/ })).toBeDisabled();
+    // Nothing tells the chart's defaults apart: no line is gray.
+    expect(line(1)).toHaveTextContent('replicas: 1');
+    expect(line(1)).not.toHaveClass('rv-default');
+    expect(line(1)).not.toHaveClass('rv-changed');
+    expect(screen.queryByText(/from the chart's defaults/)).toBeNull();
+  });
+
+  it('grays nothing when the defaults are read but not compared', async () => {
+    getRenderedValues.mockResolvedValue([
+      {
+        ...TRINO,
+        changedLines: [],
+        defaultsError: 'the defaults do not parse: yaml: line 3: mapping values are not allowed',
+      },
+    ]);
+    render(<RenderedValuesDialog projectId="demo" serviceName="sql" onHide={vi.fn()} />);
+    await waitFor(() => expect(line(1)).not.toBeNull());
+
+    expect(screen.getByText(/do not parse/)).toBeInTheDocument();
+    // The server's message says what the values are; nothing is claimed.
+    expect(screen.queryByText(/compiled values only/)).toBeNull();
+    expect(document.querySelectorAll('.rv-default')).toHaveLength(0);
+    expect(screen.getByRole('button', { name: /Changes only/ })).toBeDisabled();
+    // The chart's file is still there to read.
+    expect(screen.getByRole('button', { name: 'Chart defaults' })).toBeEnabled();
   });
 
   it('names the tabs by chart key when one chart renders several keys', async () => {

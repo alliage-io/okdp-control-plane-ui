@@ -27,7 +27,22 @@ function YamlLine({ text }: { text: string }) {
   );
 }
 
-function ValuesCode({ rows, onExpand }: { rows: ValuesRow[]; onExpand: (from: number) => void }) {
+/** The class of a line: a changed line is marked green; with `dimDefaults`,
+ *  the others come from the chart's defaults and are drawn in gray. */
+function lineClass(changed: boolean, dimDefaults: boolean): string {
+  if (changed) return 'rv-line rv-changed';
+  return dimDefaults ? 'rv-line rv-default' : 'rv-line';
+}
+
+function ValuesCode({
+  rows,
+  dimDefaults,
+  onExpand,
+}: {
+  rows: ValuesRow[];
+  dimDefaults: boolean;
+  onExpand: (from: number) => void;
+}) {
   return (
     <div className="rv-code" role="table" aria-label="values.yaml">
       {rows.map((row) =>
@@ -46,7 +61,7 @@ function ValuesCode({ rows, onExpand }: { rows: ValuesRow[]; onExpand: (from: nu
           <div
             key={row.no}
             role="row"
-            className={row.changed ? 'rv-line rv-changed' : 'rv-line'}
+            className={lineClass(row.changed, dimDefaults)}
             data-line={row.no}
           >
             <span className="rv-no" role="cell">
@@ -66,11 +81,13 @@ function ValuesCode({ rows, onExpand }: { rows: ValuesRow[]; onExpand: (from: nu
 }
 
 /**
- * The values each chart of an instance is rendered with, as compiled into the
- * deployments repository (the "final values.yaml" a plain Helm install would
- * take), with the lines that differ from the chart's own defaults
- * highlighted, git style. They are there as soon as the instance is
- * committed, before the engine deploys it.
+ * The values each chart of an instance is rendered with (the "final
+ * values.yaml" a plain Helm install would take): the upstream chart's own
+ * defaults under the values compiled into the deployments repository. The
+ * lines that differ from the chart's defaults are highlighted, git style; the
+ * others, the chart's own defaults, are drawn in gray. They are there as soon
+ * as the instance is committed, before the engine deploys it. When the
+ * chart's defaults cannot be read, the values are the compiled ones only.
  */
 export function RenderedValuesDialog({
   projectId,
@@ -128,6 +145,10 @@ export function RenderedValuesDialog({
   );
   const lineCount = useMemo(() => splitLines(text).length, [text]);
   const hasDefaults = !!current?.defaults;
+  // The values were compared with the chart's defaults: the lines not changed
+  // are the chart's own. Without them (defaultsError), the values are the
+  // compiled ones only and nothing is told apart.
+  const compared = hasDefaults && !current?.defaultsError;
   const changed = current?.changedLines.length ?? 0;
 
   const copy = () => {
@@ -189,9 +210,10 @@ export function RenderedValuesDialog({
         <>
           <p className="mb-3 text-[13px] text-fg-secondary">
             The <span className="mono">values.yaml</span> each chart of the instance is rendered
-            with, as compiled into the deployments repository and as a plain{' '}
-            <span className="mono">helm install</span> would take it. Lines in green differ from the
-            chart&apos;s own defaults: computed by the platform, or set on this instance.
+            with, as a plain <span className="mono">helm install</span> would take it: the upstream
+            chart&apos;s own defaults, with the values compiled into the deployments repository over
+            them. Lines in gray are the chart&apos;s defaults; lines in green differ from them:
+            computed by the platform, or set on this instance.
           </p>
 
           {renders.length > 1 && (
@@ -236,7 +258,11 @@ export function RenderedValuesDialog({
                   aria-pressed={view === 'defaults'}
                   disabled={!hasDefaults}
                   onClick={() => setView('defaults')}
-                  title={hasDefaults ? 'The chart’s own values.yaml' : current.defaultsError}
+                  title={
+                    hasDefaults
+                      ? 'The upstream chart’s own values.yaml, as published'
+                      : current.defaultsError
+                  }
                 >
                   Chart defaults
                 </button>
@@ -244,7 +270,7 @@ export function RenderedValuesDialog({
               <button
                 className={`rv-toggle${changesOnly ? ' active' : ''}`}
                 aria-pressed={changesOnly}
-                disabled={view !== 'rendered' || !hasDefaults}
+                disabled={view !== 'rendered' || !compared}
                 onClick={() => setChangesOnly((v) => !v)}
                 title="Fold the lines that match the chart defaults"
               >
@@ -264,7 +290,13 @@ export function RenderedValuesDialog({
             <div className="alert alert-warn">
               <i className="pi pi-info-circle"></i>
               <div>
-                <strong>Differences with the chart defaults are not shown</strong>
+                <strong>The chart&apos;s defaults are not told apart</strong>
+                {!hasDefaults && (
+                  <p>
+                    These are the compiled values only: Helm adds the upstream chart&apos;s own
+                    defaults under them when it renders the chart.
+                  </p>
+                )}
                 <p className="mono">{current.defaultsError}</p>
               </div>
             </div>
@@ -279,11 +311,16 @@ export function RenderedValuesDialog({
               </span>
               <span className="muted-text small">
                 {lineCount} lines
-                {view === 'rendered' && hasDefaults && (
+                {view === 'rendered' && compared && (
                   <>
                     {' · '}
                     <span className="rv-legend">
                       <span className="rv-swatch" /> {changed} differ from the defaults
+                    </span>
+                    {' · '}
+                    <span className="rv-legend">
+                      <span className="rv-swatch rv-swatch-default" /> {lineCount - changed} from
+                      the chart&apos;s defaults
                     </span>
                   </>
                 )}
@@ -291,6 +328,7 @@ export function RenderedValuesDialog({
             </div>
             <ValuesCode
               rows={rows}
+              dimDefaults={view === 'rendered' && compared}
               onExpand={(from) => setExpanded((prev) => new Set(prev).add(from))}
             />
           </div>

@@ -80,8 +80,9 @@ export function ConnectionInputPicker({
       .catalog()
       .then((catalog) => {
         const found = catalog.types.find((type) => type.name === input.contract);
-        // Only contracts a user may declare by hand can be created from here;
-        // s3 and database-server are always external connections.
+        // Only contracts a user may declare by hand (s3, database-server, ...)
+        // can be created from here. An output a deployed instance publishes is
+        // listed above whatever its contract, and picked by its name.
         setCreatableType(found && found.external ? found : null);
       })
       .catch(() => setCreatableType(null));

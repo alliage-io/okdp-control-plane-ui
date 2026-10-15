@@ -52,13 +52,15 @@ const SELECTABLE: SelectableConnection[] = [
     managed: false,
   },
   {
-    // Published by a deployed release rather than declared by hand.
-    name: 'demo-trino-endpoint',
+    // An output a deployed instance publishes rather than a connection
+    // declared by hand: offered all the same, though database-server has no
+    // naming convention, and referenced by its name.
+    name: 'demo-pg-app',
     scope: 'project',
     type: 'database-server',
     status: 'READY',
     managed: true,
-    providedBy: 'demo-trino',
+    providedBy: 'demo-pg',
   },
 ];
 
@@ -92,7 +94,7 @@ describe('ConnectionInputPicker', () => {
     fireEvent.click(screen.getByRole('button', { name: /Select a connection/ }));
 
     expect(await screen.findByText('rnacentral')).toBeInTheDocument();
-    expect(screen.getByText(/Provided by demo-trino/)).toBeInTheDocument();
+    expect(screen.getByText(/Provided by demo-pg/)).toBeInTheDocument();
   });
 
   it('should offer None when the package tolerates no connection', async () => {
@@ -124,6 +126,18 @@ describe('ConnectionInputPicker', () => {
     expect(onChange).toHaveBeenCalledWith('rnacentral');
   });
 
+  it('should report the name of the output picked', async () => {
+    const { onChange } = renderPicker();
+    await waitFor(() => expect(selectable).toHaveBeenCalled());
+
+    fireEvent.click(screen.getByRole('button', { name: /Select a connection/ }));
+    fireEvent.click(await screen.findByText('demo-pg-app'));
+
+    expect(onChange).toHaveBeenCalledWith('demo-pg-app');
+  });
+
+  // An instance publishing an output of the contract does not make it any
+  // less declarable by hand.
   it('should offer creating a connection for a user-declarable contract', async () => {
     renderPicker();
 

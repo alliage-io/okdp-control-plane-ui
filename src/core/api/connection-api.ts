@@ -46,8 +46,9 @@ export interface ContractDescriptor {
   /** Whether a user may declare this contract by hand. Contracts that only ever
    *  come from a deployed service (Trino, ...) appear in the internal tab only. */
   external: boolean;
-  /** An instance of the project can provide it (hive, iceberg-catalog,
-   *  trino); the others are only ever external connections. */
+  /** The contract has a naming convention (hive, iceberg-catalog, trino): an
+   *  instance's output of it is named after the instance's release. An output
+   *  of any contract is selectable, by its name. */
   internal?: boolean;
   fields: ConnectionField[];
 }

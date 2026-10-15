@@ -123,7 +123,8 @@ export interface InternalConnection {
   host: string;
   port: number;
   values: ConnectionValues;
-  /** True: read from the providing instance's descriptor outputs. */
+  /** True: provided by an instance, read from what it publishes (its
+   *  compiled `okdp.instance.yaml`). */
   managed: boolean;
   createdAt?: string;
 }
@@ -224,7 +225,6 @@ export const connectionApi = {
   project(projectId: string) {
     return endpoints(projectUrl(projectId));
   },
-
 
   listInternal(projectId: string): Promise<InternalConnection[]> {
     return http.getList<InternalConnection>(`${projectUrl(projectId)}/internal`);

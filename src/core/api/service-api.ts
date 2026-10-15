@@ -15,7 +15,8 @@ import type {
 const baseUrl = environment.apiBaseUrl;
 const seg = encodeURIComponent;
 
-/** One connection reference a service's chart schema declares, at any depth.
+/** One connection reference a package's parameter schema (its
+ *  config.schema.json) declares, at any depth.
  *  The deploy form offers a picker for each entry carrying a root `parameter`;
  *  nested references (inside list items) are picked in the list item itself. */
 export interface PackageInput {

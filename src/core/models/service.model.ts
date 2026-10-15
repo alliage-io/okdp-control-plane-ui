@@ -68,7 +68,7 @@ export interface ServiceInstance {
   /** Helm release name, `<project>-<instance>`. */
   releaseName: string;
   service: string;
-  /** Chart version. */
+  /** Package version: the catalog's `catalog/<service>/<version>/`. */
   serviceTag: string;
   /**
    * `Pending` (committed to Git, the GitOps engine has no HelmRelease or
@@ -82,9 +82,10 @@ export interface ServiceInstance {
    */
   statusMessage?: string;
   targetNamespace: string;
-  /** From the instance descriptor; empty until the chart has rendered it. */
+  /** What the instance publishes (its compiled `okdp.instance.yaml`); empty
+   *  until it is compiled, or when it publishes none. */
   url?: string;
-  /** Markdown usage notes from the instance descriptor. */
+  /** Markdown usage notes the instance publishes (`okdp.instance.yaml`). */
   usage?: string;
   parameters: Record<string, unknown>;
   /** The connections the instance is bound to. */

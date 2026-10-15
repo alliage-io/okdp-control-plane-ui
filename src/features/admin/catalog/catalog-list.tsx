@@ -5,7 +5,6 @@ import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
-import { Chips, type ChipsChangeEvent } from 'primereact/chips';
 import { Dropdown } from 'primereact/dropdown';
 import { Checkbox } from 'primereact/checkbox';
 import { Toast } from 'primereact/toast';
@@ -25,6 +24,8 @@ import DeleteConfirmDialog from '../../../shared/components/delete-confirm-dialo
  *  the inputs stay controlled. Mapped to a PlatformServiceRequest on save. */
 interface CatalogForm {
   name: string;
+  /** The service's versions in the catalogs, as the server listed them
+   *  (highest first): the choices of the default, never sent. */
   versions: string[];
   defaultVersion: string;
   description: string;
@@ -73,10 +74,13 @@ export function CatalogList() {
   };
 
   const editService = (s: PlatformService) => {
+    const versions = s.versions ?? [];
     setForm({
       name: s.name,
-      versions: s.versions ?? [],
-      defaultVersion: s.defaultVersion ?? '',
+      versions,
+      // The server reports the highest version as the default when the menu
+      // entry names none: shown as no default, so that saving does not pin it.
+      defaultVersion: s.defaultVersion && s.defaultVersion !== versions[0] ? s.defaultVersion : '',
       description: s.description ?? '',
       icon: s.icon ?? '',
       category: s.category ?? '',
@@ -100,20 +104,8 @@ export function CatalogList() {
 
   const hideDialog = () => setServiceDialog(false);
 
-  // Versions drive the default-version dropdown; drop a default that is no
-  // longer in the list so we never submit an out-of-range default.
-  const onVersionsChange = (e: ChipsChangeEvent) => {
-    const versions = e.value ?? [];
-    setForm((f) => ({
-      ...f,
-      versions,
-      defaultVersion: versions.includes(f.defaultVersion) ? f.defaultVersion : '',
-    }));
-  };
-
   const isValid =
     form.name.trim().length > 0 &&
-    form.versions.length > 0 &&
     (form.defaultVersion === '' || form.versions.includes(form.defaultVersion));
 
   const saveService = () => {
@@ -121,14 +113,13 @@ export function CatalogList() {
       return;
     }
 
+    // The versions are the catalogs': only the menu entry is sent.
     const payload: PlatformServiceRequest = {
       name: form.name.trim(),
-      versions: form.versions,
       defaultVersion: form.defaultVersion || undefined,
       description: form.description.trim() || undefined,
       icon: form.icon.trim() || undefined,
       category: form.category.trim() || undefined,
-      repository: form.repository.trim() || undefined,
       label: form.label.trim() || undefined,
       // Omit when the service exposes a UI (the default); only false is
       // meaningful, marking an infrastructure-only package hidden from the menu.
@@ -225,7 +216,11 @@ export function CatalogList() {
 
           {/* Data Table */}
           <div className="table-wrapper">
-            <DataTable paginator rows={25} paginatorTemplate="PrevPageLink PageLinks NextPageLink" alwaysShowPaginator={false}
+            <DataTable
+              paginator
+              rows={25}
+              paginatorTemplate="PrevPageLink PageLinks NextPageLink"
+              alwaysShowPaginator={false}
               value={services}
               loading={loading}
               globalFilter={globalFilter}
@@ -321,23 +316,6 @@ export function CatalogList() {
           </div>
 
           <div className="field">
-            <label htmlFor="versions">Versions</label>
-            <Chips
-              inputId="versions"
-              value={form.versions}
-              onChange={onVersionsChange}
-              separator=","
-              allowDuplicate={false}
-              addOnBlur
-              className="w-full"
-              placeholder={form.versions.length === 0 ? 'Type a version and press Enter' : ''}
-            />
-            <small className="text-fg-muted">
-              Each version is checked against the OCI registry (quay.io) on save.
-            </small>
-          </div>
-
-          <div className="field">
             <label htmlFor="defaultVersion">
               Default version <span className="optional">(optional)</span>
             </label>
@@ -349,13 +327,17 @@ export function CatalogList() {
                 setForm((f) => ({ ...f, defaultVersion: (e.value as string) ?? '' }))
               }
               className="w-full"
-              placeholder={
-                form.versions.length === 0 ? 'Add a version first' : 'First version (default)'
-              }
+              placeholder="Highest version (default)"
               disabled={form.versions.length === 0}
               showClear
               appendTo={document.body}
             />
+            <small className="text-fg-muted">
+              The versions are the{' '}
+              <span className="mono">catalog/&lt;name&gt;/&lt;version&gt;/</span> directories of the
+              platform&apos;s catalog repositories
+              {isEditMode ? '' : ', listed once the service is added'}.
+            </small>
           </div>
 
           <div className="field">
@@ -404,21 +386,23 @@ export function CatalogList() {
             />
           </div>
 
-          <div className="field">
-            <label htmlFor="repository">
-              Package repository <span className="optional">(optional)</span>
-            </label>
-            <InputText
-              id="repository"
-              value={form.repository}
-              onChange={(e) => setForm((f) => ({ ...f, repository: e.target.value }))}
-              className="w-full dialog-input"
-              placeholder="Override the global registry, e.g., quay.io/okdp/packages-dev"
-            />
-            <small className="text-fg-muted">
-              Leave empty to use the platform's default package repository.
-            </small>
-          </div>
+          {/* The catalog holding the package, as the server found it: a
+              service is in one catalog, nothing to choose. */}
+          {form.repository && (
+            <div className="field">
+              <label htmlFor="repository">Catalog</label>
+              <InputText
+                id="repository"
+                value={form.repository}
+                className="w-full dialog-input mono"
+                disabled
+              />
+              <small className="text-fg-muted">
+                The catalog repository of <span className="mono">platform/catalog.yaml</span>{' '}
+                holding the service&apos;s package.
+              </small>
+            </div>
+          )}
 
           <div className="field">
             <label htmlFor="description">

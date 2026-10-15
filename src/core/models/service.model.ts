@@ -4,13 +4,16 @@ import type { ListEvent } from '../api/sse';
 
 export interface PlatformService {
   name: string;
+  // The directories of the service's package in the catalogs,
+  // `catalog/<name>/<version>/`, highest first.
   versions: string[];
+  // The menu entry's default when the catalogs have it, else the highest.
   defaultVersion: string;
   description: string;
   icon?: string;
   category?: string;
-  // Per-service package repository override (defaults to the Context's global
-  // packageRepository when empty). Versions are resolved against this registry.
+  // The catalog repository (its name in platform/catalog.yaml) holding the
+  // service's package. Read only: a service is in one catalog.
   repository?: string;
   // Display name shown in the console menu; the service `name` (its identity
   // and route) is used when empty.
@@ -38,15 +41,17 @@ export interface MenuCategory {
 
 /**
  * Write payload for the catalog-management endpoints (POST/PUT
- * /api/platform-services). `defaultVersion` is optional on the wire — the
- * server falls back to the first version when it is omitted. The server also
- * validates each version against the OCI registry (quay.io) and rejects the
- * request (400) when a version does not exist. `repository` overrides the
- * package registry for this service; omitted means the global one is used.
+ * /api/platform-services): the service's console menu entry. The service's
+ * package must be in a catalog (400 otherwise). `defaultVersion` is optional
+ * — the highest version is deployed when it is omitted. The versions are the
+ * catalogs': the server checks the ones given (and the default) against them,
+ * a `catalog/<name>/<version>/` directory of a catalog repository, and
+ * rejects the request (400) when one does not exist. Neither `versions` nor
+ * `repository` is stored: the console sends neither.
  */
 export interface PlatformServiceRequest {
   name: string;
-  versions: string[];
+  versions?: string[];
   defaultVersion?: string;
   description?: string;
   icon?: string;

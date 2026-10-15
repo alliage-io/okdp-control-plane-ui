@@ -87,10 +87,10 @@ export interface ServiceInstance {
    */
   statusMessage?: string;
   targetNamespace: string;
-  /** What the instance publishes (its compiled `okdp.instance.yaml`); empty
+  /** What the instance publishes (its compiled `okdp.info.yaml`); empty
    *  until it is compiled, or when it publishes none. */
   url?: string;
-  /** Markdown usage notes the instance publishes (`okdp.instance.yaml`). */
+  /** Markdown usage notes the instance publishes (`okdp.info.yaml`). */
   usage?: string;
   parameters: Record<string, unknown>;
   /** The connections the instance is bound to. */

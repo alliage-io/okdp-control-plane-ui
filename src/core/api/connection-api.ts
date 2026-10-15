@@ -125,7 +125,7 @@ export interface InternalConnection {
   port: number;
   values: ConnectionValues;
   /** True: provided by an instance, read from what it publishes (its
-   *  compiled `okdp.instance.yaml`). */
+   *  compiled `okdp.info.yaml`). */
   managed: boolean;
   createdAt?: string;
 }

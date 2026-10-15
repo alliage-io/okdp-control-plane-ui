@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 /* A small Markdown renderer for the usage notes an instance publishes (its
-   compiled okdp.instance.yaml). It builds React elements (never HTML strings),
+   compiled okdp.info.yaml). It builds React elements (never HTML strings),
    so a package cannot inject markup, and it only covers what those notes use:
    headings, paragraphs, lists, fenced code, inline code, bold, italics, links
    and bare URLs. Anything else is shown as text. */

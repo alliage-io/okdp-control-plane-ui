@@ -117,7 +117,7 @@ export const NAV_CATEGORIES: NavCategory[] = [
   {
     key: 'workflows',
     label: 'Workflows',
-    icon: 'pi-cog',
+    icon: 'pi-sitemap',
     defaultExpanded: true,
     items: [
       {

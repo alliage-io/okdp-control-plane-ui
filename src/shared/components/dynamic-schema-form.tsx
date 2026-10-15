@@ -338,11 +338,11 @@ function ObjectListCell({
   );
 }
 
-/** Root keys of a chart's values schema that are never user parameters: the
- *  platform values, the external connections layered in by the GitOps engine,
- *  and the values slot Helm creates for a library dependency. The server strips
- *  them from the schema it serves; the form drops them too in case it did not. */
-const RESERVED_ROOT_KEYS: ReadonlySet<string> = new Set(['global', 'connections', 'okdp-lib']);
+/** Root keys of a package's parameter schema (its config.schema.json) that are
+ *  never user parameters: the platform values and the connections, both given
+ *  by the context. The server strips them from the schema it serves; the form
+ *  drops them too in case it did not. */
+const RESERVED_ROOT_KEYS: ReadonlySet<string> = new Set(['global', 'connections']);
 
 /** The contract a property references, when it carries the connection marker. */
 function connectionRefContract(def: any): string | undefined {

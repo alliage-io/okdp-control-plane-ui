@@ -59,14 +59,13 @@ describe('DynamicSchemaForm connection references', () => {
     );
   });
 
-  it('never renders the platform, connections or dependency keys', () => {
+  it('never renders the platform or connections keys', () => {
     render(
       <DynamicSchemaForm
         schema={{
           properties: {
             global: { type: 'object' },
             connections: { type: 'object' },
-            'okdp-lib': { type: 'object' },
             numWorkers: { type: 'integer', title: 'Workers', default: 1 },
           },
         }}
@@ -76,7 +75,6 @@ describe('DynamicSchemaForm connection references', () => {
     expect(screen.getByText('Workers')).toBeInTheDocument();
     expect(screen.queryByText(/global/i)).toBeNull();
     expect(screen.queryByText(/connections/i)).toBeNull();
-    expect(screen.queryByText(/okdp/i)).toBeNull();
   });
 
   it('offers connections of the right contract inside list items', async () => {
